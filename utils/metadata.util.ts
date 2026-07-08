@@ -8,9 +8,6 @@ interface MetadataProps {
   noIndex?: boolean;
 }
 
-/**
- * Helper function to generate standardized metadata for any page.
- */
 export function constructMetadata({
   title,
   description = seoConfig.description,
@@ -20,19 +17,17 @@ export function constructMetadata({
   return {
     title: {
       default: seoConfig.title,
-      template: `%s | ${seoConfig.title}`,
+      template: `%s — ${seoConfig.title}`,
     },
     description,
     keywords: seoConfig.keywords,
-    authors: seoConfig.authors,
-    creator: 'MalishaEdu',
     openGraph: {
       type: 'website',
       locale: 'en_US',
-      url: seoConfig.url,
-      title: title ? `${title} | ${seoConfig.title}` : seoConfig.title,
+      url: '/',
+      title: title ? `${title} — ${seoConfig.title}` : seoConfig.title,
       description,
-      siteName: seoConfig.title,
+      siteName: 'SHIFFTO',
       images: [
         {
           url: image,
@@ -44,17 +39,17 @@ export function constructMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: title ? `${title} | ${seoConfig.title}` : seoConfig.title,
+      title: title ? `${title} — ${seoConfig.title}` : seoConfig.title,
       description,
       images: [image],
-      creator: '@malishaedu',
+      creator: seoConfig.twitterHandle,
     },
     icons: {
       icon: '/favicon.ico',
       shortcut: '/favicon.ico',
       apple: '/apple-touch-icon.png',
     },
-    metadataBase: new URL(seoConfig.url),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
     ...(noIndex && {
       robots: {
         index: false,
