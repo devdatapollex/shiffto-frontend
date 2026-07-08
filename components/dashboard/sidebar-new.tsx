@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, LogOut, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DASHBOARD_MENU_ITEMS } from '@/constants/menu-items';
 import { useRole } from '@/hooks/use-role';
+import { useSession, authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/config/routes';
+import { toast } from 'sonner';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,14 +21,23 @@ interface SidebarProps {
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const pathname = usePathname();
   const { role: userRole, hasPermission } = useRole();
-  const role = userRole || 'admin';
+  const { data: session } = useSession();
+  const router = useRouter();
+  const role = userRole || 'user';
   const [isCollapsed, setIsCollapsed] = useState(false);
-  // Close sidebar on mobile when route changes
+
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsOpen(false);
     }
   }, [pathname, setIsOpen]);
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    toast.success('Signed out');
+    router.push(ROUTES.LOGIN);
+    router.refresh();
+  };
 
   const filteredMenu = DASHBOARD_MENU_ITEMS.filter((item) => {
     if (role === 'admin') return true;
@@ -36,7 +48,6 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -49,11 +60,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar Container */}
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out lg:static lg:translate-x-0',
-          'border-primary/5', // Branded border
+          'border-primary/5',
           isCollapsed ? 'w-[80px]' : 'w-[280px]',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
@@ -62,7 +72,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         <div className="flex h-16 items-center justify-between px-6 border-b border-primary/5 bg-primary/[0.02]">
           {!isCollapsed && (
             <span className="text-xl font-bold tracking-tight text-primary drop-shadow-sm">
-              MalishaEdu
+              SHIFFTO
             </span>
           )}
           <Button
@@ -135,18 +145,23 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             )}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-              A
+              {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             {!isCollapsed && (
               <div className="flex flex-1 flex-col overflow-hidden">
-                <span className="truncate text-sm font-semibold">Admin User</span>
-                <span className="truncate text-xs text-muted-foreground">admin@malishaedu.com</span>
+                <span className="truncate text-sm font-semibold">
+                  {session?.user?.name || 'User'}
+                </span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {session?.user?.email || 'user@shiffto.com'}
+                </span>
               </div>
             )}
           </div>
 
           <Button
             variant="ghost"
+            onClick={handleLogout}
             className={cn(
               'mt-2 w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10',
               isCollapsed && 'justify-center px-0'

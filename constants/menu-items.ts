@@ -1,15 +1,15 @@
 import {
   LayoutDashboard,
+  Package,
+  Plane,
+  Wallet,
+  UserCog,
+  Scale,
+  Banknote,
   Users,
-  GraduationCap,
-  Settings,
-  FileText,
-  UserCheck,
-  Building2,
-  BookOpen,
-  PieChart,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { ROUTES } from '@/config/routes';
 
 export interface MenuItem {
   label: string;
@@ -22,56 +22,50 @@ export interface MenuItem {
 export const DASHBOARD_MENU_ITEMS: MenuItem[] = [
   {
     label: 'Dashboard',
-    href: '/dashboard',
+    href: ROUTES.DASHBOARD,
     icon: LayoutDashboard,
-    roles: ['admin', 'branch', 'counselor', 'staff', 'agent', 'student'],
+    roles: ['user', 'admin'],
   },
   {
-    label: 'Universities',
-    href: '/dashboard/universities',
-    icon: GraduationCap,
+    label: 'Shipments',
+    href: ROUTES.SHIPMENTS,
+    icon: Package,
+    roles: ['user', 'admin'],
+  },
+  {
+    label: 'Trips',
+    href: ROUTES.TRIPS,
+    icon: Plane,
+    roles: ['user', 'admin'],
+  },
+  {
+    label: 'Finances',
+    href: ROUTES.FINANCES,
+    icon: Wallet,
+    roles: ['user', 'admin'],
+  },
+  {
+    label: 'Account',
+    href: ROUTES.ACCOUNT,
+    icon: UserCog,
+    roles: ['user', 'admin'],
+  },
+  {
+    label: 'Settlements',
+    href: ROUTES.SETTLEMENTS,
+    icon: Scale,
     roles: ['admin'],
   },
   {
-    label: 'Branch Management',
-    href: '/dashboard/branches',
-    icon: Building2,
+    label: 'Withdrawals',
+    href: ROUTES.WITHDRAWALS,
+    icon: Banknote,
     roles: ['admin'],
   },
   {
-    label: 'Course Catalog',
-    href: '/dashboard/courses',
-    icon: BookOpen,
-    roles: ['admin', 'branch'],
-  },
-  {
-    label: 'Leads Management',
-    href: '/dashboard/leads',
-    icon: FileText,
-    permission: 'lead:manage',
-  },
-  {
-    label: 'Counselors',
-    href: '/dashboard/counselors',
-    icon: UserCheck,
-    roles: ['admin', 'branch'],
-  },
-  {
-    label: 'Users Control',
-    href: '/dashboard/users',
+    label: 'Users',
+    href: ROUTES.USERS,
     icon: Users,
     roles: ['admin'],
-  },
-  {
-    label: 'Reports',
-    href: '/dashboard/reports',
-    icon: PieChart,
-    roles: ['admin'],
-  },
-  {
-    label: 'Settings',
-    href: '/dashboard/settings',
-    icon: Settings,
-    roles: ['admin', 'branch', 'counselor', 'staff', 'agent', 'student'],
   },
 ];

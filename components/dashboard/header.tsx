@@ -1,5 +1,8 @@
 'use client';
 
+import { useSession } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Menu, Bell, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,12 +13,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { authClient } from '@/lib/auth-client';
+import { ROUTES } from '@/config/routes';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 export function DashboardHeader({ onMenuClick }: HeaderProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    toast.success('Signed out');
+    router.push(ROUTES.LOGIN);
+    router.refresh();
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-8">
       <div className="flex items-center gap-4">
@@ -49,12 +64,14 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{session?.user?.name || 'My Account'}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
+              Log out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
