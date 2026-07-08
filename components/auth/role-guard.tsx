@@ -1,6 +1,7 @@
 'use client';
 
-import { useAuthStore, UserRole } from '@/store/auth.store';
+import { useRole } from '@/hooks/use-role';
+import { UserRole } from '@/config/roles.config';
 import { ReactNode } from 'react';
 
 interface RoleGuardProps {
@@ -9,14 +10,10 @@ interface RoleGuardProps {
   fallback?: ReactNode;
 }
 
-/**
- * RoleGuard Component
- * Wraps elements that should only be visible/accessible to specific roles.
- */
 export function RoleGuard({ children, roles, fallback = null }: RoleGuardProps) {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useRole();
 
-  if (!isAuthenticated || !user || !roles.includes(user.role)) {
+  if (!isAuthenticated || !user || !roles.includes(user.role as UserRole)) {
     return fallback;
   }
 

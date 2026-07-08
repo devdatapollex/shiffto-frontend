@@ -1,22 +1,28 @@
-import { useAuthStore } from '@/store/auth.store';
+import { useSession, authClient } from '@/lib/auth-client';
+import type { UserRole } from '@/config/roles.config';
 
-/**
- * Custom hook to easily check user roles and permissions in components.
- */
 export const useRole = () => {
-  const user = useAuthStore((state) => state.user);
+  const { data: session, isPending } = useSession();
+  const role = (session?.user?.role as UserRole) ?? 'user';
+
+  const hasPermission = (permission: string): boolean => {
+    if (role === 'admin') return true;
+    const [resource, action] = permission.split(':');
+    if (!resource || !action) return false;
+    return authClient.admin.checkRolePermission({
+      permissions: { [resource]: [action] },
+      role,
+    });
+  };
 
   return {
-    role: user?.role,
-    isAdmin: user?.role === 'admin',
-    isAgent: user?.role === 'agent',
-    isStudent: user?.role === 'student',
-    user,
-    permissions: user?.permissions || [],
-    hasPermission: (p: string) => {
-      if (user?.role === 'admin') return true;
-      return user?.permissions.includes(p) || false;
-    },
-    checkAccess: (allowedRoles: string[]) => allowedRoles.includes(user?.role || ''),
+    role,
+    isAdmin: role === 'admin',
+    isUser: role === 'user',
+    user: session?.user ?? null,
+    isAuthenticated: !!session,
+    isPending,
+    hasPermission,
+    checkAccess: (allowedRoles: string[]) => allowedRoles.includes(role),
   };
 };

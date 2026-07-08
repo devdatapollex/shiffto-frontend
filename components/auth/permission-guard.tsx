@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuthStore } from '@/store/auth.store';
+import { useRole } from '@/hooks/use-role';
 import { ReactNode } from 'react';
 
 interface PermissionGuardProps {
@@ -9,12 +9,8 @@ interface PermissionGuardProps {
   fallback?: ReactNode;
 }
 
-/**
- * PermissionGuard Component
- * Standardizes UI access control based on granular permissions.
- */
 export function PermissionGuard({ permission, children, fallback = null }: PermissionGuardProps) {
-  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const { hasPermission } = useRole();
 
   if (!hasPermission(permission)) {
     return fallback;
