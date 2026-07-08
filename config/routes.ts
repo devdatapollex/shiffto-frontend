@@ -7,6 +7,7 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   UNAUTHORIZED: '/unauthorized',
+  VERIFY_EMAIL: '/verify',
 
   // Protected Routes (user-facing)
   DASHBOARD: '/dashboard',
@@ -21,6 +22,12 @@ export const ROUTES = {
   USERS: '/dashboard/users',
 } as const;
 
-export const PUBLIC_ROUTES = [ROUTES.HOME, ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.UNAUTHORIZED];
+export const PUBLIC_ROUTES = [
+  ROUTES.HOME,
+  ROUTES.LOGIN,
+  ROUTES.REGISTER,
+  ROUTES.VERIFY_EMAIL,
+  ROUTES.UNAUTHORIZED,
+];
 
 export const DEFAULT_LOGIN_REDIRECT = ROUTES.DASHBOARD;

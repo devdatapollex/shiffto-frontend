@@ -17,3 +17,14 @@ export const registerSchema = z.object({
 });
 
 export type RegisterValues = z.infer<typeof registerSchema>;
+
+export const verifyOtpSchema = z.object({
+  email: z.string().email('Enter a valid email address'),
+  otp: z
+    .string()
+    .min(6, 'Enter the 6-digit code')
+    .max(6, 'Enter the 6-digit code')
+    .regex(/^\d{6}$/, 'Code must be 6 digits'),
+});
+
+export type VerifyOtpValues = z.infer<typeof verifyOtpSchema>;
