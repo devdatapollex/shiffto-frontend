@@ -40,12 +40,16 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values: LoginValues) => {
-    const { error } = await authClient.signIn.email({
+    const { data, error } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
     });
     if (error) {
       toast.error(error.message || 'Failed to sign in');
+      return;
+    }
+    if (data && !data.user.emailVerified) {
+      router.push(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
       return;
     }
     toast.success('Welcome back!');
