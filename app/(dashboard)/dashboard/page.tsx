@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Link href={ROUTES.SHIPMENTS}>
+        <Link href={ROUTES.MY_SHIPMENTS}>
           <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
               <Package className="h-8 w-8 text-primary mb-3" />
@@ -32,7 +32,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href={ROUTES.TRIPS}>
+        <Link href={ROUTES.MY_TRIPS}>
           <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
               <Plane className="h-8 w-8 text-primary mb-3" />
@@ -44,7 +44,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href={ROUTES.SHIPMENTS}>
+        <Link href={ROUTES.BROWSE_SHIPMENT}>
           <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
               <Search className="h-8 w-8 text-primary mb-3" />

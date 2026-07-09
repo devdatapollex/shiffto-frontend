@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, LogOut, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DASHBOARD_MENU_ITEMS } from '@/constants/menu-items';
+import { DASHBOARD_MENU_SECTIONS } from '@/constants/menu-items';
 import { useRole } from '@/hooks/use-role';
 import { useSession, authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -39,12 +39,15 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     router.refresh();
   };
 
-  const filteredMenu = DASHBOARD_MENU_ITEMS.filter((item) => {
-    if (role === 'admin') return true;
-    if (item.permission && hasPermission(item.permission)) return true;
-    if (item.roles && item.roles.includes(role || '')) return true;
-    return false;
-  });
+  const filteredSections = DASHBOARD_MENU_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => {
+      if (role === 'admin') return true;
+      if (item.permission && hasPermission(item.permission)) return true;
+      if (item.roles && item.roles.includes(role || '')) return true;
+      return false;
+    }),
+  })).filter((section) => section.items.length > 0);
 
   return (
     <>
@@ -96,44 +99,57 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
-          {filteredMenu.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+        <nav className="flex-1 space-y-6 px-3 py-4 overflow-y-auto">
+          {filteredSections.map((section, sectionIdx) => (
+            <div key={sectionIdx}>
+              {section.label && !isCollapsed && (
+                <h3 className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
+                  {section.label}
+                </h3>
+              )}
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href;
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                  isActive
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                <Icon
-                  className={cn(
-                    'h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110',
-                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                  )}
-                />
-                {!isCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      )}
+                    >
+                      <Icon
+                        className={cn(
+                          'h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110',
+                          isActive
+                            ? 'text-primary'
+                            : 'text-muted-foreground group-hover:text-foreground'
+                        )}
+                      />
+                      {!isCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
 
-                {isActive && (
-                  <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-full shadow-[0_0_10px_rgba(205,7,30,0.5)]" />
-                )}
-              </Link>
-            );
-          })}
+                      {isActive && (
+                        <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-full shadow-[0_0_10px_rgba(205,7,30,0.5)]" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Footer / User Profile */}

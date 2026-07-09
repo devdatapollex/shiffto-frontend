@@ -1,9 +1,13 @@
 import {
   LayoutDashboard,
   Package,
+  Search,
+  MapPin,
   Plane,
+  DollarSign,
   Wallet,
-  UserCog,
+  Star,
+  LifeBuoy,
   Scale,
   Banknote,
   Users,
@@ -19,53 +23,114 @@ export interface MenuItem {
   permission?: string;
 }
 
-export const DASHBOARD_MENU_ITEMS: MenuItem[] = [
+export interface MenuSection {
+  label?: string;
+  items: MenuItem[];
+}
+
+export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
   {
-    label: 'Dashboard',
-    href: ROUTES.DASHBOARD,
-    icon: LayoutDashboard,
-    roles: ['user', 'admin'],
+    items: [
+      {
+        label: 'Home',
+        href: ROUTES.DASHBOARD,
+        icon: LayoutDashboard,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
     label: 'Shipments',
-    href: ROUTES.SHIPMENTS,
-    icon: Package,
-    roles: ['user', 'admin'],
+    items: [
+      {
+        label: 'My Shipments',
+        href: ROUTES.MY_SHIPMENTS,
+        icon: Package,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Browse Shipment',
+        href: ROUTES.BROWSE_SHIPMENT,
+        icon: Search,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Tracking',
+        href: ROUTES.TRACKING,
+        icon: MapPin,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
     label: 'Trips',
-    href: ROUTES.TRIPS,
-    icon: Plane,
-    roles: ['user', 'admin'],
+    items: [
+      {
+        label: 'My Trips',
+        href: ROUTES.MY_TRIPS,
+        icon: Plane,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Finances',
-    href: ROUTES.FINANCES,
-    icon: Wallet,
-    roles: ['user', 'admin'],
+    label: 'Finance',
+    items: [
+      {
+        label: 'Payment & Earnings',
+        href: ROUTES.PAYMENT_EARNINGS,
+        icon: DollarSign,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Wallet',
+        href: ROUTES.WALLET,
+        icon: Wallet,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Ratings & Reviews',
+        href: ROUTES.RATINGS_REVIEWS,
+        icon: Star,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Account',
-    href: ROUTES.ACCOUNT,
-    icon: UserCog,
-    roles: ['user', 'admin'],
+    items: [
+      {
+        label: 'Support',
+        href: ROUTES.SUPPORT,
+        icon: LifeBuoy,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Settlements',
-    href: ROUTES.SETTLEMENTS,
-    icon: Scale,
-    roles: ['admin'],
-  },
-  {
-    label: 'Withdrawals',
-    href: ROUTES.WITHDRAWALS,
-    icon: Banknote,
-    roles: ['admin'],
-  },
-  {
-    label: 'Users',
-    href: ROUTES.USERS,
-    icon: Users,
-    roles: ['admin'],
+    label: 'Admin',
+    items: [
+      {
+        label: 'Settlements',
+        href: ROUTES.SETTLEMENTS,
+        icon: Scale,
+        roles: ['admin'],
+      },
+      {
+        label: 'Withdrawals',
+        href: ROUTES.WITHDRAWALS,
+        icon: Banknote,
+        roles: ['admin'],
+      },
+      {
+        label: 'Users',
+        href: ROUTES.USERS,
+        icon: Users,
+        roles: ['admin'],
+      },
+    ],
   },
 ];
+
+export const DASHBOARD_MENU_ITEMS: MenuItem[] = DASHBOARD_MENU_SECTIONS.flatMap(
+  (section) => section.items
+);

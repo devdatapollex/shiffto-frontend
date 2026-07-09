@@ -11,10 +11,14 @@ export const ROUTES = {
 
   // Protected Routes (user-facing)
   DASHBOARD: '/dashboard',
-  SHIPMENTS: '/dashboard/shipments',
-  TRIPS: '/dashboard/trips',
-  FINANCES: '/dashboard/finances',
-  ACCOUNT: '/dashboard/account',
+  MY_SHIPMENTS: '/dashboard/my-shipments',
+  BROWSE_SHIPMENT: '/dashboard/browse-shipment',
+  TRACKING: '/dashboard/tracking',
+  MY_TRIPS: '/dashboard/my-trips',
+  PAYMENT_EARNINGS: '/dashboard/payment-earnings',
+  WALLET: '/dashboard/wallet',
+  RATINGS_REVIEWS: '/dashboard/ratings-reviews',
+  SUPPORT: '/dashboard/support',
 
   // Admin-only Routes
   SETTLEMENTS: '/dashboard/settlements',
