@@ -27,4 +27,15 @@ export const verifyOtpSchema = z.object({
     .regex(/^\d{6}$/, 'Code must be 6 digits'),
 });
 
-export type VerifyOtpValues = z.infer<typeof verifyOtpSchema>;
+export const forgotPasswordSchema = z
+  .object({
+    email: z.string().email('Enter a valid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(8, 'Password must be at least 8 characters'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
