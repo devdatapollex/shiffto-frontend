@@ -8,6 +8,8 @@ export const ROUTES = {
   REGISTER: '/register',
   UNAUTHORIZED: '/unauthorized',
   VERIFY_EMAIL: '/verify',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 
   // Protected Routes (user-facing)
   DASHBOARD: '/dashboard',
@@ -31,6 +33,8 @@ export const PUBLIC_ROUTES = [
   ROUTES.LOGIN,
   ROUTES.REGISTER,
   ROUTES.VERIFY_EMAIL,
+  ROUTES.FORGOT_PASSWORD,
+  ROUTES.RESET_PASSWORD,
   ROUTES.UNAUTHORIZED,
 ];
 
