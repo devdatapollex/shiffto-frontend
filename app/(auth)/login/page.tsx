@@ -110,6 +110,14 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
+            <div className="flex justify-end">
+              <Link
+                href={ROUTES.FORGOT_PASSWORD}
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
