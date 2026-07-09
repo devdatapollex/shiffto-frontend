@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
 import { authClient, useSession } from '@/lib/auth-client';
 import { ROUTES } from '@/config/routes';
+import { useSendOtp } from '@/hooks/use-send-otp';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,58 +32,28 @@ function maskEmail(email: string) {
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
+  const email = session?.user?.email ?? '';
+  const emailVerified = session?.user?.emailVerified;
 
-  const paramEmail = searchParams.get('email');
-  const email = paramEmail || session?.user?.email || '';
+  useEffect(() => {
+    if (!isPending && session?.user && emailVerified) {
+      router.replace(ROUTES.DASHBOARD);
+    }
+  }, [isPending, session, emailVerified, router]);
+
+  const {
+    sendOtp,
+    isSending: isResending,
+    cooldown,
+  } = useSendOtp({
+    email,
+    type: 'email-verification',
+    autoSend: !emailVerified,
+  });
 
   const [otp, setOtp] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-
-  const sendOtp = useCallback(
-    async (showToast = true) => {
-      if (!email || isResending || cooldown > 0) return;
-      setIsResending(true);
-      const { error } = await authClient.emailOtp.sendVerificationOtp({
-        email,
-        type: 'email-verification',
-      });
-      setIsResending(false);
-      if (error) {
-        toast.error(error.message || 'Failed to send verification code');
-        return;
-      }
-      if (showToast) {
-        toast.success('Verification code sent!');
-      }
-      setCooldown(60);
-    },
-    [email, isResending, cooldown]
-  );
-
-  useEffect(() => {
-    if (email) {
-      sendOtp(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = setInterval(() => {
-      setCooldown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [cooldown]);
 
   const handleVerify = async () => {
     if (!email || otp.length !== 6) return;
@@ -101,6 +72,14 @@ export default function VerifyEmailPage() {
     router.push(ROUTES.DASHBOARD);
     router.refresh();
   };
+
+  if (isPending || emailVerified) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!email) {
     return (

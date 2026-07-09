@@ -50,18 +50,6 @@ export default function RegisterPage() {
       return;
     }
 
-    toast.success('Account created! We sent a verification code to your email.');
-
-    const { error: otpError } = await authClient.emailOtp.sendVerificationOtp({
-      email: values.email,
-      type: 'email-verification',
-    });
-    if (otpError) {
-      toast.error(
-        'Account created but we could not send the verification code. You can request a new one.'
-      );
-    }
-
     router.push(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
   };
 
