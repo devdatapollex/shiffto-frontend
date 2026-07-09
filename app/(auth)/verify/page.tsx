@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { authClient, useSession } from '@/lib/auth-client';
 import { ROUTES } from '@/config/routes';
 import { useSendOtp } from '@/hooks/use-send-otp';
+import { maskEmail } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,25 +20,16 @@ import {
 } from '@/components/ui/card';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
-function maskEmail(email: string) {
-  const [name, domain] = email.split('@');
-  if (!domain) return email;
-  const maskedName = name.length <= 2 ? name[0] + '**' : name.slice(0, 2) + '••';
-  const domainParts = domain.split('.');
-  const maskedDomain =
-    domainParts[0].length <= 2 ? domainParts[0][0] + '**' : domainParts[0].slice(0, 2) + '••';
-  domainParts[0] = maskedDomain;
-  return maskedName + '@' + domainParts.join('.');
-}
-
 export default function VerifyEmailPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
   const email = session?.user?.email ?? '';
   const emailVerified = session?.user?.emailVerified;
 
+  const successRef = useRef(false);
+
   useEffect(() => {
-    if (!isPending && session?.user && emailVerified) {
+    if (!successRef.current && !isPending && session?.user && emailVerified) {
       router.replace(ROUTES.DASHBOARD);
     }
   }, [isPending, session, emailVerified, router]);
@@ -68,6 +60,7 @@ export default function VerifyEmailPage() {
       setOtp('');
       return;
     }
+    successRef.current = true;
     toast.success('Email verified!');
     router.push(ROUTES.DASHBOARD);
     router.refresh();
