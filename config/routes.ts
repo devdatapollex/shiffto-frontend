@@ -13,6 +13,7 @@ export const ROUTES = {
 
   // Protected Routes (user-facing)
   DASHBOARD: '/dashboard',
+  CREATE_SHIPMENT: '/dashboard/shipments/create',
   MY_SHIPMENTS: '/dashboard/my-shipments',
   BROWSE_SHIPMENT: '/dashboard/browse-shipment',
   TRACKING: '/dashboard/tracking',

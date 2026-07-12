@@ -1,0 +1,53 @@
+import { z } from 'zod';
+
+export const shipmentSchema = z
+  .object({
+    itemName: z.string().min(2, 'Item name is required'),
+    categoryId: z.string().min(1, 'Select a category'),
+    weight: z
+      .number({ message: 'Weight is required' })
+      .positive('Weight must be greater than 0')
+      .max(100, 'Weight cannot exceed 100kg'),
+    quantity: z
+      .number({ message: 'Quantity is required' })
+      .int('Quantity must be a whole number')
+      .positive('Quantity must be at least 1')
+      .max(100, 'Quantity cannot exceed 100'),
+    description: z
+      .string()
+      .min(10, 'Description must be at least 10 characters')
+      .max(500, 'Description is too long'),
+    itemPhotos: z.array(z.string()).max(10, 'Maximum 10 photos'),
+    instructions: z.string().max(500, 'Instructions are too long'),
+
+    fromCountry: z.string().min(1, 'Select origin country'),
+    toCountry: z.string().min(1, 'Select destination country'),
+    pricePerKg: z
+      .number({ message: 'Price is required' })
+      .positive('Price per kg must be greater than 0'),
+    notRestrictedConfirmation: z.boolean().refine((v) => v === true, {
+      message: 'You must confirm items are not restricted',
+    }),
+
+    receiverName: z.string().min(2, 'Receiver name is required'),
+    receiverPhone: z
+      .string()
+      .min(1, 'Phone number is required')
+      .regex(/^\+?\d{6,20}$/, 'Enter a valid phone number'),
+    receiverAddress: z.string().min(10, 'Address must be at least 10 characters'),
+  })
+  .refine((data) => data.fromCountry !== data.toCountry, {
+    message: 'Origin and destination must be different',
+    path: ['toCountry'],
+  });
+
+export type CreateShipmentValues = z.infer<typeof shipmentSchema>;
+
+export const STEP_FIELDS: Record<number, (keyof CreateShipmentValues)[]> = {
+  1: ['itemName', 'categoryId', 'weight', 'quantity', 'description', 'itemPhotos', 'instructions'],
+  2: ['fromCountry', 'toCountry', 'pricePerKg', 'notRestrictedConfirmation'],
+  3: ['receiverName', 'receiverPhone', 'receiverAddress'],
+  4: [],
+};
+
+export type CreateShipmentPayload = Omit<CreateShipmentValues, 'notRestrictedConfirmation'>;
