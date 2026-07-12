@@ -1,3 +1,1 @@
-import { Sidebar } from './sidebar';
-
-export { Sidebar };
+export { Sidebar } from './sidebar-new';

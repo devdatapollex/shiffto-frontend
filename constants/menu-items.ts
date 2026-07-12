@@ -1,15 +1,19 @@
 import {
   LayoutDashboard,
+  Package,
+  Search,
+  MapPin,
+  Plane,
+  DollarSign,
+  Wallet,
+  Star,
+  LifeBuoy,
+  Scale,
+  Banknote,
   Users,
-  GraduationCap,
-  Settings,
-  FileText,
-  UserCheck,
-  Building2,
-  BookOpen,
-  PieChart,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { ROUTES } from '@/config/routes';
 
 export interface MenuItem {
   label: string;
@@ -19,59 +23,114 @@ export interface MenuItem {
   permission?: string;
 }
 
-export const DASHBOARD_MENU_ITEMS: MenuItem[] = [
+export interface MenuSection {
+  label?: string;
+  items: MenuItem[];
+}
+
+export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
   {
-    label: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    roles: ['admin', 'branch', 'counselor', 'staff', 'agent', 'student'],
+    items: [
+      {
+        label: 'Home',
+        href: ROUTES.DASHBOARD,
+        icon: LayoutDashboard,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Universities',
-    href: '/dashboard/universities',
-    icon: GraduationCap,
-    roles: ['admin'],
+    label: 'Shipments',
+    items: [
+      {
+        label: 'My Shipments',
+        href: ROUTES.MY_SHIPMENTS,
+        icon: Package,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Browse Shipment',
+        href: ROUTES.BROWSE_SHIPMENT,
+        icon: Search,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Tracking',
+        href: ROUTES.TRACKING,
+        icon: MapPin,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Branch Management',
-    href: '/dashboard/branches',
-    icon: Building2,
-    roles: ['admin'],
+    label: 'Trips',
+    items: [
+      {
+        label: 'My Trips',
+        href: ROUTES.MY_TRIPS,
+        icon: Plane,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Course Catalog',
-    href: '/dashboard/courses',
-    icon: BookOpen,
-    roles: ['admin', 'branch'],
+    label: 'Finance',
+    items: [
+      {
+        label: 'Payment & Earnings',
+        href: ROUTES.PAYMENT_EARNINGS,
+        icon: DollarSign,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Wallet',
+        href: ROUTES.WALLET,
+        icon: Wallet,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Ratings & Reviews',
+        href: ROUTES.RATINGS_REVIEWS,
+        icon: Star,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Leads Management',
-    href: '/dashboard/leads',
-    icon: FileText,
-    permission: 'lead:manage',
+    items: [
+      {
+        label: 'Support',
+        href: ROUTES.SUPPORT,
+        icon: LifeBuoy,
+        roles: ['user', 'admin'],
+      },
+    ],
   },
   {
-    label: 'Counselors',
-    href: '/dashboard/counselors',
-    icon: UserCheck,
-    roles: ['admin', 'branch'],
-  },
-  {
-    label: 'Users Control',
-    href: '/dashboard/users',
-    icon: Users,
-    roles: ['admin'],
-  },
-  {
-    label: 'Reports',
-    href: '/dashboard/reports',
-    icon: PieChart,
-    roles: ['admin'],
-  },
-  {
-    label: 'Settings',
-    href: '/dashboard/settings',
-    icon: Settings,
-    roles: ['admin', 'branch', 'counselor', 'staff', 'agent', 'student'],
+    label: 'Admin',
+    items: [
+      {
+        label: 'Settlements',
+        href: ROUTES.SETTLEMENTS,
+        icon: Scale,
+        roles: ['admin'],
+      },
+      {
+        label: 'Withdrawals',
+        href: ROUTES.WITHDRAWALS,
+        icon: Banknote,
+        roles: ['admin'],
+      },
+      {
+        label: 'Users',
+        href: ROUTES.USERS,
+        icon: Users,
+        roles: ['admin'],
+      },
+    ],
   },
 ];
+
+export const DASHBOARD_MENU_ITEMS: MenuItem[] = DASHBOARD_MENU_SECTIONS.flatMap(
+  (section) => section.items
+);

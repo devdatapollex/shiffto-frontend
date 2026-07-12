@@ -1,32 +1,18 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/config/env.config';
 import { logger } from './logger';
-import { useAuthStore } from '@/store/auth.store';
 
-/**
- * Global Axios Instance Configuration
- */
 const apiClient: AxiosInstance = axios.create({
   baseURL: env.NEXT_PUBLIC_API_URL,
-  timeout: 15000, // 15 seconds
+  timeout: 15000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-/**
- * Request Interceptor
- * Useful for adding Auth tokens or custom headers before the request is sent
- */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Get token from Zustand store
-    const token = useAuthStore.getState().token;
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
     logger.debug(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
@@ -36,10 +22,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-/**
- * Response Interceptor
- * Standardize error handling and global actions (like logout on 401)
- */
 apiClient.interceptors.response.use(
   (response) => {
     return response;
@@ -55,12 +37,9 @@ apiClient.interceptors.response.use(
       data: error.response?.data,
     });
 
-    // Global handling for specific status codes
     if (status === 401) {
-      // Logic for unauthorized: Clear local storage/session and redirect to login
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-        // window.location.href = '/login'; // Uncomment and adjust as needed
+        window.location.href = '/login';
       }
     }
 

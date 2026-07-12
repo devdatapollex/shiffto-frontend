@@ -1,6 +1,5 @@
 /**
- * Centralized Route Configuration
- * Managing all application routes in one place to avoid hardcoded strings.
+ * Centralized Route Configuration for SHIFFTO User Panel.
  */
 export const ROUTES = {
   // Public Routes
@@ -8,39 +7,35 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   UNAUTHORIZED: '/unauthorized',
+  VERIFY_EMAIL: '/verify',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 
-  // Protected Routes
+  // Protected Routes (user-facing)
   DASHBOARD: '/dashboard',
-  PROFILE: '/dashboard/profile',
-  SETTINGS: '/dashboard/settings',
+  MY_SHIPMENTS: '/dashboard/my-shipments',
+  BROWSE_SHIPMENT: '/dashboard/browse-shipment',
+  TRACKING: '/dashboard/tracking',
+  MY_TRIPS: '/dashboard/my-trips',
+  PAYMENT_EARNINGS: '/dashboard/payment-earnings',
+  WALLET: '/dashboard/wallet',
+  RATINGS_REVIEWS: '/dashboard/ratings-reviews',
+  SUPPORT: '/dashboard/support',
 
-  // Role-based Routes (examples)
-  ADMIN: {
-    DASHBOARD: '/admin/dashboard',
-    USERS: '/admin/users',
-  },
-  AGENT: {
-    DASHBOARD: '/agent/dashboard',
-  },
-  STUDENT: {
-    DASHBOARD: '/student/dashboard',
-    APPLICATIONS: '/student/applications',
-  },
+  // Admin-only Routes
+  SETTLEMENTS: '/dashboard/settlements',
+  WITHDRAWALS: '/dashboard/withdrawals',
+  USERS: '/dashboard/users',
 } as const;
 
-/**
- * List of public routes that do not require authentication.
- * Used by Middleware to allow access.
- */
 export const PUBLIC_ROUTES = [
   ROUTES.HOME,
   ROUTES.LOGIN,
   ROUTES.REGISTER,
+  ROUTES.VERIFY_EMAIL,
+  ROUTES.FORGOT_PASSWORD,
+  ROUTES.RESET_PASSWORD,
   ROUTES.UNAUTHORIZED,
-  ROUTES.DASHBOARD, // Whitelisted for starter template development
 ];
 
-/**
- * Default redirect path after successful login.
- */
 export const DEFAULT_LOGIN_REDIRECT = ROUTES.DASHBOARD;
