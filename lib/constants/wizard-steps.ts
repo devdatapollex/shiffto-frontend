@@ -12,3 +12,10 @@ export const WIZARD_STEPS: WizardStep[] = [
   { id: 4, name: 'Review', subtitle: 'Step 4/5 : Review', inactive: false },
   { id: 5, name: 'Payment', subtitle: 'Step 5/5 : Payment', inactive: true },
 ];
+
+export const TRIP_WIZARD_STEPS: WizardStep[] = [
+  { id: 1, name: 'Flight details', subtitle: 'Step 1/4 : Flight details', inactive: false },
+  { id: 2, name: 'Upload ticket', subtitle: 'Step 2/4 : Upload ticket', inactive: false },
+  { id: 3, name: 'Luggage capacity', subtitle: 'Step 3/4 : Luggage capacity', inactive: false },
+  { id: 4, name: 'Review', subtitle: 'Step 4/4 : Review', inactive: false },
+];

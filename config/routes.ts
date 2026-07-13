@@ -17,6 +17,7 @@ export const ROUTES = {
   MY_SHIPMENTS: '/dashboard/my-shipments',
   BROWSE_SHIPMENT: '/dashboard/browse-shipment',
   TRACKING: '/dashboard/tracking',
+  CREATE_TRIP: '/dashboard/trips/create',
   MY_TRIPS: '/dashboard/my-trips',
   PAYMENT_EARNINGS: '/dashboard/payment-earnings',
   WALLET: '/dashboard/wallet',
