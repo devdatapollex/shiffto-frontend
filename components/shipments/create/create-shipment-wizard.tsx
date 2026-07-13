@@ -90,7 +90,8 @@ export function CreateShipmentWizard() {
 
   useEffect(() => {
     const subscription = form.watch((data) => {
-      updateFormData(data as Partial<CreateShipmentValues>);
+      const { otp: _otp, ...rest } = data;
+      updateFormData(rest as Partial<CreateShipmentValues>);
     });
     return () => subscription.unsubscribe();
   }, [form, updateFormData]);
