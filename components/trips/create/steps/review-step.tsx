@@ -17,7 +17,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
   const fromCountry = getCountryByCode(values.fromCountry);
   const toCountry = getCountryByCode(values.toCountry);
 
-  const formattedDate = values.flightDate
+    const formattedDate = values.flightDate
     ? new Date(values.flightDate).toLocaleDateString('en-US', {
         weekday: 'short',
         year: 'numeric',
@@ -25,6 +25,23 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
         day: 'numeric',
       })
     : '';
+
+  const formatTimeString = (timeStr: string | null | undefined) => {
+    if (!timeStr) return 'Not specified';
+    try {
+      const [hoursStr, minutesStr] = timeStr.split(':');
+      const hours = parseInt(hoursStr, 10);
+      const minutes = parseInt(minutesStr, 10);
+      if (isNaN(hours) || isNaN(minutes)) return timeStr;
+      
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      return `${displayHours}:${displayMinutes} ${ampm}`;
+    } catch (e) {
+      return timeStr;
+    }
+  };
 
   const isPdf = values.ticketPhoto?.toLowerCase().endsWith('.pdf');
 
@@ -102,11 +119,11 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
           </div>
           <div className="flex flex-col">
             <span className="text-slate-400 text-xs font-semibold">Flight time</span>
-            <strong className="text-slate-700 font-semibold mt-1">{values.flightTime || 'N/A'}</strong>
+            <strong className="text-slate-700 font-semibold mt-1">{formatTimeString(values.flightTime)}</strong>
           </div>
           <div className="flex flex-col">
             <span className="text-slate-400 text-xs font-semibold">Arrival time</span>
-            <strong className="text-slate-700 font-semibold mt-1">{values.airportArrivalTime || 'N/A'}</strong>
+            <strong className="text-slate-700 font-semibold mt-1">{formatTimeString(values.airportArrivalTime)}</strong>
           </div>
         </div>
       </div>

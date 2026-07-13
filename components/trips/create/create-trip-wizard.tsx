@@ -115,6 +115,19 @@ export function CreateTripWizard() {
       };
 
       await createTripApi(payload);
+      
+      // Save to localStorage recent_flights
+      try {
+        const existing = localStorage.getItem('recent_flights');
+        let flights: string[] = existing ? JSON.parse(existing) : [];
+        flights = flights.filter((f) => f !== payload.flightNumber);
+        flights.unshift(payload.flightNumber);
+        flights = flights.slice(0, 4);
+        localStorage.setItem('recent_flights', JSON.stringify(flights));
+      } catch (e) {
+        console.error('Error saving recent flight to localStorage:', e);
+      }
+
       toast.success('Trip submitted successfully');
       resetWizard();
       setIsSuccess(true);

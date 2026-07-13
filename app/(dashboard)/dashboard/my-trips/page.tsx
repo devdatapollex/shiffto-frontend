@@ -702,7 +702,7 @@ export default function MyTripsPage() {
           {selectedViewTrip && (() => {
             const fromCountry = getCountryByCode(selectedViewTrip.fromCountry);
             const toCountry = getCountryByCode(selectedViewTrip.toCountry);
-            const tripIdLabel = `#TR-${selectedViewTrip.id.slice(0, 8).toUpperCase()}`;
+            const tripIdLabel = `#TR-${selectedViewTrip.id.slice(0, 4).toUpperCase()}`;
 
             const cabinUsed = selectedViewTrip.cabinBagCapacity - selectedViewTrip.remainingCabinCapacity;
             const cabinPercentage = selectedViewTrip.cabinBagCapacity > 0 

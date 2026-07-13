@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -14,11 +15,26 @@ import { COUNTRIES, getCountryByCode } from '@/lib/constants/countries';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import type { CreateTripValues } from '@/lib/validations/trip';
 import { ArrowLeftRight } from 'lucide-react';
-
-const RECENT_FLIGHTS = ['BG - 0306', 'BG - 0307', 'BG - 0308', 'BG - 0309'];
+import { DatePicker, TimePicker } from '@/components/ui/custom-picker';
 
 export function FlightDetailsStep() {
   const { control, setValue, watch } = useFormContext<CreateTripValues>();
+  const [recentFlights, setRecentFlights] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('recent_flights');
+      if (stored) {
+        setRecentFlights(JSON.parse(stored));
+      } else {
+        const defaultFlights = ['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309'];
+        setRecentFlights(defaultFlights);
+        localStorage.setItem('recent_flights', JSON.stringify(defaultFlights));
+      }
+    } catch (e) {
+      setRecentFlights(['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309']);
+    }
+  }, []);
 
   const fromCountry = watch('fromCountry');
   const toCountry = watch('toCountry');
@@ -50,19 +66,21 @@ export function FlightDetailsStep() {
                 {...field}
               />
             </FormControl>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="text-xs text-slate-400 font-medium mr-1">Recently used:</span>
-              {RECENT_FLIGHTS.map((flight) => (
-                <button
-                  key={flight}
-                  type="button"
-                  onClick={() => handlePillClick(flight)}
-                  className="px-3 py-1 text-xs rounded-full border border-slate-200 hover:border-orange-500 hover:text-orange-500 transition-colors font-medium bg-slate-50 text-slate-600"
-                >
-                  {flight}
-                </button>
-              ))}
-            </div>
+            {recentFlights.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <span className="text-xs text-slate-400 font-medium mr-1">Recently used:</span>
+                {recentFlights.map((flight) => (
+                  <button
+                    key={flight}
+                    type="button"
+                    onClick={() => handlePillClick(flight)}
+                    className="px-3 py-1 text-xs rounded-full border border-slate-200 hover:border-orange-500 hover:text-orange-500 transition-colors font-medium bg-slate-50 text-slate-600"
+                  >
+                    {flight}
+                  </button>
+                ))}
+              </div>
+            )}
             <FormMessage />
           </FormItem>
         )}
@@ -164,14 +182,10 @@ export function FlightDetailsStep() {
                 Departure Date <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input
-                  type="date"
-                  className="h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg"
-                  value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
-                  onChange={(e) => {
-                    const dateVal = e.target.value ? new Date(e.target.value) : undefined;
-                    field.onChange(dateVal);
-                  }}
+                <DatePicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select departure date"
                 />
               </FormControl>
               <FormMessage />
@@ -189,10 +203,10 @@ export function FlightDetailsStep() {
                 Departure Time <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input
-                  type="time"
-                  className="h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg"
-                  {...field}
+                <TimePicker
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  placeholder="Select departure time"
                 />
               </FormControl>
               <FormMessage />
@@ -210,10 +224,10 @@ export function FlightDetailsStep() {
                 Airport Arrival Time
               </FormLabel>
               <FormControl>
-                <Input
-                  type="time"
-                  className="h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg"
-                  {...field}
+                <TimePicker
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  placeholder="Select arrival time"
                 />
               </FormControl>
               <FormMessage />
