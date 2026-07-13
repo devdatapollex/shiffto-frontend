@@ -1,83 +1,63 @@
 'use client';
 
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { WIZARD_STEPS, type WizardStep } from '@/lib/constants/wizard-steps';
+import { WIZARD_STEPS } from '@/lib/constants/wizard-steps';
 
 interface StepperProps {
   currentStep: number;
   completedSteps: number[];
 }
 
-function StepperNode({
-  step,
-  isCompleted,
-  isCurrent,
-  isInactive,
-}: {
-  step: WizardStep;
-  isCompleted: boolean;
-  isCurrent: boolean;
-  isInactive: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        'flex flex-col items-center gap-1.5 flex-1 min-w-0',
-        isInactive && 'opacity-40'
-      )}
-    >
-      <div
-        className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors',
-          isCompleted && 'bg-primary text-primary-foreground',
-          isCurrent && 'border-2 border-primary bg-primary/10 text-primary',
-          !isCompleted && !isCurrent && 'border border-border text-muted-foreground'
-        )}
-      >
-        {isCompleted ? <Check className="h-4 w-4" /> : step.id}
-      </div>
-      <span
-        className={cn(
-          'text-xs text-center hidden sm:block',
-          isCurrent && 'text-primary font-medium',
-          isCompleted && 'text-foreground',
-          !isCompleted && !isCurrent && 'text-muted-foreground'
-        )}
-      >
-        {step.name}
-      </span>
-    </div>
-  );
-}
-
-function ProgressLine({ isFilled }: { isFilled: boolean }) {
-  return (
-    <div className="flex-1 px-1 mt-[-10px]">
-      <div className={cn('h-0.5 rounded-full', isFilled ? 'bg-primary' : 'bg-border')} />
-    </div>
-  );
-}
-
 export function Stepper({ currentStep, completedSteps }: StepperProps) {
+  // Only show active wizard steps (e.g. filter out Payment which is inactive)
+  const stepsToShow = WIZARD_STEPS.filter((step) => !step.inactive);
+
   return (
-    <div className="flex items-start justify-between gap-0.5">
-      {WIZARD_STEPS.map((step, index) => {
+    <div className="bg-[#0B3A8E] rounded-xl p-4 md:p-6 flex items-center justify-between gap-4 w-full">
+      {stepsToShow.map((step) => {
         const isCompleted = completedSteps.includes(step.id);
         const isCurrent = step.id === currentStep;
-        const isInactive = step.inactive;
-        const isLast = index === WIZARD_STEPS.length - 1;
-        const showLine = !isLast && !step.inactive;
+
+        // Custom colors for state transitions matching the mock-up:
+        // - Completed step: Green text, Green dot, Green line
+        // - Current step: White text, White dot, White line
+        // - Upcoming step: Muted gray-blue text, dot, line
+        let textColorClass = 'text-[#7A94C6]';
+        let dotColorClass = 'bg-[#7A94C6]';
+        let barColorClass = 'bg-[#2D5299]';
+
+        if (isCompleted) {
+          textColorClass = 'text-[#00E575]';
+          dotColorClass = 'bg-[#00E575]';
+          barColorClass = 'bg-[#00E575]';
+        } else if (isCurrent) {
+          textColorClass = 'text-white';
+          dotColorClass = 'bg-white';
+          barColorClass = 'bg-white';
+        }
 
         return (
-          <div key={step.id} className="flex items-start flex-1 min-w-0">
-            <StepperNode
-              step={step}
-              isCompleted={isCompleted}
-              isCurrent={isCurrent}
-              isInactive={isInactive}
+          <div key={step.id} className="flex-1 flex flex-col items-center gap-2">
+            <span
+              className={cn(
+                'text-xs font-semibold tracking-wide text-center transition-colors duration-200',
+                textColorClass
+              )}
+            >
+              {step.name}
+            </span>
+            <div
+              className={cn(
+                'h-1.5 w-1.5 rounded-full transition-colors duration-200',
+                dotColorClass
+              )}
             />
-            {showLine && <ProgressLine isFilled={isCompleted || isCurrent} />}
+            <div
+              className={cn(
+                'h-2 w-full rounded-full transition-colors duration-200',
+                barColorClass
+              )}
+            />
           </div>
         );
       })}

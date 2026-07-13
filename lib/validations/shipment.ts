@@ -4,15 +4,11 @@ export const shipmentSchema = z
   .object({
     itemName: z.string().min(2, 'Item name is required'),
     categoryId: z.string().min(1, 'Select a category'),
-    weight: z
-      .number({ message: 'Weight is required' })
-      .positive('Weight must be greater than 0')
-      .max(100, 'Weight cannot exceed 100kg'),
+    weight: z.number({ message: 'Weight is required' }).positive('Weight must be greater than 0'),
     quantity: z
       .number({ message: 'Quantity is required' })
       .int('Quantity must be a whole number')
-      .positive('Quantity must be at least 1')
-      .max(100, 'Quantity cannot exceed 100'),
+      .positive('Quantity must be at least 1'),
     description: z
       .string()
       .min(10, 'Description must be at least 10 characters')
@@ -24,16 +20,18 @@ export const shipmentSchema = z
     toCountry: z.string().min(1, 'Select destination country'),
     pricePerKg: z
       .number({ message: 'Price is required' })
-      .positive('Price per kg must be greater than 0'),
+      .positive('Price must be greater than $0'),
     notRestrictedConfirmation: z.boolean().refine((v) => v === true, {
       message: 'You must confirm items are not restricted',
     }),
 
     receiverName: z.string().min(2, 'Receiver name is required'),
-    receiverPhone: z
+    receiverPhone: z.string().min(1, 'Phone number is required'),
+    receiverPhoneExt: z.string().min(1, 'Extension is required'),
+    receiverPhoneNum: z
       .string()
       .min(1, 'Phone number is required')
-      .regex(/^\+?\d{6,20}$/, 'Enter a valid phone number'),
+      .regex(/^\d{5,15}$/, 'Enter a valid phone number'),
     receiverAddress: z.string().min(10, 'Address must be at least 10 characters'),
   })
   .refine((data) => data.fromCountry !== data.toCountry, {
@@ -46,8 +44,11 @@ export type CreateShipmentValues = z.infer<typeof shipmentSchema>;
 export const STEP_FIELDS: Record<number, (keyof CreateShipmentValues)[]> = {
   1: ['itemName', 'categoryId', 'weight', 'quantity', 'description', 'itemPhotos', 'instructions'],
   2: ['fromCountry', 'toCountry', 'pricePerKg', 'notRestrictedConfirmation'],
-  3: ['receiverName', 'receiverPhone', 'receiverAddress'],
+  3: ['receiverName', 'receiverPhoneExt', 'receiverPhoneNum', 'receiverAddress'],
   4: [],
 };
 
-export type CreateShipmentPayload = Omit<CreateShipmentValues, 'notRestrictedConfirmation'>;
+export type CreateShipmentPayload = Omit<
+  CreateShipmentValues,
+  'notRestrictedConfirmation' | 'receiverPhoneExt' | 'receiverPhoneNum'
+>;

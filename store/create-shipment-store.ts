@@ -16,6 +16,8 @@ const INITIAL_FORM_DATA: Partial<CreateShipmentValues> = {
   notRestrictedConfirmation: false,
   receiverName: '',
   receiverPhone: '',
+  receiverPhoneExt: '',
+  receiverPhoneNum: '',
   receiverAddress: '',
 };
 

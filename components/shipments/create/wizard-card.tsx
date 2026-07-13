@@ -47,19 +47,26 @@ export function WizardCard({
       <Stepper currentStep={currentStep} completedSteps={completedSteps} />
 
       <Card className="shadow-sm">
-        <CardHeader className="flex-row items-start justify-between space-y-0 pb-4">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Package className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle>Create a new shipment</CardTitle>
-              <CardDescription className="mt-1">{step.subtitle}</CardDescription>
-            </div>
+        <CardHeader className="flex flex-col gap-4 px-6 pt-6 pb-5 space-y-0">
+          <div className="flex w-full items-center justify-between">
+            <Package className="h-10 w-10 text-primary stroke-[1.5]" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-10 w-10 text-slate-400 hover:text-slate-600 hover:bg-transparent shrink-0"
+            >
+              <X className="size-6 stroke-[3]" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="shrink-0">
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="space-y-1">
+            <CardTitle className="text-2xl font-semibold text-[#0B3A8E] tracking-tight">
+              Create a new shipment
+            </CardTitle>
+            <CardDescription className="text-[#6B7280] text-sm md:text-base font-normal mt-1">
+              {step.subtitle}
+            </CardDescription>
+          </div>
         </CardHeader>
 
         <Separator />

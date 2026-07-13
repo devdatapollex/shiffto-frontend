@@ -6,6 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { getCountryByCode } from '@/lib/constants/countries';
+import { useCategories } from '@/hooks/use-categories';
+
 import {
   shipmentSchema,
   STEP_FIELDS,
@@ -27,11 +30,12 @@ import { ReviewStep } from '@/components/shipments/create/steps/review-step';
 function WizardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="flex gap-1">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="bg-[#0B3A8E] rounded-xl p-4 md:p-6 flex justify-between gap-4 w-full animate-pulse">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
-            <div className="h-3 w-16 bg-muted animate-pulse rounded hidden sm:block" />
+            <div className="h-3 w-20 bg-white/20 rounded animate-pulse" />
+            <div className="h-1.5 w-1.5 rounded-full bg-white/20 animate-pulse" />
+            <div className="h-2 w-full rounded-full bg-white/10 animate-pulse" />
           </div>
         ))}
       </div>
@@ -75,6 +79,7 @@ export function CreateShipmentWizard() {
   });
 
   const { mutateAsync, isPending } = useCreateShipment();
+  const { data: categories } = useCategories();
 
   useEffect(() => {
     setMounted(true);
@@ -95,6 +100,60 @@ export function CreateShipmentWizard() {
     const fields = STEP_FIELDS[step] ?? [];
     const valid = await form.trigger(fields);
     if (!valid) return;
+
+    if (step === 1) {
+      const categoryId = form.getValues('categoryId');
+      const weight = form.getValues('weight');
+      const quantity = form.getValues('quantity');
+      const category = categories?.find((c) => c.id === categoryId);
+      if (category) {
+        if (
+          typeof weight === 'number' &&
+          weight > 0 &&
+          category.maxWeight !== null &&
+          weight > category.maxWeight
+        ) {
+          form.setError('weight', {
+            type: 'manual',
+            message: `Weight cannot exceed ${category.maxWeight}kg for this category`,
+          });
+          return;
+        }
+        if (
+          typeof quantity === 'number' &&
+          quantity > 0 &&
+          category.maxQuantity !== null &&
+          quantity > category.maxQuantity
+        ) {
+          form.setError('quantity', {
+            type: 'manual',
+            message: `Quantity cannot exceed ${category.maxQuantity} for this category`,
+          });
+          return;
+        }
+      }
+    }
+
+    if (step === 2) {
+      const categoryId = form.getValues('categoryId');
+      const pricePerKg = form.getValues('pricePerKg');
+      const category = categories?.find((c) => c.id === categoryId);
+      if (category && typeof pricePerKg === 'number' && pricePerKg > 0) {
+        const { minPrice, maxPrice } = category;
+        const below = minPrice !== null && pricePerKg < minPrice;
+        const above = maxPrice !== null && pricePerKg > maxPrice;
+        if (below || above) {
+          const minStr = minPrice !== null ? `$${minPrice}` : '$0';
+          const maxStr = maxPrice !== null ? `$${maxPrice}` : 'any amount';
+          form.setError('pricePerKg', {
+            type: 'manual',
+            message: `Price must be between ${minStr} and ${maxStr}`,
+          });
+          return;
+        }
+      }
+    }
+
     markStepComplete(step);
     setStep(step + 1);
   };
@@ -108,7 +167,16 @@ export function CreateShipmentWizard() {
   };
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    const { notRestrictedConfirmation: _, ...payload } = values;
+    const { notRestrictedConfirmation: _, receiverPhoneExt, receiverPhoneNum, ...rest } = values;
+
+    const country = getCountryByCode(receiverPhoneExt || '');
+    const callingCode = country?.callingCode ?? '';
+    const mergedPhone = `${callingCode}${receiverPhoneNum || ''}`;
+
+    const payload: CreateShipmentPayload = {
+      ...rest,
+      receiverPhone: mergedPhone,
+    };
 
     try {
       await mutateAsync(payload);

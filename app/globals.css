@@ -84,7 +84,7 @@
     --foreground: hsla(219, 81%, 31%, 1);
     --card: hsla(0, 0%, 100%, 1);
     --card-foreground: hsla(219, 81%, 31%, 1);
-    --popover: hsla(0, 0%, 100%, 0.8);
+    --popover: hsla(0, 0%, 100%, 1);
     --popover-foreground: hsla(0, 0%, 32%, 1);
     --primary: hsla(21, 88%, 54%, 1);
     --primary-foreground: hsl(0 0% 100%);

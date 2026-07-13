@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   FormField,
@@ -24,8 +25,52 @@ import { PhotoDropzone } from '../photo-dropzone';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 
 export function ItemDetailsStep() {
-  const { control } = useFormContext<CreateShipmentValues>();
+  const { control, watch, setError, clearErrors } = useFormContext<CreateShipmentValues>();
   const { data: categories, isLoading } = useCategories();
+
+  const categoryId = watch('categoryId');
+  const weight = watch('weight');
+  const quantity = watch('quantity');
+
+  const selectedCategory = categories?.find((c) => c.id === categoryId);
+  const maxWeight = selectedCategory?.maxWeight ?? null;
+  const maxQuantity = selectedCategory?.maxQuantity ?? null;
+
+  useEffect(() => {
+    if (typeof weight !== 'number' || weight <= 0) {
+      clearErrors('weight');
+      return;
+    }
+    if (!selectedCategory || maxWeight === null) {
+      return;
+    }
+    if (weight > maxWeight) {
+      setError('weight', {
+        type: 'manual',
+        message: `Weight cannot exceed ${maxWeight}kg for this category`,
+      });
+    } else {
+      clearErrors('weight');
+    }
+  }, [weight, selectedCategory, maxWeight, setError, clearErrors]);
+
+  useEffect(() => {
+    if (typeof quantity !== 'number' || quantity <= 0) {
+      clearErrors('quantity');
+      return;
+    }
+    if (!selectedCategory || maxQuantity === null) {
+      return;
+    }
+    if (quantity > maxQuantity) {
+      setError('quantity', {
+        type: 'manual',
+        message: `Quantity cannot exceed ${maxQuantity} for this category`,
+      });
+    } else {
+      clearErrors('quantity');
+    }
+  }, [quantity, selectedCategory, maxQuantity, setError, clearErrors]);
 
   return (
     <div className="space-y-4">
@@ -35,7 +80,9 @@ export function ItemDetailsStep() {
           name="itemName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Item Name</FormLabel>
+              <FormLabel>
+                Item Name <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input placeholder="e.g. iPhone 15 Pro Max" {...field} />
               </FormControl>
@@ -49,16 +96,18 @@ export function ItemDetailsStep() {
           name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>
+                Category <span className="text-red-500">*</span>
+              </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
+                <FormControl className="w-full">
                   <SelectTrigger>
                     <SelectValue
                       placeholder={isLoading ? 'Loading categories...' : 'Select category'}
                     />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent position="popper">
                   {isLoading && (
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -83,7 +132,9 @@ export function ItemDetailsStep() {
           name="weight"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
-              <FormLabel>Weight</FormLabel>
+              <FormLabel>
+                Weight <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
@@ -114,7 +165,9 @@ export function ItemDetailsStep() {
           name="quantity"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
-              <FormLabel>Quantity</FormLabel>
+              <FormLabel>
+                Quantity <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -140,7 +193,9 @@ export function ItemDetailsStep() {
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>
+              Description <span className="text-red-500">*</span>
+            </FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Describe your item (condition, brand, specifications...)"
@@ -159,7 +214,9 @@ export function ItemDetailsStep() {
         name="itemPhotos"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Item Photos</FormLabel>
+            <FormLabel>
+              Item Photos <span className="text-red-500">*</span>
+            </FormLabel>
             <FormControl>
               <PhotoDropzone value={field.value} onChange={field.onChange} />
             </FormControl>
@@ -174,7 +231,10 @@ export function ItemDetailsStep() {
         name="instructions"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Special Instructions</FormLabel>
+            <FormLabel>
+              Special Instructions{' '}
+              <span className="text-muted-foreground font-light">(Optional)</span>
+            </FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Any special handling or delivery instructions..."
@@ -182,7 +242,6 @@ export function ItemDetailsStep() {
                 {...field}
               />
             </FormControl>
-            <FormDescription>Optional</FormDescription>
             <FormMessage />
           </FormItem>
         )}

@@ -11,11 +11,21 @@ import {
 } from '@/components/ui/dialog';
 import { RESTRICTED_ITEMS } from '@/lib/constants/restricted-items';
 
-export function RestrictedItemsDialog() {
+interface RestrictedItemsDialogProps {
+  className?: string;
+}
+
+export function RestrictedItemsDialog({ className }: RestrictedItemsDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button type="button" className="text-primary underline underline-offset-2 text-sm">
+        <button
+          type="button"
+          className={
+            className ||
+            'text-primary underline underline-offset-2 text-sm hover:opacity-80 transition-opacity'
+          }
+        >
           Restricted Items List
         </button>
       </DialogTrigger>

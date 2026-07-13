@@ -2,12 +2,9 @@
 
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Package, Plane } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Package, Plane, Pencil } from 'lucide-react';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { CountryFlag } from '../country-flag';
 import { useCategories } from '@/hooks/use-categories';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 
@@ -34,102 +31,126 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
   const categoryLabel = category?.name ?? 'Unknown';
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle className="text-base">Product Details</CardTitle>
-          <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(1)}>
-            Edit
-          </Button>
-        </CardHeader>
-        <Separator />
-        <CardContent className="pt-3">
-          <div className="flex gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border bg-muted">
-              {values.itemPhotos.length > 0 ? (
-                <img
-                  src={values.itemPhotos[0]}
-                  alt={values.itemName}
-                  className="h-full w-full rounded-lg object-cover"
-                />
-              ) : (
-                <Package className="h-8 w-8 text-muted-foreground" />
-              )}
-            </div>
+    <div className="space-y-6">
+      {/* Product Details Card */}
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[#8292a1] text-lg font-medium">Product details</h3>
+          <button
+            type="button"
+            onClick={() => onEdit(1)}
+            className="text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-0 cursor-pointer p-1 -m-1"
+          >
+            <Pencil className="h-5 w-5" />
+          </button>
+        </div>
 
-            <div className="min-w-0 space-y-2">
-              <div className="flex flex-wrap gap-1.5">
-                <Badge variant="secondary">{categoryLabel}</Badge>
-                <Badge variant="secondary">&check; Not Restricted</Badge>
-              </div>
-
-              <h3 className="font-semibold text-lg">{values.itemName}</h3>
-
-              <p className="text-sm text-muted-foreground">
-                {Number(values.weight)} Kg &bull; {Number(values.quantity)} pcs
-              </p>
-
-              <p className="text-sm text-muted-foreground line-clamp-3">{values.description}</p>
-
-              {values.instructions && (
-                <p className="mt-2 text-sm text-muted-foreground italic">
-                  &quot;{values.instructions}&quot;
-                </p>
-              )}
-            </div>
+        <div className="flex gap-6 items-start">
+          <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
+            {values.itemPhotos.length > 0 ? (
+              <img
+                src={values.itemPhotos[0]}
+                alt={values.itemName}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <Package className="h-10 w-10 text-slate-400" />
+            )}
           </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle className="text-base">Route &amp; Pricing</CardTitle>
-          <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(2)}>
-            Edit
-          </Button>
-        </CardHeader>
-        <Separator />
-        <CardContent className="pt-3 space-y-4">
-          <div className="flex items-center justify-center gap-0">
-            <div className="flex flex-col items-center text-center min-w-0 flex-1">
-              <span className="text-xs text-muted-foreground">From</span>
-              <span className="text-2xl mt-1">{fromCountry?.flag ?? '🌍'}</span>
-              <span className="text-sm font-medium mt-0.5 truncate max-w-full">
-                {fromCountry?.name ?? 'Select origin'}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="bg-[#F5F3FF] border border-[#E9D5FF] text-[#7C3AED] text-xs font-semibold px-2.5 py-0.5 rounded-md">
+                {categoryLabel}
+              </span>
+              <span className="bg-[#ECFDF5] border border-[#D1FAE5] text-[#059669] text-xs font-semibold px-2.5 py-0.5 rounded-md">
+                Non-restricted
               </span>
             </div>
 
-            <div className="flex items-center flex-1 px-2">
-              <div className="border-t border-dashed border-border flex-1" />
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <Plane className="h-5 w-5 text-primary" />
-              </div>
-              <div className="border-t border-dashed border-border flex-1" />
-            </div>
+            <h4 className="text-[#0B3A8E] text-lg font-bold mt-2 truncate">{values.itemName}</h4>
 
-            <div className="flex flex-col items-center text-center min-w-0 flex-1">
-              <span className="text-xs text-muted-foreground">To</span>
-              <span className="text-2xl mt-1">{toCountry?.flag ?? '🌍'}</span>
-              <span className="text-sm font-medium mt-0.5 truncate max-w-full">
+            <p className="text-slate-400 text-sm font-medium mt-1">
+              {Number(values.weight)} Kg &bull; {Number(values.quantity)}pcs
+            </p>
+
+            <p className="text-slate-500 text-sm leading-relaxed mt-2 line-clamp-3 text-slate-600">
+              {values.description}
+            </p>
+          </div>
+        </div>
+
+        {values.instructions && (
+          <div className="mt-4 pt-3 border-t border-slate-200/60 text-[#EA580C] text-sm font-semibold">
+            Special instructions: {values.instructions}
+          </div>
+        )}
+      </div>
+
+      {/* Route & Pricing Card */}
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[#8292a1] text-lg font-medium">Route &amp; pricing</h3>
+          <button
+            type="button"
+            onClick={() => onEdit(2)}
+            className="text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-0 cursor-pointer p-1 -m-1"
+          >
+            <Pencil className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          {/* Origin */}
+          <div className="flex flex-col items-start min-w-0">
+            <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              Origin
+            </span>
+            <div className="flex items-center gap-2.5 mt-2">
+              <CountryFlag
+                code={values.fromCountry}
+                className="h-6 w-9 rounded-md shadow-xs border border-slate-100"
+              />
+              <span className="text-[#0B3A8E] font-bold text-lg truncate">
+                {fromCountry?.name ?? 'Select origin'}
+              </span>
+            </div>
+          </div>
+
+          {/* Dotted Flight Line */}
+          <div className="flex-1 flex items-center px-4 relative self-end mb-2.5">
+            <div className="border-t-2 border-dashed border-[#F16522] flex-1 opacity-70" />
+            <div className="flex items-center justify-center mx-3 shrink-0">
+              <Plane className="h-6 w-6 text-black rotate-45" />
+            </div>
+            <div className="border-t-2 border-dashed border-[#F16522] flex-1 opacity-70" />
+          </div>
+
+          {/* Destination */}
+          <div className="flex flex-col items-end min-w-0">
+            <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider text-right">
+              Destination
+            </span>
+            <div className="flex items-center gap-2.5 mt-2 justify-end">
+              <CountryFlag
+                code={values.toCountry}
+                className="h-6 w-9 rounded-md shadow-xs border border-slate-100"
+              />
+              <span className="text-[#0B3A8E] font-bold text-lg truncate text-right">
                 {toCountry?.name ?? 'Select destination'}
               </span>
             </div>
           </div>
+        </div>
 
-          <Separator />
-
-          <div className="grid grid-cols-2">
-            <div>
-              <span className="text-xs text-muted-foreground">Price per Kg</span>
-              <p className="font-medium">${Number(values.pricePerKg || 0).toFixed(2)}/kg</p>
-            </div>
-            <div className="text-right">
-              <span className="text-xs text-muted-foreground">Total price</span>
-              <p className="font-semibold text-lg">${totalPrice}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Pricing Bar */}
+        <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between mt-6">
+          <span className="text-[#8292a1] text-sm font-medium">
+            ${Number(values.pricePerKg || 0).toFixed(2)}/kg
+          </span>
+          <span className="text-[#0b3a8e] font-bold text-base">Total price : ${totalPrice}</span>
+        </div>
+      </div>
     </div>
   );
 }
