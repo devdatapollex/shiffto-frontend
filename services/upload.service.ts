@@ -5,11 +5,17 @@ export interface UploadedPhoto {
   url: string;
 }
 
+interface UploadResponse {
+  success: boolean;
+  message: string;
+  data: UploadedPhoto[];
+}
+
 export async function uploadPhotos(files: File[]): Promise<UploadedPhoto[]> {
   const formData = new FormData();
   files.forEach((file) => formData.append('photos', file));
-  const { data } = await apiClient.post<UploadedPhoto[]>('/uploads/photos', formData, {
+  const { data } = await apiClient.post<UploadResponse>('/uploads/photos', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  return data;
+  return data.data;
 }
