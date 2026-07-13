@@ -125,15 +125,11 @@ export function CreateTripWizard() {
   };
 
   if (isSuccess) {
-    return (
-      <div className="mx-auto max-w-2xl w-full py-6 md:py-10">
-        <SuccessStep />
-      </div>
-    );
+    return <SuccessStep />;
   }
 
   return (
-    <div className="mx-auto max-w-2xl w-full py-6 md:py-10">
+    <>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <WizardCard
@@ -160,6 +156,6 @@ export function CreateTripWizard() {
         onOpenChange={setShowDiscardDialog}
         onConfirm={handleConfirmDiscard}
       />
-    </div>
+    </>
   );
 }
