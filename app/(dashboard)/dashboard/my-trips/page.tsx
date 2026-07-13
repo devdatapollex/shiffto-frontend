@@ -52,6 +52,10 @@ import {
   Navigation,
   ChevronLeft,
   ChevronRight,
+  Calendar,
+  Eye,
+  FileText,
+  Briefcase,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getCountryByCode } from '@/lib/constants/countries';
@@ -77,6 +81,7 @@ export default function MyTripsPage() {
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [acceptingTripId, setAcceptingTripId] = useState<string>('');
   const [bagType, setBagType] = useState<'cabin' | 'checkIn'>('checkIn');
+  const [selectedViewTrip, setSelectedViewTrip] = useState<Trip | null>(null);
 
   // React Query data fetching
   const { data: tripsData, isLoading: tripsLoading } = useMyTrips();
@@ -454,7 +459,7 @@ export default function MyTripsPage() {
                             <Button
                               variant="outline"
                               className="border-[#e2e8f0] hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs md:text-sm h-9 px-4"
-                              onClick={() => toast.info(`Viewing details for trip ${tripIdLabel}`)}
+                              onClick={() => setSelectedViewTrip(trip)}
                             >
                               View details
                             </Button>
@@ -688,6 +693,205 @@ export default function MyTripsPage() {
               {acceptShipmentMutation.isPending ? 'Accepting...' : 'Accept Shipment'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 4. Trip Details Dialog */}
+      <Dialog open={selectedViewTrip !== null} onOpenChange={(open) => !open && setSelectedViewTrip(null)}>
+        <DialogContent className="max-w-3xl w-full rounded-2xl border-[#e2e8f0] p-6 bg-white overflow-y-auto max-h-[90vh] pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
+          {selectedViewTrip && (() => {
+            const fromCountry = getCountryByCode(selectedViewTrip.fromCountry);
+            const toCountry = getCountryByCode(selectedViewTrip.toCountry);
+            const tripIdLabel = `#TR-${selectedViewTrip.id.slice(0, 8).toUpperCase()}`;
+
+            const cabinUsed = selectedViewTrip.cabinBagCapacity - selectedViewTrip.remainingCabinCapacity;
+            const cabinPercentage = selectedViewTrip.cabinBagCapacity > 0 
+              ? Math.min((cabinUsed / selectedViewTrip.cabinBagCapacity) * 100, 100) 
+              : 0;
+
+            const checkInUsed = selectedViewTrip.checkInBagCapacity - selectedViewTrip.remainingCheckInCapacity;
+            const checkInPercentage = selectedViewTrip.checkInBagCapacity > 0 
+              ? Math.min((checkInUsed / selectedViewTrip.checkInBagCapacity) * 100, 100) 
+              : 0;
+
+            return (
+              <>
+                <DialogHeader className="border-b border-slate-100 pb-4">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="space-y-1">
+                      <span className="text-xs text-slate-400 font-semibold">{tripIdLabel}</span>
+                      <DialogTitle className="text-xl font-bold text-[#0B3A8E]">Trip Details</DialogTitle>
+                    </div>
+                    {renderStatusBadge(selectedViewTrip.status)}
+                  </div>
+                </DialogHeader>
+
+                {/* Rejection Reason Alert if Rejected */}
+                {selectedViewTrip.status === 'REJECTED' && selectedViewTrip.rejectionReason && (
+                  <div className="bg-red-50 border border-red-100 p-4 rounded-xl flex gap-3 mt-4 items-start">
+                    <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-red-800 text-sm">Trip Rejected</h4>
+                      <p className="text-red-700 text-xs mt-1">{selectedViewTrip.rejectionReason}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="py-4 space-y-6">
+                  {/* Route card */}
+                  <div className="relative overflow-hidden bg-slate-50/50 border border-slate-100 rounded-2xl p-5 flex items-center justify-between">
+                    <div className="flex flex-col space-y-1 z-10">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Departure</span>
+                      <span className="font-bold text-[#0B3A8E] text-base">{fromCountry?.name}</span>
+                      <span className="text-xs text-slate-500 font-medium">{fromCountry?.code}</span>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center flex-1 px-4 relative z-10">
+                      <div className="w-full flex items-center justify-between relative">
+                        <div className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+                        <div className="flex-1 border-t border-dashed border-slate-300 mx-2 relative flex justify-center">
+                          <Plane className="h-5 w-5 text-[#0B3A8E] rotate-90 absolute -top-2.5 bg-transparent px-0.5" />
+                        </div>
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#0B3A8E]" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col space-y-1 items-end text-right z-10">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Destination</span>
+                      <span className="font-bold text-[#0B3A8E] text-base">{toCountry?.name}</span>
+                      <span className="text-xs text-slate-500 font-medium">{toCountry?.code}</span>
+                    </div>
+                  </div>
+
+                  {/* Flight Info Details */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white border border-slate-100 p-3.5 rounded-xl flex items-center gap-3 shadow-xs">
+                      <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Flight Number</p>
+                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{selectedViewTrip.flightNumber}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-slate-100 p-3.5 rounded-xl flex items-center gap-3 shadow-xs">
+                      <div className="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                        <Calendar className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Flight Date</p>
+                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{selectedViewTrip.flightDate}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-slate-100 p-3.5 rounded-xl flex items-center gap-3 shadow-xs">
+                      <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                        <Clock className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Flight Time</p>
+                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{selectedViewTrip.flightTime}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-slate-100 p-3.5 rounded-xl flex items-center gap-3 shadow-xs">
+                      <div className="h-10 w-10 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 shrink-0">
+                        <Clock className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Airport Arrival</p>
+                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">
+                          {selectedViewTrip.airportArrivalTime || 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Baggage Capacities */}
+                  <div className="space-y-4">
+                    <h4 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2 flex items-center gap-2">
+                      <Briefcase className="h-4.5 w-4.5 text-[#0B3A8E]" />
+                      Baggage Capacity Usage
+                    </h4>
+                    
+                    {/* Cabin baggage capacity */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-slate-500">Cabin luggage slot</span>
+                        <span className="text-[#0B3A8E] font-bold">
+                          {selectedViewTrip.remainingCabinCapacity} / {selectedViewTrip.cabinBagCapacity} KG remaining
+                        </span>
+                      </div>
+                      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#0B3A8E] rounded-full transition-all duration-500" 
+                          style={{ width: `${cabinPercentage}%` }} 
+                        />
+                      </div>
+                      <p className="text-slate-400 text-[10px]">
+                        Used: {cabinUsed.toFixed(1)} KG ({cabinPercentage.toFixed(0)}%)
+                      </p>
+                    </div>
+
+                    {/* Check-in baggage capacity */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-slate-500">Check-in luggage slot</span>
+                        <span className="text-[#0B3A8E] font-bold">
+                          {selectedViewTrip.remainingCheckInCapacity} / {selectedViewTrip.checkInBagCapacity} KG remaining
+                        </span>
+                      </div>
+                      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-orange-500 rounded-full transition-all duration-500" 
+                          style={{ width: `${checkInPercentage}%` }} 
+                        />
+                      </div>
+                      <p className="text-slate-400 text-[10px]">
+                        Used: {checkInUsed.toFixed(1)} KG ({checkInPercentage.toFixed(0)}%)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Flight Ticket Photo */}
+                  {selectedViewTrip.ticketPhoto && (
+                    <div className="space-y-3">
+                      <h4 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2 flex items-center gap-2">
+                        <Eye className="h-4.5 w-4.5 text-[#0B3A8E]" />
+                        Flight Ticket Document
+                      </h4>
+                      <div className="relative group overflow-hidden border border-slate-200 rounded-xl bg-slate-900 flex items-center justify-center max-h-64 w-full">
+                        <img 
+                          src={selectedViewTrip.ticketPhoto} 
+                          alt="Flight Ticket" 
+                          className="object-contain max-h-64 w-full transition-all group-hover:scale-102"
+                        />
+                        <a 
+                          href={selectedViewTrip.ticketPhoto} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="absolute inset-0 bg-slate-950/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-semibold text-sm gap-2"
+                        >
+                          <Eye className="h-5 w-5" />
+                          View Full Screen
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <DialogFooter className="border-t border-slate-100 pt-4">
+                  <Button
+                    className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl w-full sm:w-auto"
+                    onClick={() => setSelectedViewTrip(null)}
+                  >
+                    Close Details
+                  </Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>
