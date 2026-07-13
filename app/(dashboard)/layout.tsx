@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <EmailVerificationGuard>
-      <div className="flex min-h-screen bg-primary/[0.02]">
+      <div className="flex h-dvh bg-primary/[0.02]">
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
         <main className="flex-1 flex flex-col min-w-0">
@@ -18,11 +18,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
           <div className="flex-1 overflow-hidden p-4 sm:p-8 relative">
             <div
-              className="absolute top-0 left-0 right-0 h-[300px] pointer-events-none z-0"
+              className="absolute top-0 left-0 right-0 h-[200px] pointer-events-none z-0"
               style={{
                 background:
                   'linear-gradient(to right, hsla(350, 92%, 74%, 0.3), hsla(46, 73%, 78%, 1), hsla(350, 92%, 74%, 0.3))',
-                filter: 'blur(120px)',
+                filter: 'blur(50px)',
               }}
               aria-hidden="true"
             />
