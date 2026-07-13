@@ -25,7 +25,10 @@ interface WizardCardProps {
   isPending?: boolean;
   isFirstStep?: boolean;
   isLastStep?: boolean;
-  isReviewStep?: boolean;
+  isSubmitStep?: boolean;
+  submitDisabled?: boolean;
+  continueLabel?: string;
+  submitLabel?: string;
   children: ReactNode;
 }
 
@@ -39,7 +42,10 @@ export function WizardCard({
   isPending = false,
   isFirstStep = false,
   isLastStep = false,
-  isReviewStep = false,
+  isSubmitStep = false,
+  submitDisabled = false,
+  continueLabel = 'Continue',
+  submitLabel = 'Create Shipment',
   children,
 }: WizardCardProps) {
   return (
@@ -85,13 +91,13 @@ export function WizardCard({
             Back
           </Button>
 
-          {isReviewStep ? (
-            <Button key="submit-btn" type="submit" disabled={isPending}>
-              {isPending ? 'Creating...' : 'Create Shipment'}
+          {isSubmitStep ? (
+            <Button key="submit-btn" type="submit" disabled={isPending || submitDisabled}>
+              {isPending ? 'Verifying...' : submitLabel}
             </Button>
           ) : (
             <Button key="continue-btn" type="button" onClick={onContinue} disabled={isPending}>
-              Continue
+              {continueLabel}
             </Button>
           )}
         </CardFooter>

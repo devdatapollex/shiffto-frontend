@@ -19,6 +19,7 @@ const INITIAL_FORM_DATA: Partial<CreateShipmentValues> = {
   receiverPhoneExt: '',
   receiverPhoneNum: '',
   receiverAddress: '',
+  otp: '',
 };
 
 interface CreateShipmentState {

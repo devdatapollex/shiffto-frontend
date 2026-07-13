@@ -19,6 +19,7 @@ import { WIZARD_STEPS } from '@/lib/constants/wizard-steps';
 import { ROUTES } from '@/config/routes';
 import { useCreateShipmentStore } from '@/store/create-shipment-store';
 import { useCreateShipment } from '@/hooks/use-create-shipment';
+import { useShipmentOtp } from '@/hooks/use-shipment-otp';
 
 import { WizardCard } from '@/components/shipments/create/wizard-card';
 import { DiscardDraftDialog } from '@/components/shipments/create/discard-draft-dialog';
@@ -26,12 +27,13 @@ import { ItemDetailsStep } from '@/components/shipments/create/steps/item-detail
 import { RoutePricingStep } from '@/components/shipments/create/steps/route-pricing-step';
 import { ReceiverDetailsStep } from '@/components/shipments/create/steps/receiver-details-step';
 import { ReviewStep } from '@/components/shipments/create/steps/review-step';
+import { OtpVerificationStep } from '@/components/shipments/create/steps/otp-verification-step';
 
 function WizardSkeleton() {
   return (
     <div className="space-y-6">
       <div className="bg-[#0B3A8E] rounded-xl p-4 md:p-6 flex justify-between gap-4 w-full animate-pulse">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-2">
             <div className="h-3 w-20 bg-white/20 rounded animate-pulse" />
             <div className="h-1.5 w-1.5 rounded-full bg-white/20 animate-pulse" />
@@ -80,6 +82,7 @@ export function CreateShipmentWizard() {
 
   const { mutateAsync, isPending } = useCreateShipment();
   const { data: categories } = useCategories();
+  const { sendOtp, isSending: isSendingOtp, cooldown } = useShipmentOtp();
 
   useEffect(() => {
     setMounted(true);
@@ -95,6 +98,9 @@ export function CreateShipmentWizard() {
   const currentStep = WIZARD_STEPS.find((s) => s.id === step) ?? WIZARD_STEPS[0];
   const isFirstStep = step === 1;
   const isReviewStep = step === 4;
+  const isOtpStep = step === 5;
+  const otpValue = form.watch('otp') ?? '';
+  const otpComplete = otpValue.length === 6;
 
   const handleContinue = async () => {
     const fields = STEP_FIELDS[step] ?? [];
@@ -154,6 +160,11 @@ export function CreateShipmentWizard() {
       }
     }
 
+    if (step === 4) {
+      const sent = await sendOtp(false);
+      if (!sent) return;
+    }
+
     markStepComplete(step);
     setStep(step + 1);
   };
@@ -185,7 +196,8 @@ export function CreateShipmentWizard() {
       router.push(ROUTES.MY_SHIPMENTS);
       router.refresh();
     } catch (error) {
-      toast.error((error as { message?: string }).message || 'Failed to create shipment');
+      const message = (error as { message?: string })?.message;
+      if (message) toast.error(message);
     }
   });
 
@@ -214,6 +226,15 @@ export function CreateShipmentWizard() {
         return <ReceiverDetailsStep />;
       case 4:
         return <ReviewStep onEdit={handleEdit} />;
+      case 5:
+        return (
+          <OtpVerificationStep
+            sendOtp={sendOtp}
+            isSending={isSendingOtp}
+            cooldown={cooldown}
+            isSubmitting={isPending}
+          />
+        );
       default:
         return null;
     }
@@ -234,9 +255,12 @@ export function CreateShipmentWizard() {
             onClose={handleClose}
             onBack={handleBack}
             onContinue={handleContinue}
-            isPending={isPending}
+            isPending={isPending || isSendingOtp}
             isFirstStep={isFirstStep}
-            isReviewStep={isReviewStep}
+            isSubmitStep={isOtpStep}
+            submitDisabled={!otpComplete}
+            continueLabel={isReviewStep ? 'Proceed to verification' : 'Continue'}
+            submitLabel="Verify & Create"
           >
             {renderStep()}
           </WizardCard>

@@ -33,6 +33,8 @@ export const shipmentSchema = z
       .min(1, 'Phone number is required')
       .regex(/^\d{5,15}$/, 'Enter a valid phone number'),
     receiverAddress: z.string().min(10, 'Address must be at least 10 characters'),
+
+    otp: z.string().length(6, 'Enter the 6-digit code'),
   })
   .refine((data) => data.fromCountry !== data.toCountry, {
     message: 'Origin and destination must be different',
@@ -46,6 +48,7 @@ export const STEP_FIELDS: Record<number, (keyof CreateShipmentValues)[]> = {
   2: ['fromCountry', 'toCountry', 'pricePerKg', 'notRestrictedConfirmation'],
   3: ['receiverName', 'receiverPhoneExt', 'receiverPhoneNum', 'receiverAddress'],
   4: [],
+  5: ['otp'],
 };
 
 export type CreateShipmentPayload = Omit<

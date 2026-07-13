@@ -5,3 +5,7 @@ export async function createShipment(payload: CreateShipmentPayload): Promise<{ 
   const { data } = await apiClient.post<{ id: string }>('/shipments', payload);
   return data;
 }
+
+export async function sendShipmentOtp(): Promise<void> {
+  await apiClient.post('/shipments/send-otp');
+}
