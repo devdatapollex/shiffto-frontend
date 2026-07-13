@@ -114,7 +114,7 @@ export default function MyTripsPage() {
       const fromName = getCountryByCode(trip.fromCountry)?.name.toLowerCase() || '';
       const toName = getCountryByCode(trip.toCountry)?.name.toLowerCase() || '';
       const flightNum = trip.flightNumber.toLowerCase();
-      const tripId = `tr-${trip.id.slice(0, 4)}`.toLowerCase();
+      const tripId = `tr-${trip.id.slice(-4)}`.toLowerCase();
 
       return fromName.includes(query) || toName.includes(query) || flightNum.includes(query) || tripId.includes(query);
     }
@@ -427,7 +427,7 @@ export default function MyTripsPage() {
                   {paginatedTrips.map((trip) => {
                     const fromCountry = getCountryByCode(trip.fromCountry);
                     const toCountry = getCountryByCode(trip.toCountry);
-                    const tripIdLabel = `#TR-${trip.id.slice(0, 4).toUpperCase()}`;
+                    const tripIdLabel = `#TR-${trip.id.slice(-4).toUpperCase()}`;
 
                     const totalCap = (trip.cabinBagCapacity || 0) + (trip.checkInBagCapacity || 0);
                     const remCap = (trip.remainingCabinCapacity || 0) + (trip.remainingCheckInCapacity || 0);
@@ -702,7 +702,7 @@ export default function MyTripsPage() {
           {selectedViewTrip && (() => {
             const fromCountry = getCountryByCode(selectedViewTrip.fromCountry);
             const toCountry = getCountryByCode(selectedViewTrip.toCountry);
-            const tripIdLabel = `#TR-${selectedViewTrip.id.slice(0, 4).toUpperCase()}`;
+            const tripIdLabel = `#TR-${selectedViewTrip.id.slice(-4).toUpperCase()}`;
 
             const cabinUsed = selectedViewTrip.cabinBagCapacity - selectedViewTrip.remainingCabinCapacity;
             const cabinPercentage = selectedViewTrip.cabinBagCapacity > 0 
