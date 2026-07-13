@@ -136,9 +136,20 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.2 }}
+                          className="flex-grow"
                         >
                           {item.label}
                         </motion.span>
+                      )}
+
+                      {item.label === 'My Shipments' && !isCollapsed && (
+                        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-orange-100 text-[11px] font-bold text-primary animate-pulse">
+                          3
+                        </span>
+                      )}
+
+                      {item.label === 'My Shipments' && isCollapsed && (
+                        <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary" />
                       )}
 
                       {isActive && (
