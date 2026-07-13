@@ -16,9 +16,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 flex flex-col min-w-0">
           <DashboardHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
-          <div className="flex-1 overflow-y-auto p-4 sm:p-8">
-            <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {children}
+          <div className="flex-1 overflow-hidden p-4 sm:p-8 relative">
+            <div
+              className="absolute top-0 left-0 right-0 h-[300px] pointer-events-none z-0"
+              style={{
+                background:
+                  'linear-gradient(to right, hsla(350, 92%, 74%, 0.3), hsla(46, 73%, 78%, 1), hsla(350, 92%, 74%, 0.3))',
+                filter: 'blur(120px)',
+              }}
+              aria-hidden="true"
+            />
+            <div className="relative z-10 h-full overflow-y-auto">
+              <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {children}
+              </div>
             </div>
           </div>
         </main>
