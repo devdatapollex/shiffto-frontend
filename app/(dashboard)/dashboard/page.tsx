@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Link href={ROUTES.MY_SHIPMENTS}>
+        <Link href={ROUTES.CREATE_SHIPMENT}>
           <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
               <Package className="h-8 w-8 text-primary mb-3" />
