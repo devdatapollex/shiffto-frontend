@@ -698,7 +698,7 @@ export default function MyTripsPage() {
 
       {/* 4. Trip Details Dialog */}
       <Dialog open={selectedViewTrip !== null} onOpenChange={(open) => !open && setSelectedViewTrip(null)}>
-        <DialogContent className="max-w-3xl w-full rounded-2xl border-[#e2e8f0] p-6 bg-white overflow-y-auto max-h-[90vh] pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
+        <DialogContent className="max-w-4xl w-full rounded-2xl border-[#e2e8f0] p-6 bg-white overflow-y-auto max-h-[90vh] pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
           {selectedViewTrip && (() => {
             const fromCountry = getCountryByCode(selectedViewTrip.fromCountry);
             const toCountry = getCountryByCode(selectedViewTrip.toCountry);
@@ -713,6 +713,57 @@ export default function MyTripsPage() {
             const checkInPercentage = selectedViewTrip.checkInBagCapacity > 0 
               ? Math.min((checkInUsed / selectedViewTrip.checkInBagCapacity) * 100, 100) 
               : 0;
+
+            const formatDateString = (dateStr: string) => {
+              if (!dateStr) return '';
+              try {
+                const onlyDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+                const parts = onlyDate.split('-');
+                if (parts.length === 3) {
+                  const year = parseInt(parts[0], 10);
+                  const month = parseInt(parts[1], 10) - 1;
+                  const day = parseInt(parts[2], 10);
+                  const date = new Date(year, month, day);
+                  if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    });
+                  }
+                }
+                const fallbackDate = new Date(dateStr);
+                if (!isNaN(fallbackDate.getTime())) {
+                  return fallbackDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  });
+                }
+                return dateStr;
+              } catch (e) {
+                return dateStr;
+              }
+            };
+
+            const formatTimeString = (timeStr: string | null) => {
+              if (!timeStr) return 'Not specified';
+              try {
+                const [hoursStr, minutesStr] = timeStr.split(':');
+                const hours = parseInt(hoursStr, 10);
+                const minutes = parseInt(minutesStr, 10);
+                if (isNaN(hours) || isNaN(minutes)) return timeStr;
+                
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const displayHours = hours % 12 || 12;
+                const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
+                return `${displayHours}:${displayMinutes} ${ampm}`;
+              } catch (e) {
+                return timeStr;
+              }
+            };
 
             return (
               <>
@@ -781,7 +832,7 @@ export default function MyTripsPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Flight Date</p>
-                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{selectedViewTrip.flightDate}</p>
+                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{formatDateString(selectedViewTrip.flightDate)}</p>
                       </div>
                     </div>
 
@@ -791,7 +842,7 @@ export default function MyTripsPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Flight Time</p>
-                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{selectedViewTrip.flightTime}</p>
+                        <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">{formatTimeString(selectedViewTrip.flightTime)}</p>
                       </div>
                     </div>
 
@@ -802,7 +853,7 @@ export default function MyTripsPage() {
                       <div className="min-w-0">
                         <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Airport Arrival</p>
                         <p className="text-[#0B3A8E] font-bold text-sm mt-0.5 truncate">
-                          {selectedViewTrip.airportArrivalTime || 'Not specified'}
+                          {formatTimeString(selectedViewTrip.airportArrivalTime)}
                         </p>
                       </div>
                     </div>
