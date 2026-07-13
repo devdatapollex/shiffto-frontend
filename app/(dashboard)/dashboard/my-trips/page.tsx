@@ -202,248 +202,256 @@ export default function MyTripsPage() {
             <p className="text-sm">No new matching shipments available at the moment.</p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {availableShipments.map((shipment, index) => {
-              const clockBadge = getClockBadge(index);
-              const fromCountry = getCountryByCode(shipment.fromCountry);
-              const toCountry = getCountryByCode(shipment.toCountry);
+          <div className="max-h-[300px] overflow-y-auto pr-2 pb-2 scrollbar-thin">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {availableShipments.map((shipment, index) => {
+                const clockBadge = getClockBadge(index);
+                const fromCountry = getCountryByCode(shipment.fromCountry);
+                const toCountry = getCountryByCode(shipment.toCountry);
 
-              return (
-                <Card
-                  key={shipment.id}
-                  className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-2xl overflow-hidden bg-white shadow-xs"
-                >
-                  <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
-                    {/* Time limit badge */}
-                    <div className="flex justify-between items-center">
-                      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${clockBadge.class}`}>
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>{clockBadge.time}</span>
-                      </div>
-                      <span className="text-[#0B3A8E] font-bold text-lg">
-                        ${shipment.pricePerKg}/kg
-                      </span>
-                    </div>
-
-                    <div className="flex gap-4 items-start">
-                      {/* Product image placeholder */}
-                      <div className="h-16 w-16 rounded-xl border border-slate-100 bg-slate-50 shrink-0 overflow-hidden flex items-center justify-center">
-                        {shipment.itemPhotos && shipment.itemPhotos.length > 0 ? (
-                          <img
-                            src={shipment.itemPhotos[0]}
-                            alt={shipment.itemName}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <Package className="h-7 w-7 text-slate-400" />
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-bold text-[#0B3A8E] text-base truncate">
-                          {shipment.itemName}
-                        </h4>
-                        <div className="flex items-center gap-1 mt-1 text-slate-500 text-xs font-medium">
-                          <span>{fromCountry?.name}</span>
-                          <span>&rarr;</span>
-                          <span>{toCountry?.name}</span>
+                return (
+                  <Card
+                    key={shipment.id}
+                    className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-2xl overflow-hidden bg-white shadow-xs"
+                  >
+                    <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
+                      {/* Time limit badge */}
+                      <div className="flex justify-between items-center">
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${clockBadge.class}`}>
+                          <Clock className="h-3.5 w-3.5" />
+                          <span>{clockBadge.time}</span>
                         </div>
-                        <p className="text-slate-400 text-xs mt-1">
-                          {shipment.weight} Kg &bull; {shipment.quantity}pcs
-                        </p>
+                        <span className="text-[#0B3A8E] font-bold text-lg">
+                          ${shipment.pricePerKg}/kg
+                        </span>
                       </div>
-                    </div>
 
-                    {/* Action buttons */}
-                    <div className="grid grid-cols-2 gap-3 pt-2">
-                      <Button
-                        variant="outline"
-                        className="border-[#e2e8f0] text-slate-700 hover:bg-slate-50 rounded-xl h-10 font-semibold text-sm"
-                        onClick={() => toast.info('Counter feature is coming soon!')}
-                      >
-                        Counter
-                      </Button>
-                      <Button
-                        className="bg-[#0B3A8E] hover:bg-[#082a66] text-white rounded-xl h-10 font-semibold text-sm transition-colors"
-                        onClick={() => handleOpenAcceptDialog(shipment)}
-                      >
-                        Accept
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                      <div className="flex gap-4 items-start">
+                        {/* Product image placeholder */}
+                        <div className="h-16 w-16 rounded-xl border border-slate-100 bg-slate-50 shrink-0 overflow-hidden flex items-center justify-center">
+                          {shipment.itemPhotos && shipment.itemPhotos.length > 0 ? (
+                            <img
+                              src={shipment.itemPhotos[0]}
+                              alt={shipment.itemName}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <Package className="h-7 w-7 text-slate-400" />
+                          )}
+                        </div>
 
-      {/* 2. Trips History section */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-[#0B3A8E] tracking-tight">Trips History</h2>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-bold text-[#0B3A8E] text-base truncate">
+                            {shipment.itemName}
+                          </h4>
+                          <div className="flex items-center gap-1 mt-1 text-slate-500 text-xs font-medium">
+                            <span>{fromCountry?.name}</span>
+                            <span>&rarr;</span>
+                            <span>{toCountry?.name}</span>
+                          </div>
+                          <p className="text-slate-400 text-xs mt-1">
+                            {shipment.weight} Kg &bull; {shipment.quantity}pcs
+                          </p>
+                        </div>
+                      </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full sm:w-auto"
-          >
-            <TabsList className="bg-slate-100/80 p-1 rounded-xl flex flex-wrap h-auto gap-1">
-              {['all', 'active', 'pending', 'completed', 'canceled', 'rejected'].map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="rounded-lg text-xs md:text-sm font-semibold capitalize data-[state=active]:bg-white data-[state=active]:text-[#0b3a8e] data-[state=active]:shadow-xs px-3 py-1.5 transition-all cursor-pointer"
-                >
-                  {tab === 'all' ? 'All' : tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                type="text"
-                placeholder="Search shipment..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 rounded-xl border-[#e2e8f0] focus:border-[#0B3A8E] bg-white h-10 text-sm w-full"
-              />
+                      {/* Action buttons */}
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <Button
+                          variant="outline"
+                          className="border-[#e2e8f0] text-slate-700 hover:bg-slate-50 rounded-xl h-10 font-semibold text-sm"
+                          onClick={() => toast.info('Counter feature is coming soon!')}
+                        >
+                          Counter
+                        </Button>
+                        <Button
+                          className="bg-[#0B3A8E] hover:bg-[#082a66] text-white rounded-xl h-10 font-semibold text-sm transition-colors"
+                          onClick={() => handleOpenAcceptDialog(shipment)}
+                        >
+                          Accept
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-            <Button variant="outline" size="icon" className="border-[#e2e8f0] h-10 w-10 rounded-xl text-slate-600">
-              <SlidersHorizontal className="h-4.5 w-4.5" />
-            </Button>
-            <Button variant="outline" size="icon" className="border-[#e2e8f0] h-10 w-10 rounded-xl text-slate-600">
-              <ArrowUpDown className="h-4.5 w-4.5" />
-            </Button>
-          </div>
-        </div>
-
-        {tripsLoading ? (
-          <div className="border border-[#e2e8f0] rounded-2xl bg-white p-6 space-y-4 animate-pulse">
-            <div className="h-8 bg-slate-100 rounded w-1/3" />
-            <div className="h-20 bg-slate-100 rounded" />
-            <div className="h-20 bg-slate-100 rounded" />
-          </div>
-        ) : filteredTrips.length === 0 ? (
-          <Card className="border border-dashed border-[#e2e8f0] p-12 text-center text-slate-500 bg-white rounded-2xl">
-            <Plane className="h-12 w-12 text-slate-300 mx-auto mb-3 stroke-[1.2]" />
-            <p className="text-base font-medium">No trips history found.</p>
-            <p className="text-sm text-slate-400 mt-1">Try creating a new trip or modifying your search.</p>
-          </Card>
-        ) : (
-          <div className="border border-[#e2e8f0] rounded-2xl bg-white overflow-hidden shadow-xs">
-            <Table>
-              <TableHeader className="bg-slate-55/40 border-b border-[#e2e8f0]">
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4 pl-6">
-                    Trip ID & route
-                  </TableHead>
-                  <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
-                    Status
-                  </TableHead>
-                  <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
-                    Flight
-                  </TableHead>
-                  <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
-                    Total capacity
-                  </TableHead>
-                  <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
-                    Remaining capacity
-                  </TableHead>
-                  <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4 text-right pr-6">
-                    Action
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTrips.map((trip) => {
-                  const fromCountry = getCountryByCode(trip.fromCountry);
-                  const toCountry = getCountryByCode(trip.toCountry);
-                  const tripIdLabel = `#TR-${trip.id.slice(0, 4).toUpperCase()}`;
-
-                  const totalCap = (trip.cabinBagCapacity || 0) + (trip.checkInBagCapacity || 0);
-                  const remCap = (trip.remainingCabinCapacity || 0) + (trip.remainingCheckInCapacity || 0);
-
-                  return (
-                    <TableRow key={trip.id} className="hover:bg-slate-50/50 border-b border-[#e2e8f0]/60 last:border-0 transition-colors">
-                      <TableCell className="py-4 pl-6">
-                        <div className="flex flex-col space-y-1">
-                          <span className="text-xs text-slate-400 font-semibold">{tripIdLabel}</span>
-                          <span className="text-[#0B3A8E] font-bold text-sm md:text-base">
-                            {fromCountry?.name} - {toCountry?.name}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        {renderStatusBadge(trip.status)}
-                      </TableCell>
-                      <TableCell className="py-4 text-slate-700 font-semibold text-sm">
-                        {trip.flightNumber}
-                      </TableCell>
-                      <TableCell className="py-4 text-slate-600 font-medium text-sm">
-                        {totalCap} KG
-                      </TableCell>
-                      <TableCell className="py-4 text-[#0B3A8E] font-bold text-sm">
-                        {remCap} KG
-                      </TableCell>
-                      <TableCell className="py-4 text-right pr-6">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-[#e2e8f0] hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs md:text-sm h-9 px-4"
-                            onClick={() => toast.info(`Viewing details for trip ${tripIdLabel}`)}
-                          >
-                            View details
-                          </Button>
-
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-xl hover:bg-slate-100 text-slate-500"
-                              >
-                                <MoreVertical className="h-4.5 w-4.5" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-44 rounded-xl border-[#e2e8f0] p-1">
-                              {trip.status === 'ACTIVE' && (
-                                <DropdownMenuItem
-                                  className="text-emerald-600 font-medium rounded-lg cursor-pointer"
-                                  onClick={() => handleCompleteTrip(trip.id)}
-                                >
-                                  Complete Trip
-                                </DropdownMenuItem>
-                              )}
-                              {(trip.status === 'ACTIVE' || trip.status === 'PENDING') && (
-                                <DropdownMenuItem
-                                  className="text-red-600 font-medium rounded-lg cursor-pointer"
-                                  onClick={() => handleCancelTrip(trip.id)}
-                                >
-                                  Cancel Trip
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem
-                                className="text-slate-700 font-medium rounded-lg cursor-pointer"
-                                onClick={() => toast.info('Additional trip configurations coming soon!')}
-                              >
-                                Configure
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
           </div>
         )}
       </div>
+
+      {/* 2. Trips History section (inside card) */}
+      <Card className="border border-[#e2e8f0] rounded-2xl bg-white shadow-xs overflow-hidden">
+        <CardHeader className="pb-4 pt-6 px-6 border-b border-[#e2e8f0]/60 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-[#0B3A8E] tracking-tight">Trips History</h2>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full sm:w-auto"
+            >
+              <TabsList className="bg-slate-100/80 p-1 rounded-xl flex flex-wrap h-auto gap-1">
+                {['all', 'active', 'pending', 'completed', 'canceled', 'rejected'].map((tab) => (
+                  <TabsTrigger
+                    key={tab}
+                    value={tab}
+                    className="rounded-lg text-xs md:text-sm font-semibold capitalize data-[state=active]:bg-white data-[state=active]:text-[#0b3a8e] data-[state=active]:shadow-xs px-3 py-1.5 transition-all cursor-pointer"
+                  >
+                    {tab === 'all' ? 'All' : tab}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="Search shipment..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-4 rounded-xl border-[#e2e8f0] focus:border-[#0B3A8E] bg-white h-10 text-sm w-full"
+                />
+              </div>
+              <Button variant="outline" size="icon" className="border-[#e2e8f0] h-10 w-10 rounded-xl text-slate-600">
+                <SlidersHorizontal className="h-4.5 w-4.5" />
+              </Button>
+              <Button variant="outline" size="icon" className="border-[#e2e8f0] h-10 w-10 rounded-xl text-slate-600">
+                <ArrowUpDown className="h-4.5 w-4.5" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {tripsLoading ? (
+            <div className="p-6 space-y-4 animate-pulse">
+              <div className="h-8 bg-slate-100 rounded w-1/3" />
+              <div className="h-20 bg-slate-100 rounded" />
+              <div className="h-20 bg-slate-100 rounded" />
+            </div>
+          ) : filteredTrips.length === 0 ? (
+            <div className="p-12 text-center text-slate-500 bg-white">
+              <Plane className="h-12 w-12 text-slate-300 mx-auto mb-3 stroke-[1.2]" />
+              <p className="text-base font-medium">No trips history found.</p>
+              <p className="text-sm text-slate-400 mt-1">Try creating a new trip or modifying your search.</p>
+            </div>
+          ) : (
+            <div className="overflow-hidden">
+              <Table>
+                <TableHeader className="bg-slate-50/40 border-b border-[#e2e8f0]">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4 pl-6">
+                      Trip ID & route
+                    </TableHead>
+                    <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
+                      Status
+                    </TableHead>
+                    <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
+                      Flight
+                    </TableHead>
+                    <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
+                      Total capacity
+                    </TableHead>
+                    <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4">
+                      Remaining capacity
+                    </TableHead>
+                    <TableHead className="font-semibold text-slate-500 text-xs md:text-sm py-4 text-right pr-6">
+                      Action
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTrips.map((trip) => {
+                    const fromCountry = getCountryByCode(trip.fromCountry);
+                    const toCountry = getCountryByCode(trip.toCountry);
+                    const tripIdLabel = `#TR-${trip.id.slice(0, 4).toUpperCase()}`;
+
+                    const totalCap = (trip.cabinBagCapacity || 0) + (trip.checkInBagCapacity || 0);
+                    const remCap = (trip.remainingCabinCapacity || 0) + (trip.remainingCheckInCapacity || 0);
+
+                    return (
+                      <TableRow key={trip.id} className="hover:bg-slate-50/50 border-b border-[#e2e8f0]/60 last:border-0 transition-colors">
+                        <TableCell className="py-4 pl-6">
+                          <div className="flex flex-col space-y-1">
+                            <span className="text-xs text-slate-400 font-semibold">{tripIdLabel}</span>
+                            <span className="text-[#0B3A8E] font-bold text-sm md:text-base">
+                              {fromCountry?.name} - {toCountry?.name}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          {renderStatusBadge(trip.status)}
+                        </TableCell>
+                        <TableCell className="py-4 text-slate-700 font-semibold text-sm">
+                          {trip.flightNumber}
+                        </TableCell>
+                        <TableCell className="py-4 text-slate-600 font-medium text-sm">
+                          {totalCap} KG
+                        </TableCell>
+                        <TableCell className="py-4 text-[#0B3A8E] font-bold text-sm">
+                          {remCap} KG
+                        </TableCell>
+                        <TableCell className="py-4 text-right pr-6">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-[#e2e8f0] hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs md:text-sm h-9 px-4"
+                              onClick={() => toast.info(`Viewing details for trip ${tripIdLabel}`)}
+                            >
+                              View details
+                            </Button>
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 rounded-xl hover:bg-slate-100 text-slate-500"
+                                >
+                                  <MoreVertical className="h-4.5 w-4.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-44 rounded-xl border-[#e2e8f0] p-1">
+                                {trip.status === 'ACTIVE' && (
+                                  <DropdownMenuItem
+                                    className="text-emerald-600 font-medium rounded-lg cursor-pointer"
+                                    onClick={() => handleCompleteTrip(trip.id)}
+                                  >
+                                    Complete Trip
+                                  </DropdownMenuItem>
+                                )}
+                                {(trip.status === 'ACTIVE' || trip.status === 'PENDING') && (
+                                  <DropdownMenuItem
+                                    className="text-red-600 font-medium rounded-lg cursor-pointer"
+                                    onClick={() => handleCancelTrip(trip.id)}
+                                  >
+                                    Cancel Trip
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem
+                                  className="text-slate-700 font-medium rounded-lg cursor-pointer"
+                                  onClick={() => toast.info('Additional trip configurations coming soon!')}
+                                >
+                                  Configure
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* 3. Accept Shipment Coord Dialog */}
       <Dialog open={selectedShipment !== null} onOpenChange={(open) => !open && setSelectedShipment(null)}>
