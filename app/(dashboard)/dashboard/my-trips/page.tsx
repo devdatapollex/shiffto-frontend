@@ -50,6 +50,8 @@ import {
   AlertCircle,
   HelpCircle,
   Navigation,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getCountryByCode } from '@/lib/constants/countries';
@@ -61,6 +63,7 @@ export default function MyTripsPage() {
   // Tabs and search states
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [shipmentIndex, setShipmentIndex] = useState<number>(0);
 
   // Dialog states
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
@@ -79,6 +82,7 @@ export default function MyTripsPage() {
   // Helper lists
   const trips: Trip[] = tripsData?.data || [];
   const availableShipments: Shipment[] = shipmentsData?.data || [];
+  const visibleShipments = availableShipments.slice(shipmentIndex, shipmentIndex + 3);
 
   // Active trips for accepting shipments
   const activeTrips = trips.filter((t) => t.status === 'ACTIVE');
@@ -151,6 +155,18 @@ export default function MyTripsPage() {
     }
   };
 
+  const handleNextShipments = () => {
+    if (shipmentIndex + 3 < availableShipments.length) {
+      setShipmentIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevShipments = () => {
+    if (shipmentIndex > 0) {
+      setShipmentIndex((prev) => prev - 1);
+    }
+  };
+
   // Render Status Badge
   const renderStatusBadge = (status: Trip['status']) => {
     switch (status) {
@@ -202,10 +218,21 @@ export default function MyTripsPage() {
             <p className="text-sm">No new matching shipments available at the moment.</p>
           </Card>
         ) : (
-          <div className="max-h-[300px] overflow-y-auto pr-2 pb-2 scrollbar-thin">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {availableShipments.map((shipment, index) => {
-                const clockBadge = getClockBadge(index);
+          <div className="flex items-center gap-4">
+            {shipmentIndex > 0 && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePrevShipments}
+                className="h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-xs hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
+              >
+                <ChevronLeft className="h-5 w-5 text-[#0B3A8E]" />
+              </Button>
+            )}
+
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+              {visibleShipments.map((shipment, index) => {
+                const clockBadge = getClockBadge(shipmentIndex + index);
                 const fromCountry = getCountryByCode(shipment.fromCountry);
                 const toCountry = getCountryByCode(shipment.toCountry);
 
@@ -276,6 +303,17 @@ export default function MyTripsPage() {
                 );
               })}
             </div>
+
+            {shipmentIndex + 3 < availableShipments.length && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNextShipments}
+                className="h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-xs hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
+              >
+                <ChevronRight className="h-5 w-5 text-[#0B3A8E]" />
+              </Button>
+            )}
           </div>
         )}
       </div>
