@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import type { CreateTripValues } from '@/lib/validations/trip';
-import { Plane, Calendar, Clock, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Plane, FileText, CheckCircle2, Pencil } from 'lucide-react';
 
 interface ReviewStepProps {
   onJumpToStep: (step: number) => void;
@@ -30,82 +30,121 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
 
   return (
     <div className="space-y-6">
-      {/* Route and Flight Summary */}
-      <div className="border border-slate-200 rounded-xl p-5 bg-white space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-[#0B3A8E] font-bold text-sm uppercase tracking-wide">Route & Schedule</h3>
+      {/* Flight Details Card */}
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[#8292a1] text-lg font-medium">Flight details</h3>
           <button
             type="button"
             onClick={() => onJumpToStep(1)}
-            className="text-orange-500 hover:text-orange-600 text-xs font-semibold hover:underline cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-0 cursor-pointer p-1 -m-1"
           >
-            Edit
+            <Pencil className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 font-semibold text-lg text-slate-800">
-            {fromCountry && (
-              <span className="flex items-center gap-2">
-                <CountryFlag code={fromCountry.code} className="h-5 w-7" />
-                <span>{fromCountry.name}</span>
+        <div className="flex items-center justify-between gap-2">
+          {/* Origin */}
+          <div className="flex flex-col items-start min-w-0">
+            <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              Origin
+            </span>
+            <div className="flex items-center gap-2.5 mt-2">
+              {values.fromCountry && (
+                <CountryFlag
+                  code={values.fromCountry}
+                  className="h-6 w-9 rounded-md shadow-xs border border-slate-100"
+                />
+              )}
+              <span className="text-[#0B3A8E] font-bold text-lg truncate">
+                {fromCountry?.name ?? 'Select origin'}
               </span>
-            )}
-            <ArrowRight className="h-4 w-4 text-slate-400" />
-            {toCountry && (
-              <span className="flex items-center gap-2">
-                <CountryFlag code={toCountry.code} className="h-5 w-7" />
-                <span>{toCountry.name}</span>
+            </div>
+          </div>
+
+          {/* Dotted Flight Line */}
+          <div className="flex-1 flex items-center px-4 relative self-end mb-2.5">
+            <div className="border-t-2 border-dashed border-[#F16522] flex-1 opacity-70" />
+            <div className="flex items-center justify-center mx-3 shrink-0">
+              <Plane className="h-6 w-6 text-black rotate-45" />
+            </div>
+            <div className="border-t-2 border-dashed border-[#F16522] flex-1 opacity-70" />
+          </div>
+
+          {/* Destination */}
+          <div className="flex flex-col items-end min-w-0">
+            <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider text-right">
+              Destination
+            </span>
+            <div className="flex items-center gap-2.5 mt-2 justify-end">
+              {values.toCountry && (
+                <CountryFlag
+                  code={values.toCountry}
+                  className="h-6 w-9 rounded-md shadow-xs border border-slate-100"
+                />
+              )}
+              <span className="text-[#0B3A8E] font-bold text-lg truncate text-right">
+                {toCountry?.name ?? 'Select destination'}
               </span>
-            )}
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100 text-sm text-slate-600">
-          <div className="flex items-center gap-2">
-            <Plane className="h-4 w-4 text-orange-500" />
-            <span>Flight: <strong>{values.flightNumber || 'N/A'}</strong></span>
+        {/* Info Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200/60 text-sm text-slate-600">
+          <div className="flex flex-col">
+            <span className="text-slate-400 text-xs font-semibold">Flight number</span>
+            <strong className="text-slate-700 font-semibold mt-1">{values.flightNumber || 'N/A'}</strong>
           </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-orange-500" />
-            <span>Date: <strong>{formattedDate || 'N/A'}</strong></span>
+          <div className="flex flex-col">
+            <span className="text-slate-400 text-xs font-semibold">Flight date</span>
+            <strong className="text-slate-700 font-semibold mt-1">{formattedDate || 'N/A'}</strong>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-orange-500" />
-            <span>Time: <strong>{values.flightTime || 'N/A'}</strong></span>
+          <div className="flex flex-col">
+            <span className="text-slate-400 text-xs font-semibold">Flight time</span>
+            <strong className="text-slate-700 font-semibold mt-1">{values.flightTime || 'N/A'}</strong>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-slate-400 text-xs font-semibold">Arrival time</span>
+            <strong className="text-slate-700 font-semibold mt-1">{values.airportArrivalTime || 'N/A'}</strong>
           </div>
         </div>
       </div>
 
-      {/* Ticket Verification Summary */}
-      <div className="border border-slate-200 rounded-xl p-5 bg-white space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-[#0B3A8E] font-bold text-sm uppercase tracking-wide">Flight Ticket</h3>
+      {/* Flight Ticket Card */}
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[#8292a1] text-lg font-medium">Flight ticket</h3>
           <button
             type="button"
             onClick={() => onJumpToStep(2)}
-            className="text-orange-500 hover:text-orange-600 text-xs font-semibold hover:underline cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-0 cursor-pointer p-1 -m-1"
           >
-            Edit
+            <Pencil className="h-5 w-5" />
           </button>
         </div>
 
         {values.ticketPhoto ? (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-100 p-3 bg-slate-50/50">
-            {isPdf ? (
-              <FileText className="h-10 w-10 text-red-500 shrink-0" />
-            ) : (
-              <img
-                src={values.ticketPhoto}
-                alt="Ticket preview"
-                className="h-10 w-10 object-cover rounded border bg-white shrink-0"
-              />
-            )}
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-slate-700 truncate">
+          <div className="flex gap-6 items-start">
+            <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
+              {isPdf ? (
+                <FileText className="h-10 w-10 text-red-500 shrink-0" />
+              ) : (
+                <img
+                  src={values.ticketPhoto}
+                  alt="Ticket preview"
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </div>
+            <div className="flex-1 min-w-0 self-center">
+              <span className="bg-[#ECFDF5] border border-[#D1FAE5] text-[#059669] text-xs font-semibold px-2.5 py-0.5 rounded-md">
+                Verification file ready
+              </span>
+              <h4 className="text-[#0B3A8E] text-lg font-bold mt-2 truncate">
                 {isPdf ? 'Flight_Ticket.pdf' : 'Flight_Ticket.png'}
-              </p>
-              <p className="text-xs text-slate-400">Verification file ready</p>
+              </h4>
+              <p className="text-slate-400 text-sm mt-1">Uploaded successfully</p>
             </div>
           </div>
         ) : (
@@ -113,26 +152,26 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
         )}
       </div>
 
-      {/* Luggage Capacity Details */}
-      <div className="border border-slate-200 rounded-xl p-5 bg-white space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-[#0B3A8E] font-bold text-sm uppercase tracking-wide">Luggage Capacity</h3>
+      {/* Luggage Capacity Card */}
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[#8292a1] text-lg font-medium">Luggage capacity</h3>
           <button
             type="button"
             onClick={() => onJumpToStep(3)}
-            className="text-orange-500 hover:text-orange-600 text-xs font-semibold hover:underline cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-0 cursor-pointer p-1 -m-1"
           >
-            Edit
+            <Pencil className="h-5 w-5" />
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-lg border border-slate-100 p-3 bg-slate-50/30 flex items-center justify-between">
-            <span className="text-sm text-slate-500 font-medium">Cabin Bag Capacity</span>
+          <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between">
+            <span className="text-[#8292a1] text-sm font-medium">Cabin Bag Capacity</span>
             <strong className="text-[#0B3A8E] text-base">{values.cabinBagCapacity || 0} KG</strong>
           </div>
-          <div className="rounded-lg border border-slate-100 p-3 bg-slate-50/30 flex items-center justify-between">
-            <span className="text-sm text-slate-500 font-medium">Check-In Bag Capacity</span>
+          <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between">
+            <span className="text-[#8292a1] text-sm font-medium">Check-In Bag Capacity</span>
             <strong className="text-[#0B3A8E] text-base">{values.checkInBagCapacity || 0} KG</strong>
           </div>
         </div>
