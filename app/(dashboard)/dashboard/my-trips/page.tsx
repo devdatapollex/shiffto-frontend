@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMyTrips, useCancelTrip, useCompleteTrip, useAcceptShipment } from '@/hooks/use-trips';
 import { useAvailableShipments } from '@/hooks/use-available-shipments';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -65,6 +65,14 @@ export default function MyTripsPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [shipmentIndex, setShipmentIndex] = useState<number>(0);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(5);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery]);
+
   // Dialog states
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [acceptingTripId, setAcceptingTripId] = useState<string>('');
@@ -108,6 +116,13 @@ export default function MyTripsPage() {
 
     return true;
   });
+
+  // Pagination calculations
+  const totalItems = filteredTrips.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const startIdx = (currentPage - 1) * pageSize;
+  const endIdx = Math.min(startIdx + pageSize, totalItems);
+  const paginatedTrips = filteredTrips.slice(startIdx, startIdx + pageSize);
 
   const handleCancelTrip = async (id: string) => {
     try {
@@ -404,7 +419,7 @@ export default function MyTripsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTrips.map((trip) => {
+                  {paginatedTrips.map((trip) => {
                     const fromCountry = getCountryByCode(trip.fromCountry);
                     const toCountry = getCountryByCode(trip.toCountry);
                     const tripIdLabel = `#TR-${trip.id.slice(0, 4).toUpperCase()}`;
@@ -486,6 +501,100 @@ export default function MyTripsPage() {
                   })}
                 </TableBody>
               </Table>
+            </div>
+          )}
+
+          {/* Pagination controls */}
+          {filteredTrips.length > 0 && (
+            <div className="border-t border-[#e2e8f0]/60 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/20">
+              {/* Left: Entries selector and showing info */}
+              <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
+                <div className="flex items-center gap-2">
+                  <span>Show</span>
+                  <Select
+                    value={pageSize.toString()}
+                    onValueChange={(val) => {
+                      setPageSize(Number(val));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-16 rounded-lg border-[#e2e8f0] bg-white text-xs">
+                      <SelectValue placeholder="5" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
+                      {[5, 10, 20, 50].map((size) => (
+                        <SelectItem key={size} value={size.toString()} className="text-xs rounded-lg cursor-pointer">
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span>entries</span>
+                </div>
+                <span className="hidden sm:inline-block h-4 w-[1px] bg-slate-200" />
+                <span>
+                  Showing <span className="font-semibold text-slate-700">{totalItems === 0 ? 0 : startIdx + 1}</span> to{" "}
+                  <span className="font-semibold text-slate-700">{endIdx}</span> of{" "}
+                  <span className="font-semibold text-slate-700">{totalItems}</span> entries
+                </span>
+              </div>
+
+              {/* Right: Page buttons */}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                >
+                  Previous
+                </Button>
+
+                {/* Render dynamic page numbers */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  if (
+                    totalPages > 5 &&
+                    page !== 1 &&
+                    page !== totalPages &&
+                    Math.abs(page - currentPage) > 1
+                  ) {
+                    if (page === 2 && currentPage > 3) {
+                      return <span key="dots-left" className="px-1.5 text-slate-400 text-xs">...</span>;
+                    }
+                    if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                      return <span key="dots-right" className="px-1.5 text-slate-400 text-xs">...</span>;
+                    }
+                    return null;
+                  }
+
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer ${
+                        currentPage === page
+                          ? "bg-[#0B3A8E] hover:bg-[#082a66] text-white border-transparent"
+                          : "border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600"
+                      }`}
+                    >
+                      {page}
+                    </Button>
+                  );
+                })}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
