@@ -32,7 +32,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href={ROUTES.MY_TRIPS}>
+        <Link href={ROUTES.CREATE_TRIP}>
           <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
               <Plane className="h-8 w-8 text-primary mb-3" />

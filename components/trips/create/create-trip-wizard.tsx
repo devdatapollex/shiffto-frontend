@@ -29,6 +29,8 @@ export function CreateTripWizard() {
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
   // Initialize React Hook Form
   const methods = useForm<CreateTripValues>({
     resolver: zodResolver(tripSchema),
@@ -45,13 +47,23 @@ export function CreateTripWizard() {
     },
   });
 
-  const { trigger, handleSubmit, watch } = methods;
+  const { trigger, handleSubmit } = methods;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Sync form state changes back to Zustand persisted store
-  const watchedValues = watch();
   useEffect(() => {
-    updateFormData(watchedValues);
-  }, [watchedValues, updateFormData]);
+    const subscription = methods.watch((data) => {
+      updateFormData(data as any);
+    });
+    return () => subscription.unsubscribe();
+  }, [methods, updateFormData]);
+
+  if (!mounted) {
+    return null;
+  }
 
   const activeStep = TRIP_WIZARD_STEPS.find((s) => s.id === step) || TRIP_WIZARD_STEPS[0];
 
