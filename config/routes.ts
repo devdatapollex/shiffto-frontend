@@ -23,11 +23,13 @@ export const ROUTES = {
   WALLET: '/dashboard/wallet',
   RATINGS_REVIEWS: '/dashboard/ratings-reviews',
   SUPPORT: '/dashboard/support',
+  PROFILE: '/dashboard/profile',
 
   // Admin-only Routes
   SETTLEMENTS: '/dashboard/settlements',
   WITHDRAWALS: '/dashboard/withdrawals',
   USERS: '/dashboard/users',
+  ADMIN_KYC: '/dashboard/admin/kyc',
 } as const;
 
 export const PUBLIC_ROUTES = [

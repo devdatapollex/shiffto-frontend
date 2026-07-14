@@ -165,9 +165,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
         {/* Footer / User Profile */}
         <div className="mt-auto border-t p-4">
-          <div
+          <Link
+            href={ROUTES.PROFILE}
             className={cn(
-              'flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50',
+              'flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50 cursor-pointer',
               isCollapsed && 'justify-center'
             )}
           >
@@ -184,7 +185,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 </span>
               </div>
             )}
-          </div>
+          </Link>
 
           <Button
             variant="ghost"

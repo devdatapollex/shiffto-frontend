@@ -44,6 +44,8 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
     if (pathname.includes('/dashboard/wallet')) return 'Wallet';
     if (pathname.includes('/dashboard/ratings-reviews')) return 'Ratings & Reviews';
     if (pathname.includes('/dashboard/support')) return 'Support';
+    if (pathname.includes('/dashboard/profile')) return 'Profile';
+    if (pathname.includes('/dashboard/admin/kyc')) return 'KYC Submissions';
     return 'Home';
   };
 
@@ -144,8 +146,9 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>{session?.user?.name || 'My Account'}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={ROUTES.PROFILE}>Profile</Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
                 Log out
