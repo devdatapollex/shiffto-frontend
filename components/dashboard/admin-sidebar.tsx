@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, LogOut, X, Shield, ArrowLeftRight, Scale, Banknote, Users, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, LogOut, X, Shield, ArrowLeftRight, Scale, Banknote, Users, ShieldCheck, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -55,6 +55,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'Users',
       href: ROUTES.USERS,
       icon: Users,
+    },
+    {
+      label: 'Account Settings',
+      href: ROUTES.ADMIN_PROFILE,
+      icon: Settings,
     },
   ];
 
@@ -188,14 +193,20 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
 
         {/* Footer / User Profile */}
         <div className="mt-auto border-t p-4">
-          <div
+          <Link
+            href={ROUTES.ADMIN_PROFILE}
             className={cn(
-              'flex items-center gap-3 rounded-lg p-2',
-              isCollapsed && 'justify-center'
+              'flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50 cursor-pointer',
+              isCollapsed && 'justify-center',
+              pathname === ROUTES.ADMIN_PROFILE && 'bg-primary/10 text-primary'
             )}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-              {session?.user?.name?.charAt(0)?.toUpperCase() || 'A'}
+              {session?.user?.image ? (
+                <img src={session.user.image} alt="Profile" className="h-full w-full rounded-full object-cover" />
+              ) : (
+                session?.user?.name?.charAt(0)?.toUpperCase() || 'A'
+              )}
             </div>
             {!isCollapsed && (
               <div className="flex flex-1 flex-col overflow-hidden">
@@ -207,7 +218,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 </span>
               </div>
             )}
-          </div>
+          </Link>
 
           <Button
             variant="ghost"

@@ -31,6 +31,7 @@ export const ROUTES = {
   WITHDRAWALS: '/dashboard/withdrawals',
   USERS: '/dashboard/users',
   ADMIN_KYC: '/dashboard/admin/kyc',
+  ADMIN_PROFILE: '/dashboard/admin/profile',
 } as const;
 
 export const PUBLIC_ROUTES = [
