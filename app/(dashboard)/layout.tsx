@@ -1,17 +1,30 @@
 'use client';
 
 import { useState, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/sidebar-new';
+import { AdminSidebar } from '@/components/dashboard/admin-sidebar';
 import { DashboardHeader } from '@/components/dashboard/header';
 import { EmailVerificationGuard } from '@/components/auth/email-verification-guard';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isAdminRoute =
+    pathname.startsWith('/dashboard/admin') ||
+    pathname === '/dashboard/settlements' ||
+    pathname === '/dashboard/withdrawals' ||
+    pathname === '/dashboard/users';
 
   return (
     <EmailVerificationGuard>
       <div className="flex h-dvh bg-primary/[0.02]">
-        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        {isAdminRoute ? (
+          <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        ) : (
+          <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        )}
 
         <main className="flex-1 flex flex-col min-w-0">
           <DashboardHeader onMenuClick={() => setIsSidebarOpen(true)} />

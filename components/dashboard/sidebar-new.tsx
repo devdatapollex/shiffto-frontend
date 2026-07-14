@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, LogOut, X } from 'lucide-react';
+import { ChevronLeft, LogOut, X, ArrowLeftRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DASHBOARD_MENU_SECTIONS } from '@/constants/menu-items';
 import { useRole } from '@/hooks/use-role';
