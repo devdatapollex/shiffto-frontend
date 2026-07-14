@@ -5,6 +5,7 @@ export const ROUTES = {
   // Public Routes
   HOME: '/',
   LOGIN: '/login',
+  ADMIN_LOGIN: '/admin/login',
   REGISTER: '/register',
   UNAUTHORIZED: '/unauthorized',
   VERIFY_EMAIL: '/verify',
@@ -35,6 +36,7 @@ export const ROUTES = {
 export const PUBLIC_ROUTES = [
   ROUTES.HOME,
   ROUTES.LOGIN,
+  ROUTES.ADMIN_LOGIN,
   ROUTES.REGISTER,
   ROUTES.VERIFY_EMAIL,
   ROUTES.FORGOT_PASSWORD,

@@ -32,7 +32,7 @@ export function KycRequiredDialog({ open, onOpenChange }: KycRequiredDialogProps
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600 border border-amber-100">
             <ShieldAlert className="h-6 w-6" />
           </div>
-          <DialogTitle className="text-xl font-bold text-[#0B3A8E]">
+          <DialogTitle className="text-xl font-bold text-primary">
             KYC Verification Required
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-2 leading-relaxed">
@@ -47,7 +47,7 @@ export function KycRequiredDialog({ open, onOpenChange }: KycRequiredDialogProps
           </Button>
           <Button
             onClick={handleNavigateToKyc}
-            className="w-full sm:w-auto bg-[#0B3A8E] hover:bg-[#072d70] text-white flex items-center justify-center gap-2"
+            className="w-full sm:w-auto flex items-center justify-center gap-2"
           >
             Verify Identity
             <ArrowRight className="h-4 w-4" />
