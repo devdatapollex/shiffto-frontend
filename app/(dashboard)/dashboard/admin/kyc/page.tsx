@@ -234,7 +234,7 @@ export default function AdminKycPage() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid gap-6 py-4 md:grid-cols-2">
+              <div className="grid gap-6 py-4 grid-cols-1">
                 {/* User details */}
                 <div className="space-y-4">
                   <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
@@ -274,7 +274,7 @@ export default function AdminKycPage() {
                 </div>
 
                 {/* Document Photos */}
-                <div className="md:col-span-2 space-y-4">
+                <div className="space-y-4">
                   <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
                     Document Scans
                   </h4>
@@ -321,7 +321,7 @@ export default function AdminKycPage() {
 
                 {/* Rejection reason history if rejected */}
                 {selectedKyc.status === 'REJECTED' && selectedKyc.rejectionReason && (
-                  <div className="md:col-span-2 p-3 bg-red-50 border border-red-100 rounded text-xs font-semibold text-destructive">
+                  <div className="p-3 bg-red-50 border border-red-100 rounded text-xs font-semibold text-destructive">
                     Current Rejection Reason: {selectedKyc.rejectionReason}
                   </div>
                 )}
