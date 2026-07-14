@@ -68,6 +68,16 @@ export default function ProfilePage() {
   // Tab State
   const [activeTab, setActiveTab] = useState('personal');
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'kyc' || tab === 'security' || tab === 'personal' || tab === 'danger') {
+        setActiveTab(tab);
+      }
+    }
+  }, []);
+
   // Form States
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');

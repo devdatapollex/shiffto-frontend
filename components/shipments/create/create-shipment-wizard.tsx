@@ -23,6 +23,7 @@ import { useShipmentOtp } from '@/hooks/use-shipment-otp';
 
 import { WizardCard } from '@/components/shipments/create/wizard-card';
 import { DiscardDraftDialog } from '@/components/shipments/create/discard-draft-dialog';
+import { KycRequiredDialog } from '@/components/trips/create/kyc-required-dialog';
 import { ItemDetailsStep } from '@/components/shipments/create/steps/item-details-step';
 import { RoutePricingStep } from '@/components/shipments/create/steps/route-pricing-step';
 import { ReceiverDetailsStep } from '@/components/shipments/create/steps/receiver-details-step';
@@ -69,6 +70,7 @@ function WizardSkeleton() {
 export function CreateShipmentWizard() {
   const [mounted, setMounted] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+  const [showKycDialog, setShowKycDialog] = useState(false);
   const router = useRouter();
 
   const store = useCreateShipmentStore();
@@ -196,9 +198,14 @@ export function CreateShipmentWizard() {
       resetWizard();
       router.push(ROUTES.MY_SHIPMENTS);
       router.refresh();
-    } catch (error) {
-      const message = (error as { message?: string })?.message;
-      if (message) toast.error(message);
+    } catch (error: unknown) {
+      const err = error as { status?: number; message?: string };
+      const errorMsg = err?.message || 'Failed to create shipment';
+      if (err?.status === 403 || errorMsg.toLowerCase().includes('kyc')) {
+        setShowKycDialog(true);
+      } else {
+        toast.error(errorMsg);
+      }
     }
   });
 
@@ -272,6 +279,11 @@ export function CreateShipmentWizard() {
         open={showDiscardDialog}
         onOpenChange={setShowDiscardDialog}
         onConfirm={handleConfirmDiscard}
+      />
+
+      <KycRequiredDialog
+        open={showKycDialog}
+        onOpenChange={setShowKycDialog}
       />
     </div>
   );
