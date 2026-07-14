@@ -12,6 +12,8 @@ import {
   Eye,
   Loader2,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +38,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { getKycSubmissions, reviewKyc, KycDetails } from '@/services/profile.service';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type KycSubmission = KycDetails & {
   user: {
@@ -52,6 +61,16 @@ export default function AdminKycPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING');
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+
+  // Pagination calculations
+  const startIdx = (page - 1) * limit;
+  const endIdx = Math.min(startIdx + limit, total);
+  const totalPages = Math.ceil(total / limit) || 1;
+
   // Detail Dialog State
   const [selectedKyc, setSelectedKyc] = useState<KycSubmission | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
@@ -67,15 +86,16 @@ export default function AdminKycPage() {
   const fetchSubmissions = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getKycSubmissions({ status: statusFilter, limit: 50 });
+      const res = await getKycSubmissions({ status: statusFilter, page, limit });
       setSubmissions(res.data as KycSubmission[]);
+      setTotal(res.meta?.total || 0);
     } catch (error: unknown) {
       const err = error as { message?: string };
       toast.error(err.message || 'Failed to fetch KYC submissions');
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, page, limit]);
 
   useEffect(() => {
     fetchSubmissions();
@@ -131,7 +151,10 @@ export default function AdminKycPage() {
 
         <Tabs
           value={statusFilter}
-          onValueChange={(val) => setStatusFilter(val as 'PENDING' | 'APPROVED' | 'REJECTED')}
+          onValueChange={(val) => {
+            setStatusFilter(val as 'PENDING' | 'APPROVED' | 'REJECTED');
+            setPage(1);
+          }}
           className="space-y-6"
         >
         <TabsList className="bg-muted/60 p-1">
@@ -215,6 +238,99 @@ export default function AdminKycPage() {
                   ))}
                 </TableBody>
               </Table>
+            )}
+
+            {!loading && submissions.length > 0 && (
+              <div className="border-t border-[#e2e8f0]/60 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/20">
+                {/* Left: Entries selector and showing info */}
+                <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
+                  <div className="flex items-center gap-2">
+                    <span>Show</span>
+                    <Select
+                      value={limit.toString()}
+                      onValueChange={(val) => {
+                        setLimit(Number(val));
+                        setPage(1);
+                      }}
+                    >
+                      <SelectTrigger className="h-8 w-16 rounded-lg border-[#e2e8f0] bg-white text-xs">
+                        <SelectValue placeholder="10" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
+                        {[5, 10, 20, 50].map((size) => (
+                          <SelectItem key={size} value={size.toString()} className="text-xs rounded-lg cursor-pointer">
+                            {size}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <span>entries</span>
+                  </div>
+                  <span className="hidden sm:inline-block h-4 w-[1px] bg-slate-200" />
+                  <span>
+                    Showing <span className="font-semibold text-slate-700">{total === 0 ? 0 : startIdx + 1}</span> to{" "}
+                    <span className="font-semibold text-slate-700">{endIdx}</span> of{" "}
+                    <span className="font-semibold text-slate-700">{total}</span> entries
+                  </span>
+                </div>
+
+                {/* Right: Page buttons */}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={page === 1}
+                    className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                  >
+                    Previous
+                  </Button>
+
+                  {/* Render dynamic page numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                    if (
+                      totalPages > 5 &&
+                      pageNum !== 1 &&
+                      pageNum !== totalPages &&
+                      Math.abs(pageNum - page) > 1
+                    ) {
+                      if (pageNum === 2 && page > 3) {
+                        return <span key="dots-left" className="px-1.5 text-slate-400 text-xs">...</span>;
+                      }
+                      if (pageNum === totalPages - 1 && page < totalPages - 2) {
+                        return <span key="dots-right" className="px-1.5 text-slate-400 text-xs">...</span>;
+                      }
+                      return null;
+                    }
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={page === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPage(pageNum)}
+                        className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer ${
+                          page === pageNum
+                            ? "bg-[#FF6F3F] hover:bg-[#e05626] text-white border-transparent"
+                            : "border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600"
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={page === totalPages}
+                    className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
