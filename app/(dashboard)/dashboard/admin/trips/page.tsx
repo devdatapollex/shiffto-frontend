@@ -434,7 +434,7 @@ export default function AdminTripsPage() {
 
       {/* Detail Dialog */}
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
           {selectedTrip && (() => {
             const fromCountry = getCountryByCode(selectedTrip.fromCountry);
             const toCountry = getCountryByCode(selectedTrip.toCountry);
@@ -452,8 +452,8 @@ export default function AdminTripsPage() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-6 py-4 grid-cols-1 md:grid-cols-2">
-                  {/* Left Column: Details */}
+                <div className="grid gap-6 py-4 grid-cols-1">
+                  {/* Details Column */}
                   <div className="space-y-4">
                     <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
                       <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
@@ -516,7 +516,7 @@ export default function AdminTripsPage() {
                     )}
                   </div>
 
-                  {/* Right Column: Ticket Photo */}
+                  {/* Ticket Photo Column */}
                   <div className="space-y-3">
                     <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide flex justify-between items-center">
                       Uploaded Ticket Scan
