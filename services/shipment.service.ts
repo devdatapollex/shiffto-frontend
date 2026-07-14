@@ -1,6 +1,16 @@
 import apiClient from '@/lib/api-client';
 import type { CreateShipmentPayload } from '@/lib/validations/shipment';
 
+export interface ShipmentCategory {
+  id: string;
+  name: string;
+  slug: string;
+  maxWeight: number | null;
+  minPrice: number;
+  maxPrice: number | null;
+  maxQuantity: number | null;
+}
+
 export interface Shipment {
   id: string;
   itemName: string;
@@ -15,17 +25,14 @@ export interface Shipment {
   receiverName: string;
   receiverPhone: string;
   receiverAddress: string;
-  categoryId: string;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  userId: string;
   tripId: string | null;
   bagType: string | null;
   createdAt?: string;
   updatedAt?: string;
+  status: string;
+  userId: string;
+  categoryId: string;
+  category?: ShipmentCategory;
 }
 
 interface ShipmentsResponse {
@@ -61,4 +68,9 @@ export async function getAvailableShipments(params?: {
 
 export async function sendShipmentOtp(): Promise<void> {
   await apiClient.post('/shipments/send-otp');
+}
+
+export async function getShipments(): Promise<ShipmentsResponse> {
+  const { data } = await apiClient.get<ShipmentsResponse>('/shipments');
+  return data;
 }
