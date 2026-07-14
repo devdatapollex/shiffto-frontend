@@ -74,3 +74,23 @@ export async function acceptShipment(
   const { data } = await apiClient.post<any>(`/trips/${tripId}/accept-shipment`, payload);
   return data.data;
 }
+
+export async function getAllTrips(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  searchTerm?: string;
+}): Promise<TripsResponse> {
+  const { data } = await apiClient.get<TripsResponse>('/trips', {
+    params,
+  });
+  return data;
+}
+
+export async function verifyTrip(
+  id: string,
+  payload: { approved: boolean; rejectionReason?: string }
+): Promise<Trip> {
+  const { data } = await apiClient.post<{ data: Trip }>(`/trips/${id}/verify`, payload);
+  return data.data;
+}

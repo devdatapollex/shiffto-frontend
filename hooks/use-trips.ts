@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMyTrips, cancelTrip, completeTrip, acceptShipment } from '@/services/trip.service';
+import { getMyTrips, cancelTrip, completeTrip, acceptShipment, getAllTrips, verifyTrip } from '@/services/trip.service';
 
 export function useMyTrips(params?: { page?: number; limit?: number; status?: string }) {
   return useQuery({
@@ -41,6 +41,30 @@ export function useAcceptShipment() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-trips'] });
       queryClient.invalidateQueries({ queryKey: ['available-shipments'] });
+    },
+  });
+}
+
+export function useAllTrips(params?: { page?: number; limit?: number; status?: string; searchTerm?: string }) {
+  return useQuery({
+    queryKey: ['admin-trips', params],
+    queryFn: () => getAllTrips(params),
+  });
+}
+
+export function useVerifyTrip() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: { approved: boolean; rejectionReason?: string };
+    }) => verifyTrip(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['my-trips'] });
     },
   });
 }

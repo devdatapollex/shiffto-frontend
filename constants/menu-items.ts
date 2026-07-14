@@ -147,6 +147,12 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         icon: ShieldCheck,
         roles: ['admin'],
       },
+      {
+        label: 'Trips',
+        href: ROUTES.ADMIN_TRIPS,
+        icon: Plane,
+        roles: ['admin'],
+      },
     ],
   },
 ];

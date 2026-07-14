@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, LogOut, X, Shield, ArrowLeftRight, Scale, Banknote, Users, ShieldCheck, Settings } from 'lucide-react';
+import { ChevronLeft, LogOut, X, Shield, ArrowLeftRight, Scale, Banknote, Users, ShieldCheck, Settings, Plane } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'KYC Verifications',
       href: ROUTES.ADMIN_KYC,
       icon: ShieldCheck,
+    },
+    {
+      label: 'Trips',
+      href: ROUTES.ADMIN_TRIPS,
+      icon: Plane,
     },
     {
       label: 'Settlements',

@@ -46,6 +46,7 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
     if (pathname.includes('/dashboard/support')) return 'Support';
     if (pathname.includes('/dashboard/profile')) return 'Profile';
     if (pathname.includes('/dashboard/admin/kyc')) return 'KYC Submissions';
+    if (pathname.includes('/dashboard/admin/trips')) return 'Manage Trips';
     return 'Home';
   };
 
