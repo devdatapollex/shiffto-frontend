@@ -121,7 +121,7 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
           <div className="flex-1 flex items-center px-4 relative self-end mb-2.5">
             <div className="border-t-2 border-dashed border-[#F16522] flex-1 opacity-70" />
             <div className="flex items-center justify-center mx-3 shrink-0">
-              <Plane className="h-6 w-6 text-black rotate-45" />
+              <Plane className="h-6 w-6 text-black fill-black rotate-45" />
             </div>
             <div className="border-t-2 border-dashed border-[#F16522] flex-1 opacity-70" />
           </div>

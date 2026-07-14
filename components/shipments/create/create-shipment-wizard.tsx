@@ -224,7 +224,7 @@ export function CreateShipmentWizard() {
   }
 
   return (
-    <>
+    <div className="mx-auto max-w-[850px]">
       <FormProvider {...form}>
         <form onSubmit={handleSubmit}>
           <WizardCard
@@ -248,6 +248,6 @@ export function CreateShipmentWizard() {
         onOpenChange={setShowDiscardDialog}
         onConfirm={handleConfirmDiscard}
       />
-    </>
+    </div>
   );
 }
