@@ -171,13 +171,16 @@ export function RoutePricingStep() {
                     </span>
                     <Input
                       type="number"
+                      inputMode="decimal"
                       step="0.01"
                       min="0"
                       placeholder="0.00"
                       value={value === 0 ? '' : String(value)}
                       onChange={(e) => {
                         const v = e.target.value;
-                        onChange(v === '' ? 0 : parseFloat(v));
+                        onChange(
+                          v === '' || /^\d*\.?\d*$/.test(v) ? (v === '' ? 0 : parseFloat(v)) : value
+                        );
                       }}
                       className="pl-8 h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg"
                       {...field}

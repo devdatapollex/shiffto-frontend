@@ -139,13 +139,16 @@ export function ItemDetailsStep() {
                 <div className="relative">
                   <Input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     min="0"
                     placeholder="0.00"
                     value={value === 0 ? '' : String(value)}
                     onChange={(e) => {
                       const v = e.target.value;
-                      onChange(v === '' ? 0 : parseFloat(v));
+                      onChange(
+                        v === '' || /^\d*\.?\d*$/.test(v) ? (v === '' ? 0 : parseFloat(v)) : value
+                      );
                     }}
                     className="pr-10"
                     {...field}
@@ -171,13 +174,16 @@ export function ItemDetailsStep() {
               <FormControl>
                 <Input
                   type="number"
+                  inputMode="numeric"
                   min="1"
                   step="1"
                   placeholder="1"
                   value={value === 0 ? '' : String(value)}
                   onChange={(e) => {
                     const v = e.target.value;
-                    onChange(v === '' ? 0 : parseInt(v, 10));
+                    onChange(
+                      v === '' || /^\d*$/.test(v) ? (v === '' ? 0 : parseInt(v, 10)) : value
+                    );
                   }}
                   {...field}
                 />
@@ -220,7 +226,7 @@ export function ItemDetailsStep() {
             <FormControl>
               <PhotoDropzone value={field.value} onChange={field.onChange} />
             </FormControl>
-            <FormDescription>Upload up to 10 images of your item</FormDescription>
+            <FormDescription>At least 1 photo required, max 5 images</FormDescription>
             <FormMessage />
           </FormItem>
         )}

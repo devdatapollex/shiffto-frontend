@@ -22,7 +22,7 @@ export function PhotoDropzone({ value, onChange }: PhotoDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutateAsync: uploadImages } = useUploadImages();
 
-  const MAX_FILES = 10;
+  const MAX_FILES = 5;
   const MAX_SIZE = 5 * 1024 * 1024;
 
   const totalCount = value.length + uploading.length;
@@ -139,7 +139,9 @@ export function PhotoDropzone({ value, onChange }: PhotoDropzoneProps) {
         <div className="text-sm text-muted-foreground">
           <span className="font-medium text-primary">Click to browse</span> or drag and drop
         </div>
-        <div className="text-xs text-muted-foreground">Up to {MAX_FILES} images, max 5MB each</div>
+        <div className="text-xs text-muted-foreground">
+          At least 1 image required, up to {MAX_FILES} max, 5MB each
+        </div>
       </div>
 
       <input

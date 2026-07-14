@@ -57,6 +57,7 @@ export function WizardCard({
           <div className="flex w-full items-center justify-between">
             <Package className="h-10 w-10 text-primary stroke-[1.5]" />
             <Button
+              type="button"
               variant="ghost"
               size="icon"
               onClick={onClose}

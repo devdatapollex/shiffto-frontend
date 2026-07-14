@@ -13,7 +13,10 @@ export const shipmentSchema = z
       .string()
       .min(10, 'Description must be at least 10 characters')
       .max(500, 'Description is too long'),
-    itemPhotos: z.array(z.string()).max(10, 'Maximum 10 photos'),
+    itemPhotos: z
+      .array(z.string())
+      .min(1, 'At least 1 photo is required')
+      .max(5, 'Maximum 5 photos'),
     instructions: z.string().max(500, 'Instructions are too long'),
 
     fromCountry: z.string().min(1, 'Select origin country'),
