@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, LogOut, X } from 'lucide-react';
+import { ChevronLeft, LogOut, X, ArrowLeftRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DASHBOARD_MENU_SECTIONS } from '@/constants/menu-items';
 import { useRole } from '@/hooks/use-role';
@@ -39,15 +39,16 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     router.refresh();
   };
 
-  const filteredSections = DASHBOARD_MENU_SECTIONS.map((section) => ({
-    ...section,
-    items: section.items.filter((item) => {
-      if (role === 'admin') return true;
-      if (item.permission && hasPermission(item.permission)) return true;
-      if (item.roles && item.roles.includes(role || '')) return true;
-      return false;
-    }),
-  })).filter((section) => section.items.length > 0);
+  const filteredSections = DASHBOARD_MENU_SECTIONS.filter((section) => section.label !== 'Admin')
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => {
+        if (item.roles && item.roles.includes(role || '')) return true;
+        if (item.permission && hasPermission(item.permission)) return true;
+        return false;
+      }),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <>
@@ -161,13 +162,37 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               </div>
             </div>
           ))}
+
+          {role === 'admin' && (
+            <div className="pt-4 border-t border-primary/5">
+              <Link
+                href={ROUTES.ADMIN_KYC}
+                className={cn(
+                  'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                  'text-muted-foreground hover:bg-primary/5 hover:text-primary'
+                )}
+              >
+                <ArrowLeftRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-primary" />
+                {!isCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Switch to Admin View
+                  </motion.span>
+                )}
+              </Link>
+            </div>
+          )}
         </nav>
 
         {/* Footer / User Profile */}
         <div className="mt-auto border-t p-4">
-          <div
+          <Link
+            href={ROUTES.PROFILE}
             className={cn(
-              'flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50',
+              'flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50 cursor-pointer',
               isCollapsed && 'justify-center'
             )}
           >
@@ -184,7 +209,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 </span>
               </div>
             )}
-          </div>
+          </Link>
 
           <Button
             variant="ghost"

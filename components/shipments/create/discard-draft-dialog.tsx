@@ -26,7 +26,7 @@ export function DiscardDraftDialog({ open, onOpenChange, onConfirm }: DiscardDra
             Your progress will be lost and uploaded photos will be removed.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        <DialogFooter className="gap-3 sm:gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

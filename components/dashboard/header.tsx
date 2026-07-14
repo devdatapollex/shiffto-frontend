@@ -16,6 +16,11 @@ import {
 import { authClient } from '@/lib/auth-client';
 import { ROUTES } from '@/config/routes';
 import Link from 'next/link';
+import {
+  useNotifications,
+  useMarkNotificationAsRead,
+  useMarkAllNotificationsAsRead,
+} from '@/hooks/use-notifications';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -44,10 +49,19 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
     if (pathname.includes('/dashboard/wallet')) return 'Wallet';
     if (pathname.includes('/dashboard/ratings-reviews')) return 'Ratings & Reviews';
     if (pathname.includes('/dashboard/support')) return 'Support';
+    if (pathname.includes('/dashboard/profile')) return 'Profile';
+    if (pathname.includes('/dashboard/admin/kyc')) return 'KYC Submissions';
+    if (pathname.includes('/dashboard/admin/trips')) return 'Manage Trips';
     return 'Home';
   };
 
   const title = getPageTitle();
+
+  const { data: notifications } = useNotifications();
+  const { mutate: markAsRead } = useMarkNotificationAsRead();
+  const { mutate: markAllAsRead } = useMarkAllNotificationsAsRead();
+
+  const hasUnread = notifications ? notifications.some((n) => !n.read) : false;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur-sm sm:px-8">
@@ -100,18 +114,87 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
           </kbd>
         </div>
 
-        {/* Notifications Bell */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative h-9 w-9 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-2 top-2 flex h-2 w-2 rounded-full bg-orange-500 ring-2 ring-background" />
-        </Button>
+        {/* Notifications Bell Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full"
+            >
+              <Bell className="h-5 w-5" />
+              {hasUnread && (
+                <span className="absolute right-2 top-2 flex h-2 w-2 rounded-full bg-[#FF6F3F] ring-2 ring-background animate-pulse" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-80 sm:w-96 max-h-[450px] overflow-y-auto p-0"
+          >
+            <div className="flex items-center justify-between border-b p-3">
+              <span className="font-semibold text-sm text-[#0B3A8E]">Notifications</span>
+              {hasUnread && (
+                <Button
+                  variant="ghost"
+                  className="h-auto p-0 text-xs text-[#FF6F3F] hover:text-[#e05626] font-medium"
+                  onClick={() => markAllAsRead()}
+                >
+                  Mark all as read
+                </Button>
+              )}
+            </div>
+            <div className="divide-y divide-slate-100 max-h-[380px] overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
+              {notifications && notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    onClick={() => {
+                      if (!notification.read) {
+                        markAsRead(notification.id);
+                      }
+                    }}
+                    className={`p-3.5 text-xs transition-colors cursor-pointer hover:bg-slate-50/80 ${
+                      !notification.read
+                        ? 'bg-slate-50/30 font-semibold border-l-2 border-l-[#FF6F3F]'
+                        : 'border-l-2 border-l-transparent'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span
+                        className={`text-slate-800 ${!notification.read ? 'text-[#0B3A8E]' : ''}`}
+                      >
+                        {notification.title}
+                      </span>
+                      {!notification.read && (
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#FF6F3F] mt-1" />
+                      )}
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-500 leading-relaxed font-normal">
+                      {notification.message}
+                    </p>
+                    <span className="mt-1.5 block text-[10px] text-slate-400 font-normal">
+                      {new Date(notification.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <Bell className="h-8 w-8 mb-2 stroke-1" />
+                  <p className="text-xs">No notifications yet</p>
+                </div>
+              )}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Add Trip Button */}
-        <Link href={ROUTES.MY_TRIPS} className="hidden sm:inline-block">
+        <Link href={ROUTES.CREATE_TRIP} className="hidden sm:inline-block">
           <Button
             variant="outline"
             size="sm"
@@ -144,8 +227,9 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>{session?.user?.name || 'My Account'}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={ROUTES.PROFILE}>Profile</Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
                 Log out

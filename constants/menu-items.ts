@@ -4,7 +4,6 @@ import {
   Search,
   MapPin,
   Plane,
-  PlusCircle,
   DollarSign,
   Wallet,
   Star,
@@ -12,6 +11,8 @@ import {
   Scale,
   Banknote,
   Users,
+  User,
+  ShieldCheck,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
@@ -36,6 +37,12 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         label: 'Home',
         href: ROUTES.DASHBOARD,
         icon: LayoutDashboard,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Profile & KYC',
+        href: ROUTES.PROFILE,
+        icon: User,
         roles: ['user', 'admin'],
       },
     ],
@@ -72,12 +79,12 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         icon: Plane,
         roles: ['user', 'admin'],
       },
-      {
-        label: 'Add Trip',
-        href: ROUTES.CREATE_TRIP,
-        icon: PlusCircle,
-        roles: ['user', 'admin'],
-      },
+      // {
+      //   label: 'Add Trip',
+      //   href: ROUTES.CREATE_TRIP,
+      //   icon: PlusCircle,
+      //   roles: ['user', 'admin'],
+      // },
     ],
   },
   {
@@ -132,6 +139,18 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         label: 'Users',
         href: ROUTES.USERS,
         icon: Users,
+        roles: ['admin'],
+      },
+      {
+        label: 'KYC Verifications',
+        href: ROUTES.ADMIN_KYC,
+        icon: ShieldCheck,
+        roles: ['admin'],
+      },
+      {
+        label: 'Trips',
+        href: ROUTES.ADMIN_TRIPS,
+        icon: Plane,
         roles: ['admin'],
       },
     ],

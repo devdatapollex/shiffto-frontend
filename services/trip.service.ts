@@ -1,5 +1,6 @@
 import apiClient from '@/lib/api-client';
 import type { CreateTripPayload } from '@/lib/validations/trip';
+import type { Shipment } from '@/services/shipment.service';
 
 export interface Trip {
   id: string;
@@ -24,7 +25,7 @@ export interface Trip {
     email: string;
     image: string | null;
   };
-  shipments?: any[];
+  shipments?: Shipment[];
 }
 
 interface TripsResponse {
@@ -70,7 +71,30 @@ export async function completeTrip(id: string): Promise<Trip> {
 export async function acceptShipment(
   tripId: string,
   payload: { shipmentId: string; bagType: 'cabin' | 'checkIn' }
-): Promise<any> {
-  const { data } = await apiClient.post<any>(`/trips/${tripId}/accept-shipment`, payload);
+): Promise<Shipment> {
+  const { data } = await apiClient.post<{ data: Shipment }>(
+    `/trips/${tripId}/accept-shipment`,
+    payload
+  );
+  return data.data;
+}
+
+export async function getAllTrips(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  searchTerm?: string;
+}): Promise<TripsResponse> {
+  const { data } = await apiClient.get<TripsResponse>('/trips', {
+    params,
+  });
+  return data;
+}
+
+export async function verifyTrip(
+  id: string,
+  payload: { approved: boolean; rejectionReason?: string }
+): Promise<Trip> {
+  const { data } = await apiClient.post<{ data: Trip }>(`/trips/${id}/verify`, payload);
   return data.data;
 }

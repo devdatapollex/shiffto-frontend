@@ -5,6 +5,7 @@ export const ROUTES = {
   // Public Routes
   HOME: '/',
   LOGIN: '/login',
+  ADMIN_LOGIN: '/admin/login',
   REGISTER: '/register',
   UNAUTHORIZED: '/unauthorized',
   VERIFY_EMAIL: '/verify',
@@ -23,16 +24,21 @@ export const ROUTES = {
   WALLET: '/dashboard/wallet',
   RATINGS_REVIEWS: '/dashboard/ratings-reviews',
   SUPPORT: '/dashboard/support',
+  PROFILE: '/dashboard/profile',
 
   // Admin-only Routes
   SETTLEMENTS: '/dashboard/settlements',
   WITHDRAWALS: '/dashboard/withdrawals',
   USERS: '/dashboard/users',
+  ADMIN_KYC: '/dashboard/admin/kyc',
+  ADMIN_PROFILE: '/dashboard/admin/profile',
+  ADMIN_TRIPS: '/dashboard/admin/trips',
 } as const;
 
 export const PUBLIC_ROUTES = [
   ROUTES.HOME,
   ROUTES.LOGIN,
+  ROUTES.ADMIN_LOGIN,
   ROUTES.REGISTER,
   ROUTES.VERIFY_EMAIL,
   ROUTES.FORGOT_PASSWORD,

@@ -26,7 +26,7 @@ export function DiscardDraftDialog({ open, onOpenChange, onConfirm }: DiscardDra
             Your progress will be lost and the uploaded flight ticket will be removed.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-3 sm:gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
