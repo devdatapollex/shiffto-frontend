@@ -58,3 +58,7 @@ export async function getAvailableShipments(params?: {
   });
   return data;
 }
+
+export async function sendShipmentOtp(): Promise<void> {
+  await apiClient.post('/shipments/send-otp');
+}
