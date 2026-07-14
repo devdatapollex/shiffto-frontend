@@ -111,7 +111,7 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
         </Button>
 
         {/* Add Trip Button */}
-        <Link href={ROUTES.MY_TRIPS} className="hidden sm:inline-block">
+        <Link href={ROUTES.CREATE_TRIP} className="hidden sm:inline-block">
           <Button
             variant="outline"
             size="sm"

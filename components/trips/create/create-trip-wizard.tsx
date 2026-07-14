@@ -142,7 +142,7 @@ export function CreateTripWizard() {
   }
 
   return (
-    <>
+    <div className="mx-auto max-w-[850px]">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <WizardCard
@@ -169,6 +169,6 @@ export function CreateTripWizard() {
         onOpenChange={setShowDiscardDialog}
         onConfirm={handleConfirmDiscard}
       />
-    </>
+    </div>
   );
 }

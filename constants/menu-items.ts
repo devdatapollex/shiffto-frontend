@@ -72,12 +72,12 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         icon: Plane,
         roles: ['user', 'admin'],
       },
-      {
-        label: 'Add Trip',
-        href: ROUTES.CREATE_TRIP,
-        icon: PlusCircle,
-        roles: ['user', 'admin'],
-      },
+      // {
+      //   label: 'Add Trip',
+      //   href: ROUTES.CREATE_TRIP,
+      //   icon: PlusCircle,
+      //   roles: ['user', 'admin'],
+      // },
     ],
   },
   {
