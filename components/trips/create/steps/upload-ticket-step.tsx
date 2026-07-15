@@ -6,6 +6,8 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { UploadCloud, Loader2, X, FileText, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUploadImages } from '@/hooks/use-upload-image';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import type { CreateTripValues } from '@/lib/validations/trip';
 
@@ -110,11 +112,10 @@ export function UploadTicketStep() {
                         <UploadCloud className="h-8 w-8 stroke-[1.5]" />
                       </div>
                       <div className="text-sm text-slate-500">
-                        <span className="font-semibold text-orange-500">Click to upload</span> or drag and drop
+                        <span className="font-semibold text-orange-500">Click to upload</span> or
+                        drag and drop
                       </div>
-                      <div className="text-xs text-slate-400">
-                        PNG, JPG or PDF (max 10MB)
-                      </div>
+                      <div className="text-xs text-slate-400">PNG, JPG or PDF (max 10MB)</div>
                     </div>
                   )}
 
@@ -136,10 +137,12 @@ export function UploadTicketStep() {
                           </div>
                         ) : (
                           <div className="relative h-12 w-12 rounded-lg overflow-hidden border shrink-0 bg-white">
-                            <img
-                              src={field.value}
+                            <Image
+                              src={toRelativeImageUrl(field.value)}
                               alt="Flight Ticket"
                               className="h-full w-full object-cover"
+                              width={48}
+                              height={48}
                             />
                           </div>
                         )}
@@ -156,7 +159,9 @@ export function UploadTicketStep() {
 
                       <button
                         type="button"
-                        onClick={() => setValue('ticketPhoto', '', { shouldDirty: true, shouldValidate: true })}
+                        onClick={() =>
+                          setValue('ticketPhoto', '', { shouldDirty: true, shouldValidate: true })
+                        }
                         className="rounded-full bg-slate-200 hover:bg-slate-300 p-1.5 text-slate-600 transition-colors cursor-pointer"
                         title="Remove file"
                       >

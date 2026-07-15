@@ -38,6 +38,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { getKycSubmissions, reviewKyc, KycDetails } from '@/services/profile.service';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import {
   Select,
   SelectContent,
@@ -542,10 +544,12 @@ export default function AdminKycPage() {
           <DialogContent className="max-w-4xl p-1 bg-black/90">
             <div className="relative flex items-center justify-center max-h-[85vh] w-full min-h-[400px]">
               {previewPhotoUrl && (
-                <img
-                  src={previewPhotoUrl}
+                <Image
+                  src={toRelativeImageUrl(previewPhotoUrl)}
                   alt="Document Preview"
                   className="max-h-[85vh] max-w-full object-contain"
+                  width={800}
+                  height={600}
                 />
               )}
               <button

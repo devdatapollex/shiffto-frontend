@@ -47,6 +47,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { toRelativeImageUrl } from '@/lib/image-utils';
 import { ShipmentDetailsModal } from '@/components/shipments/shipment-details-modal';
 import Image from 'next/image';
 
@@ -609,10 +610,12 @@ export default function MyShipmentsPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
                             {item.itemPhotos?.[0] ? (
-                              <img
-                                src={item.itemPhotos[0]}
+                              <Image
+                                src={toRelativeImageUrl(item.itemPhotos[0])}
                                 alt={item.itemName}
                                 className="object-cover w-full h-full"
+                                width={40}
+                                height={40}
                               />
                             ) : (
                               <Package className="h-5 w-5 text-slate-400" />

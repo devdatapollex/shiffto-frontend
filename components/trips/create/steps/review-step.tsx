@@ -2,6 +2,8 @@
 
 import { useFormContext } from 'react-hook-form';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import type { CreateTripValues } from '@/lib/validations/trip';
 import { Plane, FileText, CheckCircle2, Pencil } from 'lucide-react';
@@ -17,7 +19,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
   const fromCountry = getCountryByCode(values.fromCountry);
   const toCountry = getCountryByCode(values.toCountry);
 
-    const formattedDate = values.flightDate
+  const formattedDate = values.flightDate
     ? new Date(values.flightDate).toLocaleDateString('en-US', {
         weekday: 'short',
         year: 'numeric',
@@ -33,7 +35,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
       const hours = parseInt(hoursStr, 10);
       const minutes = parseInt(minutesStr, 10);
       if (isNaN(hours) || isNaN(minutes)) return timeStr;
-      
+
       const ampm = hours >= 12 ? 'PM' : 'AM';
       const displayHours = hours % 12 || 12;
       const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
@@ -111,7 +113,9 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200/60 text-sm text-slate-600">
           <div className="flex flex-col">
             <span className="text-slate-400 text-xs font-semibold">Flight number</span>
-            <strong className="text-slate-700 font-semibold mt-1">{values.flightNumber || 'N/A'}</strong>
+            <strong className="text-slate-700 font-semibold mt-1">
+              {values.flightNumber || 'N/A'}
+            </strong>
           </div>
           <div className="flex flex-col">
             <span className="text-slate-400 text-xs font-semibold">Flight date</span>
@@ -119,11 +123,15 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
           </div>
           <div className="flex flex-col">
             <span className="text-slate-400 text-xs font-semibold">Flight time</span>
-            <strong className="text-slate-700 font-semibold mt-1">{formatTimeString(values.flightTime)}</strong>
+            <strong className="text-slate-700 font-semibold mt-1">
+              {formatTimeString(values.flightTime)}
+            </strong>
           </div>
           <div className="flex flex-col">
             <span className="text-slate-400 text-xs font-semibold">Arrival time</span>
-            <strong className="text-slate-700 font-semibold mt-1">{formatTimeString(values.airportArrivalTime)}</strong>
+            <strong className="text-slate-700 font-semibold mt-1">
+              {formatTimeString(values.airportArrivalTime)}
+            </strong>
           </div>
         </div>
       </div>
@@ -147,10 +155,12 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
               {isPdf ? (
                 <FileText className="h-10 w-10 text-red-500 shrink-0" />
               ) : (
-                <img
-                  src={values.ticketPhoto}
+                <Image
+                  src={toRelativeImageUrl(values.ticketPhoto)}
                   alt="Ticket preview"
                   className="h-full w-full object-cover"
+                  width={120}
+                  height={120}
                 />
               )}
             </div>
@@ -189,7 +199,9 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
           </div>
           <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between">
             <span className="text-[#8292a1] text-sm font-medium">Check-In Bag Capacity</span>
-            <strong className="text-[#0B3A8E] text-base">{values.checkInBagCapacity || 0} KG</strong>
+            <strong className="text-[#0B3A8E] text-base">
+              {values.checkInBagCapacity || 0} KG
+            </strong>
           </div>
         </div>
       </div>
@@ -199,7 +211,9 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
         <CheckCircle2 className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
         <div>
           <p className="font-semibold text-blue-900 mb-0.5">Admin approval verification</p>
-          Your trip will be submitted to the Admin team for KYC Verification. Once verified and approved, it will become active and visible to Senders looking to ship luggage cargo on your flight route.
+          Your trip will be submitted to the Admin team for KYC Verification. Once verified and
+          approved, it will become active and visible to Senders looking to ship luggage cargo on
+          your flight route.
         </div>
       </div>
     </div>

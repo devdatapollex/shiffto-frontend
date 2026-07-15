@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import { Eye, Plane, Package, CheckCircle2, CircleDot, Circle, X } from 'lucide-react';
 
 interface ShipmentDetailsModalProps {
@@ -313,10 +315,12 @@ export function ShipmentDetailsModal({
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
                       {shipment.itemPhotos?.[0] ? (
-                        <img
-                          src={shipment.itemPhotos[0]}
+                        <Image
+                          src={toRelativeImageUrl(shipment.itemPhotos[0])}
                           alt={shipment.itemName}
                           className="object-cover w-full h-full"
+                          width={40}
+                          height={40}
                         />
                       ) : (
                         <Package className="h-5 w-5 text-slate-400" />

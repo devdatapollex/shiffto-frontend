@@ -43,6 +43,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import { useAllTrips, useVerifyTrip } from '@/hooks/use-trips';
 import type { Trip } from '@/services/trip.service';
 import {
@@ -676,10 +678,12 @@ export default function AdminTripsPage() {
         <DialogContent className="max-w-4xl p-1 bg-black/95 border-0">
           <div className="relative flex items-center justify-center max-h-[85vh] w-full min-h-[400px]">
             {previewPhotoUrl && (
-              <img
-                src={previewPhotoUrl}
+              <Image
+                src={toRelativeImageUrl(previewPhotoUrl)}
                 alt="Flight Ticket Preview"
                 className="max-h-[85vh] max-w-full object-contain rounded-lg"
+                width={800}
+                height={600}
               />
             )}
             <button
