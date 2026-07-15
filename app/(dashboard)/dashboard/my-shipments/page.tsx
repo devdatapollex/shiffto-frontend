@@ -47,6 +47,8 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { ShipmentDetailsModal } from '@/components/shipments/shipment-details-modal';
+import Image from 'next/image';
 
 // --- Types ---
 
@@ -161,6 +163,7 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 
 export default function MyShipmentsPage() {
   const { isAdmin } = useRole();
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
 
   // --- Offers (mock data, unchanged) ---
   const [offers, setOffers] = useState<Offer[]>([
@@ -381,10 +384,12 @@ export default function MyShipmentsPage() {
                       <div className="flex gap-4 items-start mb-4">
                         <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
                           {offer.itemImage ? (
-                            <img
+                            <Image
                               src={offer.itemImage}
                               alt={offer.itemName}
                               className="object-cover w-full h-full"
+                              width={56}
+                              height={56}
                             />
                           ) : (
                             <Package className="h-6 w-6 text-slate-400" />
@@ -416,10 +421,12 @@ export default function MyShipmentsPage() {
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="w-8 h-8 rounded-full bg-slate-200 border border-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
                             {offer.traveler.avatar ? (
-                              <img
+                              <Image
                                 src={offer.traveler.avatar}
                                 alt={offer.traveler.name}
                                 className="object-cover w-full h-full"
+                                width={56}
+                                height={56}
                               />
                             ) : (
                               <span>{offer.traveler.name.charAt(0)}</span>
@@ -652,7 +659,9 @@ export default function MyShipmentsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View details</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setSelectedShipmentId(item.id)}>
+                                View details
+                              </DropdownMenuItem>
                               {item.status === 'AWAITING_MATCH' && (
                                 <DropdownMenuItem className="text-destructive">
                                   Cancel shipment
@@ -791,6 +800,12 @@ export default function MyShipmentsPage() {
           </div>
         )}
       </div>
+
+      <ShipmentDetailsModal
+        shipmentId={selectedShipmentId}
+        open={selectedShipmentId !== null}
+        onOpenChange={(open) => !open && setSelectedShipmentId(null)}
+      />
     </div>
   );
 }
