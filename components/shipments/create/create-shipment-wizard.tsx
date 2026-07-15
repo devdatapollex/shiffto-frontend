@@ -180,34 +180,41 @@ export function CreateShipmentWizard() {
     setStep(targetStep);
   };
 
-  const handleSubmit = form.handleSubmit(async (values) => {
-    const { notRestrictedConfirmation: _, receiverPhoneExt, receiverPhoneNum, ...rest } = values;
+  const handleSubmit = form.handleSubmit(
+    async (values) => {
+      const { notRestrictedConfirmation: _, receiverPhoneExt, receiverPhoneNum, ...rest } = values;
 
-    const country = getCountryByCode(receiverPhoneExt || '');
-    const callingCode = country?.callingCode ?? '';
-    const mergedPhone = `${callingCode}${receiverPhoneNum || ''}`;
+      const country = getCountryByCode(receiverPhoneExt || '');
+      const callingCode = country?.callingCode ?? '';
+      const mergedPhone = `${callingCode}${receiverPhoneNum || ''}`;
 
-    const payload: CreateShipmentPayload = {
-      ...rest,
-      receiverPhone: mergedPhone,
-    };
+      const payload: CreateShipmentPayload = {
+        ...rest,
+        receiverPhone: mergedPhone,
+      };
 
-    try {
-      await mutateAsync(payload);
-      toast.success('Shipment created successfully!');
-      resetWizard();
-      router.push(ROUTES.MY_SHIPMENTS);
-      router.refresh();
-    } catch (error: unknown) {
-      const err = error as { status?: number; message?: string };
-      const errorMsg = err?.message || 'Failed to create shipment';
-      if (err?.status === 403 || errorMsg.toLowerCase().includes('kyc')) {
-        setShowKycDialog(true);
-      } else {
-        toast.error(errorMsg);
+      try {
+        await mutateAsync(payload);
+        toast.success('Shipment created successfully!');
+        resetWizard();
+        router.push(ROUTES.MY_SHIPMENTS);
+        router.refresh();
+      } catch (error: unknown) {
+        const err = error as { status?: number; message?: string };
+        const errorMsg = err?.message || 'Failed to create shipment';
+        if (err?.status === 403 || errorMsg.toLowerCase().includes('kyc')) {
+          setShowKycDialog(true);
+        } else {
+          toast.error(errorMsg);
+        }
       }
+    },
+    (errors) => {
+      const firstError = Object.values(errors)[0];
+      const message = firstError?.message ?? 'Please fix the errors before submitting.';
+      toast.error(message);
     }
-  });
+  );
 
   const handleClose = useCallback(() => {
     if (form.formState.isDirty) {
@@ -281,10 +288,7 @@ export function CreateShipmentWizard() {
         onConfirm={handleConfirmDiscard}
       />
 
-      <KycRequiredDialog
-        open={showKycDialog}
-        onOpenChange={setShowKycDialog}
-      />
+      <KycRequiredDialog open={showKycDialog} onOpenChange={setShowKycDialog} />
     </div>
   );
 }

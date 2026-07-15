@@ -4,23 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
-import {
-  User,
-  Lock,
-  Camera,
-  Loader2,
-} from 'lucide-react';
+import { User, Lock, Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  getProfile,
-  updateProfile,
-  changePassword,
-  UserProfile,
-} from '@/services/profile.service';
+import { getProfile, updateProfile, changePassword, UserProfile } from '@/services/profile.service';
 import { uploadPhotos } from '@/services/upload.service';
 import { ROUTES } from '@/config/routes';
 import { RoleGuard } from '@/components/auth/role-guard';
@@ -166,7 +156,12 @@ export default function AdminProfilePage() {
 
   if (loading) {
     return (
-      <RoleGuard roles={['admin']} fallback={<div className="p-8 text-center font-bold text-destructive">Unauthorized Access</div>}>
+      <RoleGuard
+        roles={['admin']}
+        fallback={
+          <div className="p-8 text-center font-bold text-destructive">Unauthorized Access</div>
+        }
+      >
         <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-2">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Loading admin profile...</p>
@@ -176,7 +171,12 @@ export default function AdminProfilePage() {
   }
 
   return (
-    <RoleGuard roles={['admin']} fallback={<div className="p-8 text-center font-bold text-destructive">Unauthorized Access</div>}>
+    <RoleGuard
+      roles={['admin']}
+      fallback={
+        <div className="p-8 text-center font-bold text-destructive">Unauthorized Access</div>
+      }
+    >
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-[#0B3A8E]">Admin Settings</h1>
@@ -201,8 +201,12 @@ export default function AdminProfilePage() {
           <TabsContent value="personal">
             <Card className="border-slate-100 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-[#0B3A8E]">Personal Information</CardTitle>
-                <CardDescription>Update your administrative profile photo and contact details.</CardDescription>
+                <CardTitle className="text-xl font-bold text-[#0B3A8E]">
+                  Personal Information
+                </CardTitle>
+                <CardDescription>
+                  Update your administrative profile photo and contact details.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Profile Photo */}
@@ -212,7 +216,9 @@ export default function AdminProfilePage() {
                       {image ? (
                         <img src={image} alt="Profile" className="h-full w-full object-cover" />
                       ) : (
-                        <span className="text-[#0B3A8E]">{name.charAt(0).toUpperCase() || 'A'}</span>
+                        <span className="text-[#0B3A8E]">
+                          {name.charAt(0).toUpperCase() || 'A'}
+                        </span>
                       )}
                     </div>
                     <label
@@ -291,9 +297,12 @@ export default function AdminProfilePage() {
           <TabsContent value="security">
             <Card className="border-slate-100 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-[#0B3A8E]">Security & Password</CardTitle>
+                <CardTitle className="text-xl font-bold text-[#0B3A8E]">
+                  Security & Password
+                </CardTitle>
                 <CardDescription>
-                  Ensure your administrative account is protected. Changing password will sign you out.
+                  Ensure your administrative account is protected. Changing password will sign you
+                  out.
                 </CardDescription>
               </CardHeader>
               <CardContent>

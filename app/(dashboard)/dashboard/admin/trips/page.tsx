@@ -44,6 +44,7 @@ import { Label } from '@/components/ui/label';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { useAllTrips, useVerifyTrip } from '@/hooks/use-trips';
+import type { Trip } from '@/services/trip.service';
 import {
   Select,
   SelectContent,
@@ -60,7 +61,7 @@ export default function AdminTripsPage() {
   const [limit, setLimit] = useState<number>(10);
 
   // Detail Dialog State
-  const [selectedTrip, setSelectedTrip] = useState<any | null>(null);
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
 
   // Reject Reason Dialog State
@@ -107,8 +108,9 @@ export default function AdminTripsPage() {
       });
       toast.success('Trip approved successfully!');
       setShowDetailDialog(false);
-    } catch (error: any) {
-      toast.error(error?.message || 'Failed to approve trip');
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err?.message || 'Failed to approve trip');
     }
   };
 
@@ -128,8 +130,9 @@ export default function AdminTripsPage() {
       setShowRejectDialog(false);
       setShowDetailDialog(false);
       setRejectionReason('');
-    } catch (error: any) {
-      toast.error(error?.message || 'Failed to reject trip');
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err?.message || 'Failed to reject trip');
     }
   };
 
@@ -189,7 +192,12 @@ export default function AdminTripsPage() {
   };
 
   return (
-    <RoleGuard roles={['admin']} fallback={<div className="p-8 text-center font-bold text-destructive">Unauthorized Access</div>}>
+    <RoleGuard
+      roles={['admin']}
+      fallback={
+        <div className="p-8 text-center font-bold text-destructive">Unauthorized Access</div>
+      }
+    >
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-[#0B3A8E]">Manage Trips</h1>
@@ -284,7 +292,7 @@ export default function AdminTripsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {trips.map((trip: any) => {
+                    {trips.map((trip: Trip) => {
                       const fromCountry = getCountryByCode(trip.fromCountry);
                       const toCountry = getCountryByCode(trip.toCountry);
                       const shortId = `#TR-${trip.id.slice(-4).toUpperCase()}`;
@@ -296,7 +304,9 @@ export default function AdminTripsPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-col">
-                              <span className="font-semibold text-slate-800">{trip.user?.name}</span>
+                              <span className="font-semibold text-slate-800">
+                                {trip.user?.name}
+                              </span>
                               <span className="text-xs text-slate-500">{trip.user?.email}</span>
                             </div>
                           </TableCell>
@@ -354,7 +364,11 @@ export default function AdminTripsPage() {
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
                         {[5, 10, 20, 50].map((size) => (
-                          <SelectItem key={size} value={size.toString()} className="text-xs rounded-lg cursor-pointer">
+                          <SelectItem
+                            key={size}
+                            value={size.toString()}
+                            className="text-xs rounded-lg cursor-pointer"
+                          >
                             {size}
                           </SelectItem>
                         ))}
@@ -364,8 +378,11 @@ export default function AdminTripsPage() {
                   </div>
                   <span className="hidden sm:inline-block h-4 w-[1px] bg-slate-200" />
                   <span>
-                    Showing <span className="font-semibold text-slate-700">{total === 0 ? 0 : startIdx + 1}</span> to{" "}
-                    <span className="font-semibold text-slate-700">{endIdx}</span> of{" "}
+                    Showing{' '}
+                    <span className="font-semibold text-slate-700">
+                      {total === 0 ? 0 : startIdx + 1}
+                    </span>{' '}
+                    to <span className="font-semibold text-slate-700">{endIdx}</span> of{' '}
                     <span className="font-semibold text-slate-700">{total}</span> entries
                   </span>
                 </div>
@@ -391,10 +408,18 @@ export default function AdminTripsPage() {
                       Math.abs(pageNum - page) > 1
                     ) {
                       if (pageNum === 2 && page > 3) {
-                        return <span key="dots-left" className="px-1.5 text-slate-400 text-xs">...</span>;
+                        return (
+                          <span key="dots-left" className="px-1.5 text-slate-400 text-xs">
+                            ...
+                          </span>
+                        );
                       }
                       if (pageNum === totalPages - 1 && page < totalPages - 2) {
-                        return <span key="dots-right" className="px-1.5 text-slate-400 text-xs">...</span>;
+                        return (
+                          <span key="dots-right" className="px-1.5 text-slate-400 text-xs">
+                            ...
+                          </span>
+                        );
                       }
                       return null;
                     }
@@ -402,13 +427,13 @@ export default function AdminTripsPage() {
                     return (
                       <Button
                         key={pageNum}
-                        variant={page === pageNum ? "default" : "outline"}
+                        variant={page === pageNum ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setPage(pageNum)}
                         className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer ${
                           page === pageNum
-                            ? "bg-[#FF6F3F] hover:bg-[#e05626] text-white border-transparent"
-                            : "border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600"
+                            ? 'bg-[#FF6F3F] hover:bg-[#e05626] text-white border-transparent'
+                            : 'border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600'
                         }`}
                       >
                         {pageNum}
@@ -435,155 +460,171 @@ export default function AdminTripsPage() {
       {/* Detail Dialog */}
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
-          {selectedTrip && (() => {
-            const fromCountry = getCountryByCode(selectedTrip.fromCountry);
-            const toCountry = getCountryByCode(selectedTrip.toCountry);
-            const shortId = `#TR-${selectedTrip.id.slice(-4).toUpperCase()}`;
+          {selectedTrip &&
+            (() => {
+              const fromCountry = getCountryByCode(selectedTrip.fromCountry);
+              const toCountry = getCountryByCode(selectedTrip.toCountry);
+              const shortId = `#TR-${selectedTrip.id.slice(-4).toUpperCase()}`;
 
-            return (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-bold text-[#0B3A8E] flex items-center gap-2">
-                    <Plane className="h-5 w-5" />
-                    Trip Details {shortId}
-                  </DialogTitle>
-                  <DialogDescription>
-                    Review user details and ticket verification upload.
-                  </DialogDescription>
-                </DialogHeader>
+              return (
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold text-[#0B3A8E] flex items-center gap-2">
+                      <Plane className="h-5 w-5" />
+                      Trip Details {shortId}
+                    </DialogTitle>
+                    <DialogDescription>
+                      Review user details and ticket verification upload.
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <div className="grid gap-6 py-4 grid-cols-1">
-                  {/* Details Column */}
-                  <div className="space-y-4">
-                    <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
-                      <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
-                        Traveler Info
-                      </h4>
-                      <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
-                        <span className="text-slate-400 font-medium">Name:</span>
-                        <span className="font-semibold text-slate-800 break-all">{selectedTrip.user?.name}</span>
-                        <span className="text-slate-400 font-medium">Email:</span>
-                        <span className="text-slate-700 break-all">{selectedTrip.user?.email}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
-                      <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
-                        Flight Details
-                      </h4>
-                      <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
-                        <span className="text-slate-400 font-medium">Flight No:</span>
-                        <span className="font-semibold text-slate-800">{selectedTrip.flightNumber}</span>
-                        <span className="text-slate-400 font-medium">Origin:</span>
-                        <span className="text-slate-800 font-semibold">{fromCountry?.name} ({selectedTrip.fromCountry})</span>
-                        <span className="text-slate-400 font-medium">Destination:</span>
-                        <span className="text-slate-800 font-semibold">{toCountry?.name} ({selectedTrip.toCountry})</span>
-                        <span className="text-slate-400 font-medium">Departure Date:</span>
-                        <span className="text-slate-800 font-semibold">
-                          {new Date(selectedTrip.flightDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </span>
-                        <span className="text-slate-400 font-medium">Departure Time:</span>
-                        <span className="text-slate-800 font-semibold">{formatTime12h(selectedTrip.flightTime)}</span>
-                        <span className="text-slate-400 font-medium">Arrival Time:</span>
-                        <span className="text-slate-800 font-semibold">{formatTime12h(selectedTrip.airportArrivalTime)}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
-                      <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
-                        Baggage Allowance
-                      </h4>
-                      <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
-                        <span className="text-slate-400 font-medium">Cabin Bag:</span>
-                        <span className="font-bold text-[#0B3A8E]">{selectedTrip.cabinBagCapacity} KG</span>
-                        <span className="text-slate-400 font-medium">Check-in Bag:</span>
-                        <span className="font-bold text-[#0B3A8E]">{selectedTrip.checkInBagCapacity} KG</span>
-                      </div>
-                    </div>
-
-                    {selectedTrip.status === 'REJECTED' && selectedTrip.rejectionReason && (
-                      <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs font-semibold text-destructive flex gap-2">
-                        <AlertCircle className="h-4 w-4 shrink-0" />
-                        <div>
-                          <div className="font-bold uppercase">Rejection Reason</div>
-                          <div className="mt-0.5 font-medium">{selectedTrip.rejectionReason}</div>
+                  <div className="grid gap-6 py-4 grid-cols-1">
+                    {/* Details Column */}
+                    <div className="space-y-4">
+                      <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
+                        <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
+                          Traveler Info
+                        </h4>
+                        <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
+                          <span className="text-slate-400 font-medium">Name:</span>
+                          <span className="font-semibold text-slate-800 break-all">
+                            {selectedTrip.user?.name}
+                          </span>
+                          <span className="text-slate-400 font-medium">Email:</span>
+                          <span className="text-slate-700 break-all">
+                            {selectedTrip.user?.email}
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Ticket Photo Column */}
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide flex justify-between items-center">
-                      Uploaded Ticket Scan
-                      {selectedTrip.ticketPhoto && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs p-0 text-[#FF6F3F] hover:text-[#e05626]"
-                          onClick={() => setPreviewPhotoUrl(selectedTrip.ticketPhoto)}
-                        >
-                          <ExternalLink className="h-3 w-3 mr-1" /> View Full
-                        </Button>
+                      <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
+                        <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
+                          Flight Details
+                        </h4>
+                        <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
+                          <span className="text-slate-400 font-medium">Flight No:</span>
+                          <span className="font-semibold text-slate-800">
+                            {selectedTrip.flightNumber}
+                          </span>
+                          <span className="text-slate-400 font-medium">Origin:</span>
+                          <span className="text-slate-800 font-semibold">
+                            {fromCountry?.name} ({selectedTrip.fromCountry})
+                          </span>
+                          <span className="text-slate-400 font-medium">Destination:</span>
+                          <span className="text-slate-800 font-semibold">
+                            {toCountry?.name} ({selectedTrip.toCountry})
+                          </span>
+                          <span className="text-slate-400 font-medium">Departure Date:</span>
+                          <span className="text-slate-800 font-semibold">
+                            {new Date(selectedTrip.flightDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </span>
+                          <span className="text-slate-400 font-medium">Departure Time:</span>
+                          <span className="text-slate-800 font-semibold">
+                            {formatTime12h(selectedTrip.flightTime)}
+                          </span>
+                          <span className="text-slate-400 font-medium">Arrival Time:</span>
+                          <span className="text-slate-800 font-semibold">
+                            {formatTime12h(selectedTrip.airportArrivalTime)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
+                        <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
+                          Baggage Allowance
+                        </h4>
+                        <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
+                          <span className="text-slate-400 font-medium">Cabin Bag:</span>
+                          <span className="font-bold text-[#0B3A8E]">
+                            {selectedTrip.cabinBagCapacity} KG
+                          </span>
+                          <span className="text-slate-400 font-medium">Check-in Bag:</span>
+                          <span className="font-bold text-[#0B3A8E]">
+                            {selectedTrip.checkInBagCapacity} KG
+                          </span>
+                        </div>
+                      </div>
+
+                      {selectedTrip.status === 'REJECTED' && selectedTrip.rejectionReason && (
+                        <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs font-semibold text-destructive flex gap-2">
+                          <AlertCircle className="h-4 w-4 shrink-0" />
+                          <div>
+                            <div className="font-bold uppercase">Rejection Reason</div>
+                            <div className="mt-0.5 font-medium">{selectedTrip.rejectionReason}</div>
+                          </div>
+                        </div>
                       )}
-                    </h4>
+                    </div>
 
-                    {selectedTrip.ticketPhoto ? (
-                      <div className="border rounded-xl overflow-hidden bg-slate-50 p-2">
-                        <div
-                          className="h-64 w-full bg-contain bg-center bg-no-repeat rounded-lg border cursor-zoom-in"
-                          style={{ backgroundImage: `url(${selectedTrip.ticketPhoto})` }}
-                          onClick={() => setPreviewPhotoUrl(selectedTrip.ticketPhoto)}
-                        />
-                      </div>
-                    ) : (
-                      <div className="h-64 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm">
-                        <FileText className="h-8 w-8 mb-2" />
-                        No ticket file uploaded
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <DialogFooter className="gap-2 border-t pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowDetailDialog(false)}
-                  >
-                    Close
-                  </Button>
-
-                  {selectedTrip.status === 'PENDING' && (
-                    <>
-                      <Button
-                        variant="destructive"
-                        onClick={() => setShowRejectDialog(true)}
-                        disabled={verifyTripMutation.isPending}
-                      >
-                        <X className="mr-1.5 h-4 w-4" /> Reject
-                      </Button>
-                      <Button
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleApprove(selectedTrip.id)}
-                        disabled={verifyTripMutation.isPending}
-                      >
-                        {verifyTripMutation.isPending ? (
-                          <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Check className="mr-1.5 h-4 w-4" />
+                    {/* Ticket Photo Column */}
+                    <div className="space-y-3">
+                      <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide flex justify-between items-center">
+                        Uploaded Ticket Scan
+                        {selectedTrip.ticketPhoto && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs p-0 text-[#FF6F3F] hover:text-[#e05626]"
+                            onClick={() => setPreviewPhotoUrl(selectedTrip.ticketPhoto)}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" /> View Full
+                          </Button>
                         )}
-                        Approve
-                      </Button>
-                    </>
-                  )}
-                </DialogFooter>
-              </>
-            );
-          })()}
+                      </h4>
+
+                      {selectedTrip.ticketPhoto ? (
+                        <div className="border rounded-xl overflow-hidden bg-slate-50 p-2">
+                          <div
+                            className="h-64 w-full bg-contain bg-center bg-no-repeat rounded-lg border cursor-zoom-in"
+                            style={{ backgroundImage: `url(${selectedTrip.ticketPhoto})` }}
+                            onClick={() => setPreviewPhotoUrl(selectedTrip.ticketPhoto)}
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-64 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm">
+                          <FileText className="h-8 w-8 mb-2" />
+                          No ticket file uploaded
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <DialogFooter className="gap-2 border-t pt-4">
+                    <Button variant="outline" onClick={() => setShowDetailDialog(false)}>
+                      Close
+                    </Button>
+
+                    {selectedTrip.status === 'PENDING' && (
+                      <>
+                        <Button
+                          variant="destructive"
+                          onClick={() => setShowRejectDialog(true)}
+                          disabled={verifyTripMutation.isPending}
+                        >
+                          <X className="mr-1.5 h-4 w-4" /> Reject
+                        </Button>
+                        <Button
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => handleApprove(selectedTrip.id)}
+                          disabled={verifyTripMutation.isPending}
+                        >
+                          {verifyTripMutation.isPending ? (
+                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="mr-1.5 h-4 w-4" />
+                          )}
+                          Approve
+                        </Button>
+                      </>
+                    )}
+                  </DialogFooter>
+                </>
+              );
+            })()}
         </DialogContent>
       </Dialog>
 
@@ -593,7 +634,8 @@ export default function AdminTripsPage() {
           <DialogHeader>
             <DialogTitle className="text-destructive">Reject Flight Trip</DialogTitle>
             <DialogDescription>
-              Provide an explanation of why this flight trip is rejected. The user will see this notification.
+              Provide an explanation of why this flight trip is rejected. The user will see this
+              notification.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-2">

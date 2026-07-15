@@ -49,7 +49,9 @@ export interface KycSubmissionsResponse {
     limit: number;
     total: number;
   };
-  data: (KycDetails & { user: { id: string; name: string; email: string; image: string | null; phone: string | null } })[];
+  data: (KycDetails & {
+    user: { id: string; name: string; email: string; image: string | null; phone: string | null };
+  })[];
 }
 
 export async function getProfile(): Promise<UserProfile> {

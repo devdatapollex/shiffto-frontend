@@ -39,16 +39,16 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     router.refresh();
   };
 
-  const filteredSections = DASHBOARD_MENU_SECTIONS.filter(
-    (section) => section.label !== 'Admin'
-  ).map((section) => ({
-    ...section,
-    items: section.items.filter((item) => {
-      if (item.roles && item.roles.includes(role || '')) return true;
-      if (item.permission && hasPermission(item.permission)) return true;
-      return false;
-    }),
-  })).filter((section) => section.items.length > 0);
+  const filteredSections = DASHBOARD_MENU_SECTIONS.filter((section) => section.label !== 'Admin')
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => {
+        if (item.roles && item.roles.includes(role || '')) return true;
+        if (item.permission && hasPermission(item.permission)) return true;
+        return false;
+      }),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <>

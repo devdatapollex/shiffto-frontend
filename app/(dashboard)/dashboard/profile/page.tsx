@@ -20,9 +20,22 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -243,7 +256,10 @@ export default function ProfilePage() {
   };
 
   // Upload KYC Photo (front / back)
-  const handleKycPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, side: 'front' | 'back') => {
+  const handleKycPhotoUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    side: 'front' | 'back'
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -402,7 +418,11 @@ export default function ProfilePage() {
             <Shield className="h-4 w-4" />
             <span className="hidden md:inline">KYC Verification</span>
           </TabsTrigger>
-          <TabsTrigger value="danger" id="tab-danger" className="flex items-center gap-2 text-destructive">
+          <TabsTrigger
+            value="danger"
+            id="tab-danger"
+            className="flex items-center gap-2 text-destructive"
+          >
             <AlertTriangle className="h-4 w-4" />
             <span className="hidden md:inline">Danger Zone</span>
           </TabsTrigger>
@@ -412,7 +432,9 @@ export default function ProfilePage() {
         <TabsContent value="personal">
           <Card className="border-slate-100 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-[#0B3A8E]">Personal Information</CardTitle>
+              <CardTitle className="text-xl font-bold text-[#0B3A8E]">
+                Personal Information
+              </CardTitle>
               <CardDescription>Update your profile photo and contact details.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -508,9 +530,12 @@ export default function ProfilePage() {
         <TabsContent value="security">
           <Card className="border-slate-100 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-[#0B3A8E]">Security & Password</CardTitle>
+              <CardTitle className="text-xl font-bold text-[#0B3A8E]">
+                Security & Password
+              </CardTitle>
               <CardDescription>
-                Ensure your account is protected with a strong, complex password. Changing password will sign you out.
+                Ensure your account is protected with a strong, complex password. Changing password
+                will sign you out.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -569,9 +594,12 @@ export default function ProfilePage() {
         <TabsContent value="kyc">
           <Card className="border-slate-100 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-[#0B3A8E]">Identity Verification (KYC)</CardTitle>
+              <CardTitle className="text-xl font-bold text-[#0B3A8E]">
+                Identity Verification (KYC)
+              </CardTitle>
               <CardDescription>
-                Verification covers traveler and sender privileges. Complete the form to start matching shipments.
+                Verification covers traveler and sender privileges. Complete the form to start
+                matching shipments.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -583,7 +611,8 @@ export default function ProfilePage() {
                     <div>
                       <h4 className="font-semibold text-green-800">KYC Status: Approved</h4>
                       <p className="text-xs text-green-700 mt-1">
-                        Your identity has been fully verified. You can now publish shipment requests and list travel trips.
+                        Your identity has been fully verified. You can now publish shipment requests
+                        and list travel trips.
                       </p>
                     </div>
                   </>
@@ -594,7 +623,8 @@ export default function ProfilePage() {
                     <div>
                       <h4 className="font-semibold text-orange-800">KYC Status: Pending Review</h4>
                       <p className="text-xs text-orange-700 mt-1">
-                        Your submissions are currently being verified by our administration team. This usually takes 24 hours.
+                        Your submissions are currently being verified by our administration team.
+                        This usually takes 24 hours.
                       </p>
                     </div>
                   </>
@@ -605,7 +635,8 @@ export default function ProfilePage() {
                     <div className="flex-1">
                       <h4 className="font-semibold text-destructive">KYC Status: Rejected</h4>
                       <p className="text-xs text-red-700 mt-1">
-                        Your document could not be verified. Please review the reason below and submit resubmission form from scratch.
+                        Your document could not be verified. Please review the reason below and
+                        submit resubmission form from scratch.
                       </p>
                       {profile?.kyc?.rejectionReason && (
                         <div className="mt-3 p-2 bg-red-50 border border-red-100 rounded text-xs font-semibold text-destructive">
@@ -621,7 +652,8 @@ export default function ProfilePage() {
                     <div>
                       <h4 className="font-semibold text-yellow-800">KYC Status: Not Submitted</h4>
                       <p className="text-xs text-yellow-700 mt-1">
-                        Submit verification documents. Without approval, you will not be allowed to add trips or shipments.
+                        Submit verification documents. Without approval, you will not be allowed to
+                        add trips or shipments.
                       </p>
                     </div>
                   </>
@@ -648,7 +680,9 @@ export default function ProfilePage() {
                             name="documentType"
                             value={type}
                             checked={docType === type}
-                            onChange={() => setDocType(type as 'PASSPORT' | 'DRIVING_LICENSE' | 'NID')}
+                            onChange={() =>
+                              setDocType(type as 'PASSPORT' | 'DRIVING_LICENSE' | 'NID')
+                            }
                             className="text-primary focus:ring-primary h-4 w-4"
                           />
                           {type === 'PASSPORT' && 'Passport'}
@@ -707,7 +741,11 @@ export default function ProfilePage() {
                       <div className="relative border-2 border-dashed border-slate-200 rounded-lg p-4 flex flex-col items-center justify-center h-48 bg-slate-50 hover:bg-slate-100 transition-colors">
                         {frontPhotoUrl ? (
                           <div className="absolute inset-0 p-2">
-                            <img src={frontPhotoUrl} alt="Document Front" className="h-full w-full object-contain rounded-md" />
+                            <img
+                              src={frontPhotoUrl}
+                              alt="Document Front"
+                              className="h-full w-full object-contain rounded-md"
+                            />
                             <button
                               type="button"
                               onClick={() => {
@@ -722,8 +760,12 @@ export default function ProfilePage() {
                         ) : (
                           <div className="flex flex-col items-center text-center">
                             <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                            <p className="text-xs font-semibold text-slate-700">Click to upload document front</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">JPG, PNG, WebP up to 5MB</p>
+                            <p className="text-xs font-semibold text-slate-700">
+                              Click to upload document front
+                            </p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              JPG, PNG, WebP up to 5MB
+                            </p>
                           </div>
                         )}
                         <input
@@ -747,7 +789,11 @@ export default function ProfilePage() {
                       <div className="relative border-2 border-dashed border-slate-200 rounded-lg p-4 flex flex-col items-center justify-center h-48 bg-slate-50 hover:bg-slate-100 transition-colors">
                         {backPhotoUrl ? (
                           <div className="absolute inset-0 p-2">
-                            <img src={backPhotoUrl} alt="Document Back" className="h-full w-full object-contain rounded-md" />
+                            <img
+                              src={backPhotoUrl}
+                              alt="Document Back"
+                              className="h-full w-full object-contain rounded-md"
+                            />
                             <button
                               type="button"
                               onClick={() => {
@@ -762,8 +808,12 @@ export default function ProfilePage() {
                         ) : (
                           <div className="flex flex-col items-center text-center">
                             <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                            <p className="text-xs font-semibold text-slate-700">Click to upload document back</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">JPG, PNG, WebP up to 5MB</p>
+                            <p className="text-xs font-semibold text-slate-700">
+                              Click to upload document back
+                            </p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              JPG, PNG, WebP up to 5MB
+                            </p>
                           </div>
                         )}
                         <input
@@ -835,13 +885,15 @@ export default function ProfilePage() {
               <CardHeader className="bg-red-50/10">
                 <CardTitle className="text-xl font-bold text-red-800">Deactivate Account</CardTitle>
                 <CardDescription className="text-red-700/80">
-                  Temporarily disable your profile. You can only be reactivated by the platform administration.
+                  Temporarily disable your profile. You can only be reactivated by the platform
+                  administration.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <p className="text-sm text-slate-600">
-                  Deactivating your account blocks all shipment creations, trip list postings, and makes your profile invisible to other users.
-                  You cannot deactivate your account if there are active matched shipments or trips in progress.
+                  Deactivating your account blocks all shipment creations, trip list postings, and
+                  makes your profile invisible to other users. You cannot deactivate your account if
+                  there are active matched shipments or trips in progress.
                 </p>
               </CardContent>
               <CardFooter className="border-t border-slate-100 bg-slate-50/50 py-3">
@@ -859,15 +911,19 @@ export default function ProfilePage() {
             {/* Account Deletion */}
             <Card className="border-destructive shadow-sm">
               <CardHeader className="bg-destructive/5">
-                <CardTitle className="text-xl font-bold text-destructive">Delete Account Permanently</CardTitle>
+                <CardTitle className="text-xl font-bold text-destructive">
+                  Delete Account Permanently
+                </CardTitle>
                 <CardDescription className="text-destructive/80">
-                  This action is permanent and cannot be undone. All your user profile and matched data will be removed.
+                  This action is permanent and cannot be undone. All your user profile and matched
+                  data will be removed.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <p className="text-sm text-slate-600">
-                  Once deleted, your account cannot be recovered. All history, transaction logs, ratings, and wallet links are permanently purged.
-                  Active matched shipments must be completed before you can request account deletion.
+                  Once deleted, your account cannot be recovered. All history, transaction logs,
+                  ratings, and wallet links are permanently purged. Active matched shipments must be
+                  completed before you can request account deletion.
                 </p>
               </CardContent>
               <CardFooter className="border-t border-slate-100 bg-slate-50/50 py-3">
@@ -893,15 +949,12 @@ export default function ProfilePage() {
               Confirm Account Deactivation
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to deactivate your account? Your shipments and trips will be paused.
-              This can only be reactivated by contacting administration.
+              Are you sure you want to deactivate your account? Your shipments and trips will be
+              paused. This can only be reactivated by contacting administration.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowDeactivateDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowDeactivateDialog(false)}>
               Cancel
             </Button>
             <Button
@@ -926,7 +979,8 @@ export default function ProfilePage() {
               Confirm Permanent Deletion
             </DialogTitle>
             <DialogDescription>
-              This is non-reversible. Please enter your password to confirm that you wish to delete your account permanently.
+              This is non-reversible. Please enter your password to confirm that you wish to delete
+              your account permanently.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-2">

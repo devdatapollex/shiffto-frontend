@@ -116,7 +116,7 @@ export function CreateTripWizard() {
       };
 
       await createTripApi(payload);
-      
+
       // Save to localStorage recent_flights
       try {
         const existing = localStorage.getItem('recent_flights');
@@ -176,10 +176,7 @@ export function CreateTripWizard() {
         onConfirm={handleConfirmDiscard}
       />
 
-      <KycRequiredDialog
-        open={showKycDialog}
-        onOpenChange={setShowKycDialog}
-      />
+      <KycRequiredDialog open={showKycDialog} onOpenChange={setShowKycDialog} />
     </div>
   );
 }

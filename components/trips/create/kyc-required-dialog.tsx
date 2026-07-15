@@ -37,12 +37,16 @@ export function KycRequiredDialog({ open, onOpenChange }: KycRequiredDialogProps
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-2 leading-relaxed">
             To maintain a secure and trusted community, we require all users to complete their
-            identity verification before creating trips or shipments. This helps us ensure
-            safety, trust, and compliance across the platform.
+            identity verification before creating trips or shipments. This helps us ensure safety,
+            trust, and compliance across the platform.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="w-full sm:w-auto"
+          >
             Not Now
           </Button>
           <Button

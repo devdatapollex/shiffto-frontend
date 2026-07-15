@@ -109,9 +109,14 @@ export function ReceiverDetailsStep() {
                   <input
                     type="tel"
                     inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="Enter the phone number of receiver"
                     className="border-0 focus:outline-hidden focus-visible:ring-0 shadow-none bg-transparent w-full h-full pl-0 text-sm text-slate-700 placeholder:text-slate-400"
-                    {...field}
+                    value={field.value}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/[^0-9]/g, '');
+                      field.onChange(digits);
+                    }}
                   />
                 </FormControl>
               </FormItem>

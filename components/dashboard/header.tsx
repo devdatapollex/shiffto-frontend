@@ -16,8 +16,11 @@ import {
 import { authClient } from '@/lib/auth-client';
 import { ROUTES } from '@/config/routes';
 import Link from 'next/link';
-import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '@/hooks/use-notifications';
-
+import {
+  useNotifications,
+  useMarkNotificationAsRead,
+  useMarkAllNotificationsAsRead,
+} from '@/hooks/use-notifications';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -125,7 +128,10 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 sm:w-96 max-h-[450px] overflow-y-auto p-0">
+          <DropdownMenuContent
+            align="end"
+            className="w-80 sm:w-96 max-h-[450px] overflow-y-auto p-0"
+          >
             <div className="flex items-center justify-between border-b p-3">
               <span className="font-semibold text-sm text-[#0B3A8E]">Notifications</span>
               {hasUnread && (
@@ -149,11 +155,15 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
                       }
                     }}
                     className={`p-3.5 text-xs transition-colors cursor-pointer hover:bg-slate-50/80 ${
-                      !notification.read ? 'bg-slate-50/30 font-semibold border-l-2 border-l-[#FF6F3F]' : 'border-l-2 border-l-transparent'
+                      !notification.read
+                        ? 'bg-slate-50/30 font-semibold border-l-2 border-l-[#FF6F3F]'
+                        : 'border-l-2 border-l-transparent'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <span className={`text-slate-800 ${!notification.read ? 'text-[#0B3A8E]' : ''}`}>
+                      <span
+                        className={`text-slate-800 ${!notification.read ? 'text-[#0B3A8E]' : ''}`}
+                      >
                         {notification.title}
                       </span>
                       {!notification.read && (

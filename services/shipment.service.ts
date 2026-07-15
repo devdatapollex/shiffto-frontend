@@ -1,6 +1,8 @@
 import apiClient from '@/lib/api-client';
 import type { CreateShipmentPayload } from '@/lib/validations/shipment';
 
+export type ShipmentStatus = 'AWAITING_MATCH' | 'ACTIVE' | 'DELIVERED' | 'CANCELED';
+
 export interface ShipmentCategory {
   id: string;
   name: string;
@@ -9,6 +11,25 @@ export interface ShipmentCategory {
   minPrice: number;
   maxPrice: number | null;
   maxQuantity: number | null;
+}
+
+export interface ShipmentStepDefinition {
+  id: string;
+  stage: string;
+  label: string;
+  order: number;
+  description: string | null;
+}
+
+export interface ShipmentStep {
+  id: string;
+  shipmentId: string;
+  stage: string;
+  order: number;
+  isCurrent: boolean;
+  completedAt: string | null;
+  notes: string | null;
+  definition: ShipmentStepDefinition;
 }
 
 export interface Shipment {
@@ -29,10 +50,11 @@ export interface Shipment {
   bagType: string | null;
   createdAt?: string;
   updatedAt?: string;
-  status: string;
+  status: ShipmentStatus;
   userId: string;
   categoryId: string;
   category?: ShipmentCategory;
+  shipmentSteps?: ShipmentStep[];
 }
 
 interface ShipmentsResponse {
@@ -70,7 +92,20 @@ export async function sendShipmentOtp(): Promise<void> {
   await apiClient.post('/shipments/send-otp');
 }
 
-export async function getShipments(): Promise<ShipmentsResponse> {
-  const { data } = await apiClient.get<ShipmentsResponse>('/shipments');
+export async function getShipments(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  userId?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}): Promise<ShipmentsResponse> {
+  const { data } = await apiClient.get<ShipmentsResponse>('/shipments', { params });
   return data;
+}
+
+export async function getShipmentSteps(shipmentId: string): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.get<{ data: ShipmentStep[] }>(`/shipments/${shipmentId}/steps`);
+  return data.data;
 }

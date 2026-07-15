@@ -4,7 +4,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, LogOut, X, Shield, ArrowLeftRight, Scale, Banknote, Users, ShieldCheck, Settings, Plane } from 'lucide-react';
+import {
+  ChevronLeft,
+  LogOut,
+  X,
+  Shield,
+  ArrowLeftRight,
+  Scale,
+  Banknote,
+  Users,
+  ShieldCheck,
+  Settings,
+  Plane,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -96,7 +108,10 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
               <span className="text-lg font-bold tracking-tight text-primary drop-shadow-sm flex items-center gap-1.5">
-                SHIFFTO <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary uppercase font-bold">Admin</span>
+                SHIFFTO{' '}
+                <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary uppercase font-bold">
+                  Admin
+                </span>
               </span>
             </div>
           ) : (
@@ -208,7 +223,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
               {session?.user?.image ? (
-                <img src={session.user.image} alt="Profile" className="h-full w-full rounded-full object-cover" />
+                <img
+                  src={session.user.image}
+                  alt="Profile"
+                  className="h-full w-full rounded-full object-cover"
+                />
               ) : (
                 session?.user?.name?.charAt(0)?.toUpperCase() || 'A'
               )}

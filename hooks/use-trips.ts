@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMyTrips, cancelTrip, completeTrip, acceptShipment, getAllTrips, verifyTrip } from '@/services/trip.service';
+import {
+  getMyTrips,
+  cancelTrip,
+  completeTrip,
+  acceptShipment,
+  getAllTrips,
+  verifyTrip,
+} from '@/services/trip.service';
 
 export function useMyTrips(params?: { page?: number; limit?: number; status?: string }) {
   return useQuery({
@@ -45,7 +52,12 @@ export function useAcceptShipment() {
   });
 }
 
-export function useAllTrips(params?: { page?: number; limit?: number; status?: string; searchTerm?: string }) {
+export function useAllTrips(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  searchTerm?: string;
+}) {
   return useQuery({
     queryKey: ['admin-trips', params],
     queryFn: () => getAllTrips(params),
