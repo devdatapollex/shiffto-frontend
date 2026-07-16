@@ -13,7 +13,7 @@ export const tripSchema = z
     }),
     flightTime: z.string().min(1, 'Departure time is required'),
     airportArrivalTime: z.string().optional(),
-    ticketPhoto: z.string().min(1, 'Flight ticket photo is required'),
+    ticketPhoto: z.string().optional(),
     cabinBagCapacity: z
       .number({
         error: (iss) =>
@@ -52,7 +52,7 @@ export type CreateTripPayload = {
   flightDate: string; // ISO string for backend
   flightTime: string;
   airportArrivalTime?: string;
-  ticketPhoto: string;
+  ticketPhoto?: string;
   cabinBagCapacity: number;
   checkInBagCapacity: number;
 };
