@@ -86,8 +86,9 @@ export function UploadTicketStep() {
 
           return (
             <FormItem className="space-y-2">
-              <FormLabel className="text-[#0B3A8E] font-semibold text-sm">
-                Upload Ticket <span className="text-red-500">*</span>
+              <FormLabel className="text-[#0B3A8E] font-semibold text-sm flex items-center justify-between">
+                <span>Upload Ticket</span>
+                <span className="text-xs font-normal text-slate-400">(Optional)</span>
               </FormLabel>
               <FormControl>
                 <div className="space-y-4">

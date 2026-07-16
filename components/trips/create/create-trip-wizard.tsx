@@ -110,7 +110,7 @@ export function CreateTripWizard() {
         flightDate: values.flightDate.toISOString().split('T')[0], // YYYY-MM-DD format for flightDate
         flightTime: values.flightTime,
         airportArrivalTime: values.airportArrivalTime || undefined,
-        ticketPhoto: values.ticketPhoto,
+        ticketPhoto: values.ticketPhoto || undefined,
         cabinBagCapacity: Number(values.cabinBagCapacity),
         checkInBagCapacity: Number(values.checkInBagCapacity),
       };

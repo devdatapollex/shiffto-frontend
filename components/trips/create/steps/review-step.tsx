@@ -165,7 +165,20 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-red-500">Ticket file is required</p>
+          <div className="flex gap-6 items-start">
+            <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center">
+              <FileText className="h-10 w-10 text-slate-300 shrink-0" />
+            </div>
+            <div className="flex-1 min-w-0 self-center">
+              <span className="bg-slate-100 border border-slate-200 text-slate-500 text-xs font-semibold px-2.5 py-0.5 rounded-md">
+                No file uploaded
+              </span>
+              <h4 className="text-slate-500 text-lg font-bold mt-2 truncate">
+                No ticket attached
+              </h4>
+              <p className="text-slate-400 text-sm mt-1">You did not upload a flight ticket. Admin verification will proceed using flight details.</p>
+            </div>
+          </div>
         )}
       </div>
 
