@@ -27,6 +27,7 @@ export const ROUTES = {
   PROFILE: '/dashboard/profile',
 
   // Admin-only Routes
+  ADMIN_SHIPMENTS: '/dashboard/admin/shipments',
   SETTLEMENTS: '/dashboard/settlements',
   WITHDRAWALS: '/dashboard/withdrawals',
   USERS: '/dashboard/users',

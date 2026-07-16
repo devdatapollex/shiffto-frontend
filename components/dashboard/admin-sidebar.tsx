@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Settings,
   Plane,
+  Package,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
@@ -52,6 +53,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'KYC Verifications',
       href: ROUTES.ADMIN_KYC,
       icon: ShieldCheck,
+    },
+    {
+      label: 'Shipments',
+      href: ROUTES.ADMIN_SHIPMENTS,
+      icon: Package,
     },
     {
       label: 'Trips',

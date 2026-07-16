@@ -1,30 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
+import { useState, useMemo, useReducer, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'motion/react';
 import {
-  Clock,
-  Plane,
-  Scale,
-  Boxes,
-  Calendar,
-  Tag,
+  Crosshair,
+  Mail,
   MoreHorizontal,
+  Plane,
   Search,
   ArrowUpDown,
   X,
   Package,
   ChevronsLeft,
   ChevronsRight,
+  ChevronRight,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { getShipments, type Shipment } from '@/services/shipment.service';
-import { useRole } from '@/hooks/use-role';
-import { useReceivedOffers, useAcceptOffer, useRejectOffer } from '@/hooks/use-offers';
-import type { Offer as RealOffer } from '@/services/offer.service';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -50,42 +43,10 @@ import {
 } from '@/components/ui/pagination';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
-import { ShipmentDetailsModal } from '@/components/shipments/shipment-details-modal';
-import Image from 'next/image';
 
-// --- Types ---
+// --- Types & Constants (mirrored from my-shipments) ---
 
-interface Traveler {
-  name: string;
-  avatar?: string;
-  code: string;
-  date: string;
-  offeredPrice: number;
-}
-
-interface Offer {
-  id: string;
-  timeRemaining: string;
-  timeColor: 'red' | 'yellow' | 'green';
-  itemName: string;
-  itemImage?: string;
-  fromCountry: string;
-  toCountry: string;
-  weight: number;
-  quantity: number;
-  price: number;
-  traveler: Traveler;
-}
-
-// --- Constants ---
-
-const STATUS_TABS = [
-  { label: 'All', value: undefined },
-  { label: 'Awaiting match', value: 'AWAITING_MATCH' },
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Delivered', value: 'DELIVERED' },
-  { label: 'Canceled', value: 'CANCELED' },
-] as const;
+type ShipmentStatus = 'AWAITING_MATCH' | 'ACTIVE' | 'DELIVERED' | 'CANCELED';
 
 const STATUS_DISPLAY_MAP: Record<string, string> = {
   AWAITING_MATCH: 'Awaiting match',
@@ -104,7 +65,7 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_ROWS_PER_PAGE = 10;
 
-// --- Filter reducer ---
+// --- Filter state ---
 
 type FiltersState = {
   page: number;
@@ -162,39 +123,22 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
   return pages;
 }
 
+const MOCK_ASSIGNEES: Record<string, { name: string; avatar?: string }> = {
+  'SH-2345': { name: 'Ahmed Khan' },
+  'SH-2654': { name: 'Jerry Daniel' },
+  'SH-2654-2': { name: 'Harry Styles' },
+  'BG-4371': { name: 'Dua Lipa' },
+  'GL-1123': { name: 'Ed Sheeran' },
+  'KT-9812': { name: 'Ariana Grande' },
+  'RG-3005': { name: 'Billie Eilish' },
+};
+
 // --- Component ---
 
-export default function MyShipmentsPage() {
-  const { isAdmin } = useRole();
-  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
+export default function TrackingPage() {
+  const [activeTab, setActiveTab] = useState<'shipment' | 'trip'>('shipment');
+  const [trackId, setTrackId] = useState('');
 
-  // --- Offers (mock data, unchanged) ---
-  // --- Offers (backend-driven) ---
-  const { data: offersData, isLoading: offersLoading } = useReceivedOffers();
-  const offers: RealOffer[] = offersData || [];
-
-  const acceptOfferMutation = useAcceptOffer();
-  const rejectOfferMutation = useRejectOffer();
-
-  const getFlightTimeStatus = (flightDateStr?: string) => {
-    if (!flightDateStr) return { label: 'Upcoming', class: 'bg-emerald-50 text-emerald-600 border-emerald-100' };
-    const flightDate = new Date(flightDateStr);
-    const now = new Date();
-    const diffMs = flightDate.getTime() - now.getTime();
-    const diffHours = diffMs / (1000 * 60 * 60);
-
-    if (diffHours < 0) {
-      return { label: 'Passed', class: 'bg-slate-50 text-slate-500 border-slate-200' };
-    } else if (diffHours < 24) {
-      return { label: `${Math.round(diffHours)}h left`, class: 'bg-red-50 text-red-600 border-red-100' };
-    } else if (diffHours < 72) {
-      return { label: `${Math.round(diffHours / 24)}d left`, class: 'bg-amber-50 text-amber-600 border-amber-100' };
-    } else {
-      return { label: `${Math.round(diffHours / 24)}d left`, class: 'bg-emerald-50 text-emerald-600 border-emerald-100' };
-    }
-  };
-
-  // --- Backend-driven state ---
   const [filters, dispatch] = useReducer(filtersReducer, {
     page: 1,
     search: '',
@@ -207,7 +151,6 @@ export default function MyShipmentsPage() {
 
   const debouncedSearch = useDebouncedValue(filters.search, 300);
 
-  // --- Fetch from backend ---
   const { data: apiResponse, isLoading } = useQuery({
     queryKey: [
       'shipments',
@@ -235,7 +178,6 @@ export default function MyShipmentsPage() {
   const meta = apiResponse?.meta ?? { page: 1, limit: DEFAULT_ROWS_PER_PAGE, total: 0 };
   const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
 
-  // --- Sort helpers ---
   const handleSort = (field: string) => {
     const newOrder = filters.sortBy === field && filters.sortOrder === 'asc' ? 'desc' : 'asc';
     dispatch({ type: 'SET_SORT', sortBy: field, sortOrder: newOrder });
@@ -246,7 +188,6 @@ export default function MyShipmentsPage() {
     return filters.sortOrder === 'asc' ? ' ↑' : ' ↓';
   };
 
-  // --- Rows per page handler ---
   const handleRowsPerPageChange = (value: string) => {
     if (value === 'custom') {
       setCustomRowsInput('');
@@ -266,7 +207,6 @@ export default function MyShipmentsPage() {
     }
   };
 
-  // --- Pagination range ---
   const pageNumbers = useMemo(
     () => generatePageNumbers(meta.page, totalPages),
     [meta.page, totalPages]
@@ -275,219 +215,53 @@ export default function MyShipmentsPage() {
   const showingFrom = meta.total === 0 ? 0 : (meta.page - 1) * meta.limit + 1;
   const showingTo = Math.min(meta.page * meta.limit, meta.total);
 
-  // --- Offer actions ---
-  const handleAcceptOffer = async (offerId: string, travellerName: string, offeredPrice: number) => {
-    try {
-      await acceptOfferMutation.mutateAsync(offerId);
-      toast.success(
-        `You accepted the offer from ${travellerName} for $${offeredPrice}!`
-      );
-    } catch (err: any) {
-      toast.error(err?.message || 'Failed to accept offer');
-    }
-  };
-
-  const handleRejectOffer = async (offerId: string, travellerName: string) => {
-    try {
-      await rejectOfferMutation.mutateAsync(offerId);
-      toast.success(`Offer from ${travellerName} declined.`);
-    } catch (err: any) {
-      toast.error(err?.message || 'Failed to decline offer');
-    }
-  };
-
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
-      {/* 1. OFFERS RECEIVED SECTION */}
-      <div className="space-y-4 bg-background p-4 rounded-lg">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl text-muted-foreground tracking-tight">Offers received</h2>
-          <Badge className="bg-primary text-white font-bold h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full">
-            {offers.length}
-          </Badge>
-        </div>
-
-        <AnimatePresence mode="popLayout">
-          {offersLoading ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse flex flex-col justify-between overflow-hidden rounded-lg border border-slate-100 bg-white p-5 shadow-sm h-64">
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <div className="h-6 w-20 bg-slate-100 rounded-full"></div>
-                      <div className="h-6 w-12 bg-slate-100 rounded"></div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="h-14 w-14 bg-slate-100 rounded-xl"></div>
-                      <div className="space-y-2 flex-1">
-                        <div className="h-4 w-3/4 bg-slate-100 rounded"></div>
-                        <div className="h-3 w-1/2 bg-slate-100 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-10 bg-slate-100 rounded-xl"></div>
-                </div>
-              ))}
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
+      {/* Track your consignment header */}
+      <div className="relative rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm p-6 sm:p-8">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0D307A]/10 text-[#0D307A]">
+              <Crosshair className="h-5 w-5" />
             </div>
-          ) : offers.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="flex flex-col items-center justify-center py-12 px-4 rounded-2xl border border-slate-100 bg-white shadow-sm text-center"
-            >
-              <Package className="h-10 w-10 text-slate-300 mb-3" />
-              <p className="text-slate-500 font-medium">All caught up!</p>
-              <p className="text-xs text-slate-400 mt-1">
-                No pending offers for your shipments right now.
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Track your consignment</h1>
+              <p className="text-sm text-slate-500">
+                Use your shipment or trip id to track them in real-time.
               </p>
-            </motion.div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {offers.map((offer) => {
-                const timeStatus = getFlightTimeStatus(offer.trip?.flightDate);
-                const travelerName = offer.traveller?.name || 'Unknown Traveler';
-                const offeredPrice = offer.offeredPrice;
-
-                return (
-                  <motion.div
-                    key={offer.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                    className="relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md duration-200"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold ${timeStatus.class}`}
-                        >
-                          <Clock className="h-3.5 w-3.5 stroke-[2.5]" />
-                          {timeStatus.label}
-                        </span>
-                        <div className="flex flex-col items-end">
-                          <span className="text-lg font-bold text-[#0B3A8E]">${offer.senderPrice}</span>
-                          <span className="text-[9px] text-slate-400 font-medium uppercase">Original Price</span>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-4 items-start mb-4">
-                        <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
-                          {offer.shipment?.itemPhotos?.[0] ? (
-                            <Image
-                              src={toRelativeImageUrl(offer.shipment.itemPhotos[0])}
-                              alt={offer.shipment.itemName}
-                              className="object-cover w-full h-full"
-                              width={56}
-                              height={56}
-                            />
-                          ) : (
-                            <Package className="h-6 w-6 text-slate-400" />
-                          )}
-                        </div>
-                        <div className="space-y-1 min-w-0">
-                          <h3 className="text-sm font-bold text-slate-800 truncate">
-                            {offer.shipment?.itemName || 'Unknown Item'}
-                          </h3>
-                          <p className="text-xs text-slate-500 flex items-center gap-1">
-                            <Plane className="h-3.5 w-3.5 text-slate-400 rotate-45 shrink-0" />
-                            {offer.shipment ? (
-                              <>
-                                {getCountryByCode(offer.shipment.fromCountry)?.name ?? offer.shipment.fromCountry} -{' '}
-                                {getCountryByCode(offer.shipment.toCountry)?.name ?? offer.shipment.toCountry}
-                              </>
-                            ) : (
-                              'Unknown Route'
-                            )}
-                          </p>
-                          <div className="flex items-center gap-3 text-slate-400 text-[11px] font-medium pt-0.5">
-                            <span className="flex items-center gap-1">
-                              <Scale className="h-3 w-3 shrink-0" />
-                              {offer.shipment?.weight || 0} Kg
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Boxes className="h-3 w-3 shrink-0" />
-                              {offer.shipment?.quantity || 0}pcs
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 mb-5 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-slate-200 border border-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
-                            {offer.traveller?.image ? (
-                              <Image
-                                src={toRelativeImageUrl(offer.traveller.image)}
-                                alt={travelerName}
-                                className="object-cover w-full h-full"
-                                width={56}
-                                height={56}
-                              />
-                            ) : (
-                              <span>{travelerName.charAt(0)}</span>
-                            )}
-                          </div>
-                          <div className="min-w-0 space-y-0.5">
-                            <h4 className="text-xs font-bold text-slate-800 truncate">
-                              {travelerName}
-                            </h4>
-                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
-                              <span className="flex items-center gap-1">
-                                <Tag className="h-2.5 w-2.5 shrink-0" />
-                                {offer.trip?.flightNumber || 'N/A'}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-2.5 w-2.5 shrink-0" />
-                                {offer.trip?.flightDate ? new Date(offer.trip.flightDate).toLocaleDateString() : 'N/A'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right pl-2 shrink-0">
-                          <span className={`text-sm font-bold block ${offer.isCounterOffer ? 'text-amber-600 scale-105 font-extrabold' : 'text-[#0D307A]'}`}>
-                            ${offeredPrice}
-                          </span>
-                          <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider block">
-                            {offer.isCounterOffer ? 'Counter Offer' : 'Offered price'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
-                        onClick={() => handleRejectOffer(offer.id, travelerName)}
-                        className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
-                      >
-                        {rejectOfferMutation.isPending ? 'Declining...' : 'Reject'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
-                        onClick={() => handleAcceptOffer(offer.id, travelerName, offeredPrice)}
-                        className="flex-1 bg-[#0B3A8E] hover:bg-[#092E72] text-white font-semibold shadow-sm"
-                      >
-                        {acceptOfferMutation.isPending ? 'Accepting...' : 'Accept'}
-                      </Button>
-                    </div>
-                  </motion.div>
-                );
-              })}
             </div>
-          )}
-        </AnimatePresence>
+          </div>
+
+          <div className="flex flex-col gap-1.5 sm:w-80">
+            <label className="text-xs font-semibold text-slate-700">
+              Shipment/trip ID <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Enter your shipment/trip ID"
+                value={trackId}
+                onChange={(e) => setTrackId(e.target.value)}
+                className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-4 pr-12 text-sm transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary shadow-sm"
+              />
+              <button
+                type="button"
+                onClick={() => {}}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-md bg-[#0D307A] text-white hover:bg-[#092E72] transition-colors"
+                aria-label="Track"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 2. SHIPMENT HISTORY SECTION */}
+      {/* Consignment History */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
         {/* Title and Controls Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
-          <h3 className="text-xl text-muted-foreground tracking-tight">Shipment History</h3>
+          <h3 className="text-xl text-muted-foreground tracking-tight">Consignment History</h3>
 
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Search Input */}
@@ -495,7 +269,7 @@ export default function MyShipmentsPage() {
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search shipments..."
+                placeholder="Search shipment"
                 value={filters.search}
                 onChange={(e) => dispatch({ type: 'SET_SEARCH', search: e.target.value })}
                 className="h-9 w-full sm:w-60 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-4 text-xs transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary shadow-sm"
@@ -510,7 +284,16 @@ export default function MyShipmentsPage() {
               )}
             </div>
 
-            {/* Sort Dropdown */}
+            {/* Filter button */}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+            >
+              <Crosshair className="h-4 w-4" />
+            </Button>
+
+            {/* Export/sort button */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -539,28 +322,35 @@ export default function MyShipmentsPage() {
           </div>
         </div>
 
-        {/* Status Tab Filters */}
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-2 overflow-x-auto scrollbar-none">
-          {STATUS_TABS.map((tab) => {
-            const isActive = filters.status === tab.value;
-            return (
-              <button
-                key={tab.label}
-                onClick={() => dispatch({ type: 'SET_STATUS', status: tab.value })}
-                className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-all whitespace-nowrap ${
-                  isActive
-                    ? 'bg-[#0D307A]/10 text-[#0D307A] border-transparent'
-                    : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Tabs */}
+        <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+          <button
+            onClick={() => setActiveTab('shipment')}
+            className={`text-xs font-semibold px-5 py-2 rounded-full border transition-all ${
+              activeTab === 'shipment'
+                ? 'bg-[#0D307A]/10 text-[#0D307A] border-transparent'
+                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            Shipment
+          </button>
+          <button
+            onClick={() => {}}
+            disabled
+            className="text-xs font-semibold px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-400 cursor-not-allowed opacity-60"
+            title="Coming soon"
+          >
+            Trip
+          </button>
         </div>
 
-        {/* Shipments Table */}
-        {isLoading ? (
+        {/* Table */}
+        {activeTab !== 'shipment' ? (
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+            <Plane className="h-12 w-12 text-slate-200 mb-3" />
+            <p className="text-sm font-medium text-slate-500">Trip tracking coming soon</p>
+          </div>
+        ) : isLoading ? (
           <div className="space-y-4 py-6">
             {[1, 2, 3].map((i) => (
               <div
@@ -592,12 +382,16 @@ export default function MyShipmentsPage() {
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 text-sm">
                 {shipments.map((item) => {
+                  const status = item.status as ShipmentStatus;
                   const statusClass =
-                    STATUS_BADGE_CLASS[item.status] || STATUS_BADGE_CLASS['AWAITING_MATCH'];
-                  const displayStatus = STATUS_DISPLAY_MAP[item.status] || item.status;
+                    STATUS_BADGE_CLASS[status] || STATUS_BADGE_CLASS['AWAITING_MATCH'];
+                  const displayStatus = STATUS_DISPLAY_MAP[status] || status;
                   const shortId = `SH-${item.id.slice(-6).toUpperCase()}`;
                   const route = `${getCountryByCode(item.fromCountry)?.name ?? item.fromCountry} - ${getCountryByCode(item.toCountry)?.name ?? item.toCountry}`;
                   const amount = item.pricePerKg * item.weight;
+
+                  // Use mock assignees to match the design; fall back to N/A.
+                  const assignee = MOCK_ASSIGNEES[shortId] ?? { name: 'N/A' };
 
                   return (
                     <tr
@@ -620,7 +414,7 @@ export default function MyShipmentsPage() {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <span className="font-semibold text-foreground block truncate">
+                            <span className="font-semibold text-[#0D307A] block truncate">
                               {item.itemName}
                             </span>
                             <span className="text-[10px] text-slate-400 font-semibold tracking-wider block mt-0.5">
@@ -645,31 +439,41 @@ export default function MyShipmentsPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="text-xs text-slate-400 font-medium">N/A</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-slate-200 border border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600 overflow-hidden">
+                            {assignee.name.charAt(0)}
+                          </div>
+                          <span className="text-xs text-slate-600 font-medium">
+                            {assignee.name}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-5 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
-                              >
-                                <MoreHorizontal className="h-4.5 w-4.5" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setSelectedShipmentId(item.id)}>
-                                View details
-                              </DropdownMenuItem>
-                              {item.status === 'AWAITING_MATCH' && (
-                                <DropdownMenuItem className="text-destructive">
-                                  Cancel shipment
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {}}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg text-[#0D307A] hover:bg-[#0D307A]/10 transition-colors"
+                            aria-label="Track"
+                          >
+                            <Crosshair className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {}}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                            aria-label="Message"
+                          >
+                            <Mail className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {}}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                            aria-label="More"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -681,7 +485,7 @@ export default function MyShipmentsPage() {
         )}
 
         {/* Pagination Footer */}
-        {meta.total > 0 && (
+        {activeTab === 'shipment' && meta.total > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
             {/* Rows per page + custom input */}
             <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -699,7 +503,7 @@ export default function MyShipmentsPage() {
                   <SelectItem value="custom">Custom</SelectItem>
                 </SelectContent>
               </Select>
-              {customRowsInput !== '' || !ROWS_PER_PAGE_OPTIONS.includes(filters.limit) ? (
+              {(customRowsInput !== '' || !ROWS_PER_PAGE_OPTIONS.includes(filters.limit)) && (
                 <div className="flex items-center gap-1">
                   <Input
                     type="number"
@@ -718,7 +522,7 @@ export default function MyShipmentsPage() {
                     placeholder="n"
                   />
                 </div>
-              ) : null}
+              )}
             </div>
 
             {/* Showing X-Y of Z */}
@@ -801,12 +605,6 @@ export default function MyShipmentsPage() {
           </div>
         )}
       </div>
-
-      <ShipmentDetailsModal
-        shipmentId={selectedShipmentId}
-        open={selectedShipmentId !== null}
-        onOpenChange={(open) => !open && setSelectedShipmentId(null)}
-      />
     </div>
   );
 }
