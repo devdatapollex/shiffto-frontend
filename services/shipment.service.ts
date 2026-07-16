@@ -96,11 +96,8 @@ export async function getAvailableShipments(params?: {
   fromCountry?: string;
   toCountry?: string;
 }): Promise<ShipmentsResponse> {
-  const { data } = await apiClient.get<ShipmentsResponse>('/shipments', {
-    params: {
-      type: 'available',
-      ...params,
-    },
+  const { data } = await apiClient.get<ShipmentsResponse>('/trips/available-shipments', {
+    params,
   });
   return data;
 }

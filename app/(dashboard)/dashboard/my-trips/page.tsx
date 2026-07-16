@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useMyTrips, useCancelTrip, useCompleteTrip, useAcceptShipment } from '@/hooks/use-trips';
+import { useMyTrips, useCancelTrip, useCompleteTrip } from '@/hooks/use-trips';
+import { useCreateOffer } from '@/hooks/use-offers';
 import { useAvailableShipments } from '@/hooks/use-available-shipments';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -86,6 +87,12 @@ export default function MyTripsPage() {
   const [bagType, setBagType] = useState<'cabin' | 'checkIn'>('checkIn');
   const [selectedViewTrip, setSelectedViewTrip] = useState<Trip | null>(null);
 
+  // Counter offer dialog states
+  const [selectedCounterShipment, setSelectedCounterShipment] = useState<Shipment | null>(null);
+  const [counterPrice, setCounterPrice] = useState<string>('');
+  const [counterTripId, setCounterTripId] = useState<string>('');
+  const [counterBagType, setCounterBagType] = useState<'cabin' | 'checkIn'>('checkIn');
+
   // React Query data fetching
   const { data: tripsData, isLoading: tripsLoading } = useMyTrips();
   const { data: shipmentsData, isLoading: shipmentsLoading } = useAvailableShipments();
@@ -93,7 +100,7 @@ export default function MyTripsPage() {
   // Mutations
   const cancelTripMutation = useCancelTrip();
   const completeTripMutation = useCompleteTrip();
-  const acceptShipmentMutation = useAcceptShipment();
+  const createOfferMutation = useCreateOffer();
 
   // Helper lists
   const trips: Trip[] = tripsData?.data || [];
@@ -171,18 +178,66 @@ export default function MyTripsPage() {
     if (!selectedShipment || !acceptingTripId) return;
 
     try {
-      await acceptShipmentMutation.mutateAsync({
+      await createOfferMutation.mutateAsync({
         tripId: acceptingTripId,
-        payload: {
-          shipmentId: selectedShipment.id,
-          bagType,
-        },
+        shipmentId: selectedShipment.id,
+        bagType,
+        offeredPrice: selectedShipment.pricePerKg,
       });
-      toast.success('Shipment accepted for your trip!');
+      toast.success("Offer submitted successfully at sender's price!");
       setSelectedShipment(null);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to accept shipment');
+      toast.error(err?.message || 'Failed to submit offer');
+    }
+  };
+
+  const handleOpenCounterDialog = (shipment: Shipment) => {
+    setSelectedCounterShipment(shipment);
+    setCounterPrice(shipment.pricePerKg.toString());
+    if (activeTrips.length > 0) {
+      setCounterTripId(activeTrips[0].id);
+    } else {
+      setCounterTripId('');
+    }
+    setCounterBagType('checkIn');
+  };
+
+  const handleCounterOfferSubmit = async () => {
+    if (!selectedCounterShipment || !counterTripId) return;
+
+    const price = parseFloat(counterPrice);
+    if (isNaN(price) || price <= 0) {
+      toast.error('Please enter a valid positive price');
+      return;
+    }
+
+    const category = selectedCounterShipment.category;
+    if (!category) {
+      toast.error('Shipment category is missing');
+      return;
+    }
+    if (price < category.minPrice) {
+      toast.error(`Price cannot be less than the category minimum of $${category.minPrice}`);
+      return;
+    }
+    if (category.maxPrice !== null && price > category.maxPrice) {
+      toast.error(`Price cannot be more than the category maximum of $${category.maxPrice}`);
+      return;
+    }
+
+    try {
+      await createOfferMutation.mutateAsync({
+        tripId: counterTripId,
+        shipmentId: selectedCounterShipment.id,
+        bagType: counterBagType,
+        offeredPrice: price,
+      });
+      toast.success('Counter-offer submitted successfully!');
+      setSelectedCounterShipment(null);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to submit counter-offer');
     }
   };
 
@@ -342,7 +397,7 @@ export default function MyTripsPage() {
                         <Button
                           variant="outline"
                           className="border-[#e2e8f0] text-slate-700 hover:bg-slate-50 rounded-xl h-10 font-semibold text-sm"
-                          onClick={() => toast.info('Counter feature is coming soon!')}
+                          onClick={() => handleOpenCounterDialog(shipment)}
                         >
                           Counter
                         </Button>
@@ -763,11 +818,139 @@ export default function MyTripsPage() {
               Cancel
             </Button>
             <Button
-              disabled={activeTrips.length === 0 || acceptShipmentMutation.isPending}
+              disabled={activeTrips.length === 0 || createOfferMutation.isPending}
               className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl"
               onClick={handleAcceptShipmentSubmit}
             >
-              {acceptShipmentMutation.isPending ? 'Accepting...' : 'Accept Shipment'}
+              {createOfferMutation.isPending ? 'Submitting...' : 'Submit Offer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Counter-Offer Dialog */}
+      <Dialog
+        open={selectedCounterShipment !== null}
+        onOpenChange={(open) => !open && setSelectedCounterShipment(null)}
+      >
+        <DialogContent className="max-w-md w-full rounded-2xl border-[#e2e8f0] p-6 bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-[#0B3A8E]">
+              Submit Counter-Offer
+            </DialogTitle>
+            <DialogDescription className="text-slate-400 text-sm">
+              Propose a custom price per kg for this shipment.
+            </DialogDescription>
+          </DialogHeader>
+
+          {activeTrips.length === 0 ? (
+            <div className="py-4 text-center space-y-2">
+              <AlertCircle className="h-8 w-8 text-amber-500 mx-auto" />
+              <p className="text-sm font-semibold text-slate-700">No active trips found</p>
+              <p className="text-xs text-slate-400">
+                You must have an approved, ACTIVE trip with route matching the shipment to make a counter-offer.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 py-3">
+              <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-2">
+                <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">
+                  Shipment Item
+                </span>
+                <p className="font-bold text-[#0B3A8E] text-base">{selectedCounterShipment?.itemName}</p>
+                <div className="flex justify-between text-slate-500 text-sm">
+                  <span>Required capacity:</span>
+                  <strong className="text-slate-800">{selectedCounterShipment?.weight} KG</strong>
+                </div>
+                <div className="flex justify-between text-slate-500 text-sm">
+                  <span>Current price per KG:</span>
+                  <strong className="text-slate-800">${selectedCounterShipment?.pricePerKg}</strong>
+                </div>
+                <div className="flex justify-between text-slate-500 text-sm">
+                  <span>Allowed price range:</span>
+                  <strong className="text-indigo-600">
+                    ${selectedCounterShipment?.category?.minPrice || 0} - {selectedCounterShipment?.category?.maxPrice ? `$${selectedCounterShipment?.category?.maxPrice}` : 'Unlimited'}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                  Your Offered Price (per KG)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-slate-400 font-semibold">$</span>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    className="pl-7 rounded-xl border-[#e2e8f0] h-11 bg-white text-slate-800"
+                    placeholder="Enter your price"
+                    value={counterPrice}
+                    onChange={(e) => setCounterPrice(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                  Select flight trip
+                </label>
+                <Select value={counterTripId} onValueChange={setCounterTripId}>
+                  <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] h-11 bg-white">
+                    <SelectValue placeholder="Choose a trip" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-[#e2e8f0]">
+                    {activeTrips.map((t) => {
+                      const fromCountry = getCountryByCode(t.fromCountry);
+                      const toCountry = getCountryByCode(t.toCountry);
+                      return (
+                        <SelectItem key={t.id} value={t.id} className="cursor-pointer">
+                          {fromCountry?.name} - {toCountry?.name} ({t.flightNumber})
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                  Select bag slot
+                </label>
+                <Select
+                  value={counterBagType}
+                  onValueChange={(val) => setCounterBagType(val as 'cabin' | 'checkIn')}
+                >
+                  <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] h-11 bg-white">
+                    <SelectValue placeholder="Choose bag slot" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-[#e2e8f0]">
+                    <SelectItem value="checkIn" className="cursor-pointer">
+                      Check-in luggage
+                    </SelectItem>
+                    <SelectItem value="cabin" className="cursor-pointer">
+                      Cabin luggage
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              className="border-[#e2e8f0] hover:bg-slate-50 font-semibold rounded-xl"
+              onClick={() => setSelectedCounterShipment(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={activeTrips.length === 0 || createOfferMutation.isPending}
+              className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl"
+              onClick={handleCounterOfferSubmit}
+            >
+              {createOfferMutation.isPending ? 'Submitting...' : 'Submit Counter-Offer'}
             </Button>
           </DialogFooter>
         </DialogContent>
