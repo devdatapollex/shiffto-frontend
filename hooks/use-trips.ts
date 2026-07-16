@@ -6,6 +6,7 @@ import {
   acceptShipment,
   getAllTrips,
   verifyTrip,
+  getTripById,
 } from '@/services/trip.service';
 
 export function useMyTrips(params?: { page?: number; limit?: number; status?: string }) {
@@ -78,5 +79,13 @@ export function useVerifyTrip() {
       queryClient.invalidateQueries({ queryKey: ['admin-trips'] });
       queryClient.invalidateQueries({ queryKey: ['my-trips'] });
     },
+  });
+}
+
+export function useTripDetails(tripId: string | null, enabled: boolean = true) {
+  return useQuery({
+    queryKey: ['trip-details', tripId],
+    queryFn: () => getTripById(tripId!),
+    enabled: enabled && !!tripId,
   });
 }

@@ -43,6 +43,13 @@ export interface ShipmentTripDetails {
   status: string;
   totalCapacity?: number;
   remainingCapacity?: number;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+    phone?: string | null;
+  };
 }
 
 export interface ShipmentDetails extends Omit<Shipment, 'tripId'> {

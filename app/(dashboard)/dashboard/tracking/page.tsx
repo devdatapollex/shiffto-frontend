@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useReducer, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
   Crosshair,
@@ -154,6 +155,7 @@ const MOCK_ASSIGNEES: Record<string, { name: string; avatar?: string }> = {
 // --- Component ---
 
 export default function TrackingPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'shipment' | 'trip'>('shipment');
   const [trackId, setTrackId] = useState('');
 
@@ -561,7 +563,8 @@ export default function TrackingPage() {
                     return (
                       <tr
                         key={item.id}
-                        className="hover:bg-slate-50/60 transition-colors duration-150"
+                        className="hover:bg-slate-50/60 transition-colors duration-150 cursor-pointer"
+                        onClick={() => router.push(`/dashboard/tracking/shipment/${item.id}`)}
                       >
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
@@ -617,7 +620,10 @@ export default function TrackingPage() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               type="button"
-                              onClick={() => {}}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/dashboard/tracking/shipment/${item.id}`);
+                              }}
                               className="h-8 w-8 flex items-center justify-center rounded-lg text-[#0D307A] hover:bg-[#0D307A]/10 transition-colors"
                               aria-label="Track"
                             >
@@ -690,7 +696,8 @@ export default function TrackingPage() {
                   return (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50/60 transition-colors duration-150"
+                      className="hover:bg-slate-50/60 transition-colors duration-150 cursor-pointer"
+                      onClick={() => router.push(`/dashboard/tracking/trip/${item.id}`)}
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
