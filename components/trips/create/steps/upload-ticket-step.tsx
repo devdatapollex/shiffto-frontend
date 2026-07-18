@@ -139,7 +139,7 @@ export function UploadTicketStep() {
                         ) : (
                           <div className="relative h-12 w-12 rounded-lg overflow-hidden border shrink-0 bg-white">
                             <Image
-                              src={toRelativeImageUrl(field.value)}
+                              src={toRelativeImageUrl(field.value || '')}
                               alt="Flight Ticket"
                               className="h-full w-full object-cover"
                               width={48}

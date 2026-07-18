@@ -20,7 +20,9 @@ import {
   Trash2,
   Loader2,
   GripVertical,
+  Eye,
 } from 'lucide-react';
+import { ShipmentStepsModal } from '@/components/admin/shipment-steps-modal';
 import { getShipments, type Shipment, type ShipmentCategory } from '@/services/shipment.service';
 import { getStepDefinitions, type StepDefinition } from '@/services/step-definition.service';
 import {
@@ -212,10 +214,10 @@ type StepDefinitionFormValues = z.infer<typeof stepDefinitionSchema>;
 interface CategoryPayload {
   name: string;
   slug: string;
-  maxWeight?: number;
+  maxWeight?: number | null;
   minPrice: number;
-  maxPrice?: number;
-  maxQuantity?: number;
+  maxPrice?: number | null;
+  maxQuantity?: number | null;
 }
 
 // ============================================
@@ -223,6 +225,7 @@ interface CategoryPayload {
 // ============================================
 
 function ShipmentsTab() {
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [filters, dispatch] = useReducer(filtersReducer, {
     page: 1,
     search: '',
@@ -402,6 +405,7 @@ function ShipmentsTab() {
                 <th className="px-5 py-4 font-semibold">Amount</th>
                 <th className="px-5 py-4 font-semibold">Category</th>
                 <th className="px-5 py-4 font-semibold">Created</th>
+                <th className="px-5 py-4 font-semibold text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700 text-sm">
@@ -471,6 +475,17 @@ function ShipmentsTab() {
                           : 'N/A'}
                       </span>
                     </td>
+                    <td className="px-5 py-4 text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedShipmentId(item.id)}
+                        className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg"
+                      >
+                        <Eye className="mr-1.5 h-3.5 w-3.5" />
+                        View Steps
+                      </Button>
+                    </td>
                   </tr>
                 );
               })}
@@ -478,6 +493,13 @@ function ShipmentsTab() {
           </table>
         </div>
       )}
+
+      {/* Steps & Proofs Modal */}
+      <ShipmentStepsModal
+        shipmentId={selectedShipmentId}
+        open={selectedShipmentId !== null}
+        onOpenChange={(open) => !open && setSelectedShipmentId(null)}
+      />
 
       {/* Pagination Footer */}
       {meta.total > 0 && (
@@ -621,7 +643,7 @@ function CategoriesTab() {
   const meta = response?.meta ?? { page: 1, limit: 10, total: 0 };
   const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
 
-  const createForm = useForm<CategoryFormValues>({
+  const createForm = useForm({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: '',
@@ -633,7 +655,7 @@ function CategoriesTab() {
     },
   });
 
-  const editForm = useForm<CategoryFormValues>({
+  const editForm = useForm({
     resolver: zodResolver(categorySchema),
   });
 
