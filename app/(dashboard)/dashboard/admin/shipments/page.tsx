@@ -22,7 +22,7 @@ import {
   GripVertical,
   Eye,
 } from 'lucide-react';
-import { ShipmentStepsModal } from '@/components/admin/shipment-steps-modal';
+import Link from 'next/link';
 import { getShipments, type Shipment, type ShipmentCategory } from '@/services/shipment.service';
 import { getStepDefinitions, type StepDefinition } from '@/services/step-definition.service';
 import {
@@ -225,7 +225,6 @@ interface CategoryPayload {
 // ============================================
 
 function ShipmentsTab() {
-  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [filters, dispatch] = useReducer(filtersReducer, {
     page: 1,
     search: '',
@@ -476,15 +475,19 @@ function ShipmentsTab() {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedShipmentId(item.id)}
-                        className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg"
-                      >
-                        <Eye className="mr-1.5 h-3.5 w-3.5" />
-                        View Steps
-                      </Button>
+                      <Link href={`/dashboard/admin/shipments/${item.id}`} passHref legacyBehavior>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg cursor-pointer"
+                        >
+                          <a>
+                            <Eye className="mr-1.5 h-3.5 w-3.5" />
+                            See Details
+                          </a>
+                        </Button>
+                      </Link>
                     </td>
                   </tr>
                 );
@@ -493,13 +496,6 @@ function ShipmentsTab() {
           </table>
         </div>
       )}
-
-      {/* Steps & Proofs Modal */}
-      <ShipmentStepsModal
-        shipmentId={selectedShipmentId}
-        open={selectedShipmentId !== null}
-        onOpenChange={(open) => !open && setSelectedShipmentId(null)}
-      />
 
       {/* Pagination Footer */}
       {meta.total > 0 && (

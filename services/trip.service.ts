@@ -49,6 +49,8 @@ export async function getMyTrips(params?: {
   page?: number;
   limit?: number;
   status?: string;
+  fromCountry?: string;
+  toCountry?: string;
 }): Promise<TripsResponse> {
   const { data } = await apiClient.get<TripsResponse>('/trips', {
     params: {
