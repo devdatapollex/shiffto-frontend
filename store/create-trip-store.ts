@@ -23,7 +23,7 @@ interface CreateTripState {
   markStepComplete: (step: number) => void;
   resetWizard: () => void;
 }
-
+// this is handler
 export const useCreateTripStore = create<CreateTripState>()(
   persist(
     (set) => ({
