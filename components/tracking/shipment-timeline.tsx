@@ -1,8 +1,27 @@
 'use client';
 
-import { Check, Hourglass, Plane, Package, MapPin, Truck, DollarSign, ClipboardCheck } from 'lucide-react';
+import { useState } from 'react';
+import {
+  Check,
+  Hourglass,
+  Plane,
+  Package,
+  MapPin,
+  Truck,
+  DollarSign,
+  ClipboardCheck,
+  Image as ImageIcon,
+} from 'lucide-react';
 import type { ShipmentStep } from '@/services/shipment.service';
 import { cn } from '@/lib/utils';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface ShipmentTimelineProps {
   steps: ShipmentStep[];
@@ -60,36 +79,52 @@ const STAGES_ORDER = [
 ];
 
 export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
+  const [previewPhoto, setPreviewPhoto] = useState<{ url: string; label: string } | null>(null);
+
   const sortedSteps = [...steps].sort((a, b) => {
     return STAGES_ORDER.indexOf(a.stage) - STAGES_ORDER.indexOf(b.stage);
   });
 
   const getStepData = (stage: string) => {
     const step = sortedSteps.find((s) => s.stage === stage);
-    if (!step) return { status: 'pending', completedAt: null, notes: null };
+    if (!step) return { status: 'pending', completedAt: null, notes: null, photoUrl: null };
 
     if (step.completedAt) {
-      return { status: 'completed', completedAt: step.completedAt, notes: step.notes };
+      return {
+        status: 'completed',
+        completedAt: step.completedAt,
+        notes: step.notes,
+        photoUrl: step.photoUrl || null,
+      };
     }
     if (step.isCurrent) {
-      return { status: 'current', completedAt: null, notes: step.notes };
+      return {
+        status: 'current',
+        completedAt: null,
+        notes: step.notes,
+        photoUrl: step.photoUrl || null,
+      };
     }
-    return { status: 'pending', completedAt: null, notes: null };
+    return { status: 'pending', completedAt: null, notes: null, photoUrl: null };
   };
 
   const formatStepTime = (dateStr: string | null) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return '';
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }) + ' ' + date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
+    return (
+      date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }) +
+      ' ' +
+      date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+    );
   };
 
   return (
@@ -97,11 +132,10 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
       <div className="min-w-[900px] flex items-start justify-between relative">
         {STAGES_ORDER.map((stage, idx) => {
           const config = STAGE_CONFIG[stage];
-          const { status, completedAt, notes } = getStepData(stage);
+          const { status, completedAt, notes, photoUrl } = getStepData(stage);
 
           const isCompleted = status === 'completed';
           const isCurrent = status === 'current';
-          const isPending = status === 'pending';
 
           const IconComponent = isCompleted ? Check : isCurrent ? config.activeIcon : config.defaultIcon;
 
@@ -144,18 +178,22 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
                   {config.label}
                 </span>
 
+                {/* Photo proof badge if present */}
+                {photoUrl && (
+                  <button
+                    onClick={() => setPreviewPhoto({ url: photoUrl, label: config.label })}
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 rounded-md px-1.5 py-0.5 mt-1 cursor-pointer transition-colors"
+                  >
+                    <ImageIcon className="h-3 w-3" />
+                    <span>View Proof</span>
+                  </button>
+                )}
+
                 {/* Custom Notes */}
                 {notes && (
                   <p className="text-[10px] text-slate-600 mt-1 leading-relaxed whitespace-pre-line font-medium">
                     {notes}
                   </p>
-                )}
-
-                {/* Flight track mock link */}
-                {stage === 'CHECKED_IN' && isCompleted && (
-                  <span className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 underline cursor-pointer mt-0.5 block">
-                    Track flight
-                  </span>
                 )}
 
                 {/* Timestamp */}
@@ -171,6 +209,28 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
           );
         })}
       </div>
+
+      {/* Image Preview Modal */}
+      <Dialog open={previewPhoto !== null} onOpenChange={(open) => !open && setPreviewPhoto(null)}>
+        <DialogContent className="max-w-md rounded-2xl p-6 bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <ImageIcon className="h-5 w-5 text-emerald-600" />
+              Proof Photo ({previewPhoto?.label})
+            </DialogTitle>
+          </DialogHeader>
+          {previewPhoto && (
+            <div className="relative w-full h-72 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 mt-2">
+              <Image
+                src={toRelativeImageUrl(previewPhoto.url)}
+                alt="Step proof photo"
+                className="object-contain w-full h-full"
+                fill
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

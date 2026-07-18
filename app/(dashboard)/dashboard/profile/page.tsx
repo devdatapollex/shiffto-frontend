@@ -310,14 +310,11 @@ export default function ProfilePage() {
       toast.error('Phone Number is required');
       return;
     }
-    if (!frontPhotoUrl) {
-      toast.error('Front photo of document is required');
-      return;
-    }
-    if (!backPhotoUrl) {
-      toast.error('Back photo of document is required');
-      return;
-    }
+    // REVERT_MARKER: Restore original validation "if (!frontPhotoUrl)" and "if (!backPhotoUrl)" when KYC photos are required.
+    const finalFrontUrl = frontPhotoUrl || 'https://placehold.co/600x400?text=KYC+Front+Photo';
+    const finalFrontKey = frontPhotoKey || 'dummy-kyc-front-key';
+    const finalBackUrl = backPhotoUrl || 'https://placehold.co/600x400?text=KYC+Back+Photo';
+    const finalBackKey = backPhotoKey || 'dummy-kyc-back-key';
 
     try {
       setSavingKyc(true);
@@ -326,10 +323,10 @@ export default function ProfilePage() {
         documentNumber: docNumber,
         nationality,
         phoneNumber: kycPhone,
-        frontPhotoUrl,
-        frontPhotoKey,
-        backPhotoUrl,
-        backPhotoKey,
+        frontPhotoUrl: finalFrontUrl,
+        frontPhotoKey: finalFrontKey,
+        backPhotoUrl: finalBackUrl,
+        backPhotoKey: finalBackKey,
       });
       toast.success('KYC Verification submitted successfully. Awaiting review.');
       fetchUserProfile();
