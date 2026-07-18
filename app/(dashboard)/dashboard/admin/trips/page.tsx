@@ -20,6 +20,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -62,16 +63,7 @@ export default function AdminTripsPage() {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
 
-  // Detail Dialog State
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
-  const [showDetailDialog, setShowDetailDialog] = useState(false);
 
-  // Reject Reason Dialog State
-  const [showRejectDialog, setShowRejectDialog] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState('');
-
-  // Ticket Preview modal state
-  const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
 
   // Debounce search term
   useEffect(() => {
@@ -102,41 +94,7 @@ export default function AdminTripsPage() {
   const endIdx = Math.min(startIdx + limit, total);
   const totalPages = Math.ceil(total / limit) || 1;
 
-  const handleApprove = async (tripId: string) => {
-    try {
-      await verifyTripMutation.mutateAsync({
-        id: tripId,
-        payload: { approved: true },
-      });
-      toast.success('Trip approved successfully!');
-      setShowDetailDialog(false);
-    } catch (error: unknown) {
-      const err = error as { message?: string };
-      toast.error(err?.message || 'Failed to approve trip');
-    }
-  };
 
-  const handleRejectSubmit = async () => {
-    if (!selectedTrip) return;
-    if (!rejectionReason.trim()) {
-      toast.error('Rejection reason is required');
-      return;
-    }
-
-    try {
-      await verifyTripMutation.mutateAsync({
-        id: selectedTrip.id,
-        payload: { approved: false, rejectionReason },
-      });
-      toast.success('Trip rejected successfully');
-      setShowRejectDialog(false);
-      setShowDetailDialog(false);
-      setRejectionReason('');
-    } catch (error: unknown) {
-      const err = error as { message?: string };
-      toast.error(err?.message || 'Failed to reject trip');
-    }
-  };
 
   const renderStatusBadge = (status: string) => {
     switch (status) {
@@ -327,18 +285,19 @@ export default function AdminTripsPage() {
                           </TableCell>
                           <TableCell>{renderStatusBadge(trip.status)}</TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="rounded-lg h-8 cursor-pointer"
-                              onClick={() => {
-                                setSelectedTrip(trip);
-                                setShowDetailDialog(true);
-                              }}
-                            >
-                              <Eye className="mr-1.5 h-4 w-4" />
-                              Review
-                            </Button>
+                            <Link href={`/dashboard/admin/trips/${trip.id}`} passHref legacyBehavior>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                asChild
+                                className="rounded-lg h-8 cursor-pointer"
+                              >
+                                <a>
+                                  <Eye className="mr-1.5 h-4 w-4" />
+                                  See Details
+                                </a>
+                              </Button>
+                            </Link>
                           </TableCell>
                         </TableRow>
                       );
@@ -458,243 +417,6 @@ export default function AdminTripsPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Detail Dialog */}
-      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
-          {selectedTrip &&
-            (() => {
-              const fromCountry = getCountryByCode(selectedTrip.fromCountry);
-              const toCountry = getCountryByCode(selectedTrip.toCountry);
-              const shortId = `#TR-${selectedTrip.id.slice(-4).toUpperCase()}`;
-
-              return (
-                <>
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-[#0B3A8E] flex items-center gap-2">
-                      <Plane className="h-5 w-5" />
-                      Trip Details {shortId}
-                    </DialogTitle>
-                    <DialogDescription>
-                      Review user details and ticket verification upload.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="grid gap-6 py-4 grid-cols-1">
-                    {/* Details Column */}
-                    <div className="space-y-4">
-                      <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
-                        <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
-                          Traveler Info
-                        </h4>
-                        <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
-                          <span className="text-slate-400 font-medium">Name:</span>
-                          <span className="font-semibold text-slate-800 break-all">
-                            {selectedTrip.user?.name}
-                          </span>
-                          <span className="text-slate-400 font-medium">Email:</span>
-                          <span className="text-slate-700 break-all">
-                            {selectedTrip.user?.email}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
-                        <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
-                          Flight Details
-                        </h4>
-                        <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
-                          <span className="text-slate-400 font-medium">Flight No:</span>
-                          <span className="font-semibold text-slate-800">
-                            {selectedTrip.flightNumber}
-                          </span>
-                          <span className="text-slate-400 font-medium">Origin:</span>
-                          <span className="text-slate-800 font-semibold">
-                            {fromCountry?.name} ({selectedTrip.fromCountry})
-                          </span>
-                          <span className="text-slate-400 font-medium">Destination:</span>
-                          <span className="text-slate-800 font-semibold">
-                            {toCountry?.name} ({selectedTrip.toCountry})
-                          </span>
-                          <span className="text-slate-400 font-medium">Departure Date:</span>
-                          <span className="text-slate-800 font-semibold">
-                            {new Date(selectedTrip.flightDate).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
-                          </span>
-                          <span className="text-slate-400 font-medium">Departure Time:</span>
-                          <span className="text-slate-800 font-semibold">
-                            {formatTime12h(selectedTrip.flightTime)}
-                          </span>
-                          <span className="text-slate-400 font-medium">Arrival Time:</span>
-                          <span className="text-slate-800 font-semibold">
-                            {formatTime12h(selectedTrip.airportArrivalTime)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">
-                        <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide">
-                          Baggage Allowance
-                        </h4>
-                        <div className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
-                          <span className="text-slate-400 font-medium">Cabin Bag:</span>
-                          <span className="font-bold text-[#0B3A8E]">
-                            {selectedTrip.cabinBagCapacity} KG
-                          </span>
-                          <span className="text-slate-400 font-medium">Check-in Bag:</span>
-                          <span className="font-bold text-[#0B3A8E]">
-                            {selectedTrip.checkInBagCapacity} KG
-                          </span>
-                        </div>
-                      </div>
-
-                      {selectedTrip.status === 'REJECTED' && selectedTrip.rejectionReason && (
-                        <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs font-semibold text-destructive flex gap-2">
-                          <AlertCircle className="h-4 w-4 shrink-0" />
-                          <div>
-                            <div className="font-bold uppercase">Rejection Reason</div>
-                            <div className="mt-0.5 font-medium">{selectedTrip.rejectionReason}</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Ticket Photo Column */}
-                    <div className="space-y-3">
-                      <h4 className="font-bold text-slate-800 border-b pb-1 text-sm uppercase tracking-wide flex justify-between items-center">
-                        Uploaded Ticket Scan
-                        {selectedTrip.ticketPhoto && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 text-xs p-0 text-[#FF6F3F] hover:text-[#e05626]"
-                            onClick={() => setPreviewPhotoUrl(selectedTrip.ticketPhoto)}
-                          >
-                            <ExternalLink className="h-3 w-3 mr-1" /> View Full
-                          </Button>
-                        )}
-                      </h4>
-
-                      {selectedTrip.ticketPhoto ? (
-                        <div className="border rounded-xl overflow-hidden bg-slate-50 p-2">
-                          <div
-                            className="h-64 w-full bg-contain bg-center bg-no-repeat rounded-lg border cursor-zoom-in"
-                            style={{ backgroundImage: `url(${selectedTrip.ticketPhoto})` }}
-                            onClick={() => setPreviewPhotoUrl(selectedTrip.ticketPhoto)}
-                          />
-                        </div>
-                      ) : (
-                        <div className="h-64 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm">
-                          <FileText className="h-8 w-8 mb-2" />
-                          No ticket file uploaded
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <DialogFooter className="gap-2 border-t pt-4">
-                    <Button variant="outline" onClick={() => setShowDetailDialog(false)}>
-                      Close
-                    </Button>
-
-                    {selectedTrip.status === 'PENDING' && (
-                      <>
-                        <Button
-                          variant="destructive"
-                          onClick={() => setShowRejectDialog(true)}
-                          disabled={verifyTripMutation.isPending}
-                        >
-                          <X className="mr-1.5 h-4 w-4" /> Reject
-                        </Button>
-                        <Button
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                          onClick={() => handleApprove(selectedTrip.id)}
-                          disabled={verifyTripMutation.isPending}
-                        >
-                          {verifyTripMutation.isPending ? (
-                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Check className="mr-1.5 h-4 w-4" />
-                          )}
-                          Approve
-                        </Button>
-                      </>
-                    )}
-                  </DialogFooter>
-                </>
-              );
-            })()}
-        </DialogContent>
-      </Dialog>
-
-      {/* Reject Reason Dialog */}
-      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-destructive">Reject Flight Trip</DialogTitle>
-            <DialogDescription>
-              Provide an explanation of why this flight trip is rejected. The user will see this
-              notification.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-2">
-            <Label htmlFor="reject-reason">Reason for Rejection</Label>
-            <Textarea
-              id="reject-reason"
-              placeholder="e.g. Unreadable flight ticket photo / Flight number mismatch"
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-              rows={4}
-              required
-            />
-          </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowRejectDialog(false);
-                setRejectionReason('');
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleRejectSubmit}
-              disabled={verifyTripMutation.isPending}
-            >
-              {verifyTripMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Submit Rejection
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Ticket Preview Dialog */}
-      <Dialog open={!!previewPhotoUrl} onOpenChange={(open) => !open && setPreviewPhotoUrl(null)}>
-        <DialogContent className="max-w-4xl p-1 bg-black/95 border-0">
-          <div className="relative flex items-center justify-center max-h-[85vh] w-full min-h-[400px]">
-            {previewPhotoUrl && (
-              <Image
-                src={toRelativeImageUrl(previewPhotoUrl)}
-                alt="Flight Ticket Preview"
-                className="max-h-[85vh] max-w-full object-contain rounded-lg"
-                width={800}
-                height={600}
-              />
-            )}
-            <button
-              onClick={() => setPreviewPhotoUrl(null)}
-              className="absolute top-4 right-4 bg-black/60 hover:bg-black/90 text-white rounded-full h-8 w-8 flex items-center justify-center border border-white/20 font-bold"
-            >
-              ✕
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </RoleGuard>
   );
 }

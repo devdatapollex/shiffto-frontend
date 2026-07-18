@@ -97,6 +97,52 @@ export default function MyTripsPage() {
   const { data: tripsData, isLoading: tripsLoading } = useMyTrips();
   const { data: shipmentsData, isLoading: shipmentsLoading } = useAvailableShipments();
 
+  // Fetch matching trips for Accept dialog
+  const { data: acceptMatchingTripsData, isLoading: acceptMatchingLoading } = useMyTrips(
+    {
+      status: 'ACTIVE',
+      fromCountry: selectedShipment?.fromCountry,
+      toCountry: selectedShipment?.toCountry,
+    },
+    {
+      enabled: !!selectedShipment,
+    }
+  );
+
+  // Fetch matching trips for Counter-Offer dialog
+  const { data: counterMatchingTripsData, isLoading: counterMatchingLoading } = useMyTrips(
+    {
+      status: 'ACTIVE',
+      fromCountry: selectedCounterShipment?.fromCountry,
+      toCountry: selectedCounterShipment?.toCountry,
+    },
+    {
+      enabled: !!selectedCounterShipment,
+    }
+  );
+
+  const matchingAcceptTrips = acceptMatchingTripsData?.data || [];
+  useEffect(() => {
+    if (selectedShipment && matchingAcceptTrips.length > 0) {
+      if (!matchingAcceptTrips.some((t) => t.id === acceptingTripId)) {
+        setAcceptingTripId(matchingAcceptTrips[0].id);
+      }
+    } else if (selectedShipment && matchingAcceptTrips.length === 0 && !acceptMatchingLoading) {
+      setAcceptingTripId('');
+    }
+  }, [matchingAcceptTrips, selectedShipment, acceptMatchingLoading, acceptingTripId]);
+
+  const matchingCounterTrips = counterMatchingTripsData?.data || [];
+  useEffect(() => {
+    if (selectedCounterShipment && matchingCounterTrips.length > 0) {
+      if (!matchingCounterTrips.some((t) => t.id === counterTripId)) {
+        setCounterTripId(matchingCounterTrips[0].id);
+      }
+    } else if (selectedCounterShipment && matchingCounterTrips.length === 0 && !counterMatchingLoading) {
+      setCounterTripId('');
+    }
+  }, [matchingCounterTrips, selectedCounterShipment, counterMatchingLoading, counterTripId]);
+
   // Mutations
   const cancelTripMutation = useCancelTrip();
   const completeTripMutation = useCompleteTrip();
@@ -166,11 +212,7 @@ export default function MyTripsPage() {
 
   const handleOpenAcceptDialog = (shipment: Shipment) => {
     setSelectedShipment(shipment);
-    if (activeTrips.length > 0) {
-      setAcceptingTripId(activeTrips[0].id);
-    } else {
-      setAcceptingTripId('');
-    }
+    setAcceptingTripId('');
     setBagType('checkIn');
   };
 
@@ -195,11 +237,7 @@ export default function MyTripsPage() {
   const handleOpenCounterDialog = (shipment: Shipment) => {
     setSelectedCounterShipment(shipment);
     setCounterPrice(shipment.pricePerKg.toString());
-    if (activeTrips.length > 0) {
-      setCounterTripId(activeTrips[0].id);
-    } else {
-      setCounterTripId('');
-    }
+    setCounterTripId('');
     setCounterBagType('checkIn');
   };
 
@@ -741,10 +779,15 @@ export default function MyTripsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {activeTrips.length === 0 ? (
+          {acceptMatchingLoading ? (
+            <div className="py-8 text-center space-y-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0B3A8E] mx-auto"></div>
+              <p className="text-xs text-slate-400">Fetching matching trips...</p>
+            </div>
+          ) : matchingAcceptTrips.length === 0 ? (
             <div className="py-4 text-center space-y-2">
               <AlertCircle className="h-8 w-8 text-amber-500 mx-auto" />
-              <p className="text-sm font-semibold text-slate-700">No active trips found</p>
+              <p className="text-sm font-semibold text-slate-700">No active matching trips found</p>
               <p className="text-xs text-slate-400">
                 You must have an approved, ACTIVE trip with route matching the shipment to accept
                 it.
@@ -772,7 +815,7 @@ export default function MyTripsPage() {
                     <SelectValue placeholder="Choose a trip" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-[#e2e8f0]">
-                    {activeTrips.map((t) => {
+                    {matchingAcceptTrips.map((t) => {
                       const fromCountry = getCountryByCode(t.fromCountry);
                       const toCountry = getCountryByCode(t.toCountry);
                       return (
@@ -818,7 +861,7 @@ export default function MyTripsPage() {
               Cancel
             </Button>
             <Button
-              disabled={activeTrips.length === 0 || createOfferMutation.isPending}
+              disabled={matchingAcceptTrips.length === 0 || createOfferMutation.isPending || acceptMatchingLoading}
               className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl"
               onClick={handleAcceptShipmentSubmit}
             >
@@ -843,10 +886,15 @@ export default function MyTripsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {activeTrips.length === 0 ? (
+          {counterMatchingLoading ? (
+            <div className="py-8 text-center space-y-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0B3A8E] mx-auto"></div>
+              <p className="text-xs text-slate-400">Fetching matching trips...</p>
+            </div>
+          ) : matchingCounterTrips.length === 0 ? (
             <div className="py-4 text-center space-y-2">
               <AlertCircle className="h-8 w-8 text-amber-500 mx-auto" />
-              <p className="text-sm font-semibold text-slate-700">No active trips found</p>
+              <p className="text-sm font-semibold text-slate-700">No active matching trips found</p>
               <p className="text-xs text-slate-400">
                 You must have an approved, ACTIVE trip with route matching the shipment to make a counter-offer.
               </p>
@@ -900,7 +948,7 @@ export default function MyTripsPage() {
                     <SelectValue placeholder="Choose a trip" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-[#e2e8f0]">
-                    {activeTrips.map((t) => {
+                    {matchingCounterTrips.map((t) => {
                       const fromCountry = getCountryByCode(t.fromCountry);
                       const toCountry = getCountryByCode(t.toCountry);
                       return (
@@ -946,7 +994,7 @@ export default function MyTripsPage() {
               Cancel
             </Button>
             <Button
-              disabled={activeTrips.length === 0 || createOfferMutation.isPending}
+              disabled={matchingCounterTrips.length === 0 || createOfferMutation.isPending || counterMatchingLoading}
               className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl"
               onClick={handleCounterOfferSubmit}
             >
@@ -1206,7 +1254,7 @@ export default function MyTripsPage() {
                     </div>
 
                     {/* Flight Ticket Photo */}
-                    {selectedViewTrip.ticketPhoto && (
+                    {selectedViewTrip.ticketPhoto && selectedViewTrip.ticketPhoto !== 'pending' && (
                       <div className="space-y-3">
                         <h4 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2 flex items-center gap-2">
                           <Eye className="h-4.5 w-4.5 text-[#0B3A8E]" />
