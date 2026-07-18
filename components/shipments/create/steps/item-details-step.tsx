@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCategories } from '@/hooks/use-categories';
-import { Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import { PhotoDropzone } from '../photo-dropzone';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 
@@ -158,6 +158,16 @@ export function ItemDetailsStep() {
                   </span>
                 </div>
               </FormControl>
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1 select-none">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-400" />
+                <span>
+                  {selectedCategory
+                    ? maxWeight !== null
+                      ? `Allowed range: 0.01 - ${maxWeight} kg`
+                      : 'Any weight allowed'
+                    : 'Select a category to see allowed weight range'}
+                </span>
+              </div>
               <FormMessage />
             </FormItem>
           )}
