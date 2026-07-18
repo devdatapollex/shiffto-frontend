@@ -2,7 +2,9 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useShipmentDetails } from '@/hooks/use-shipment-details';
+import { useRole } from '@/hooks/use-role';
 import { ShipmentTimeline } from '@/components/tracking/shipment-timeline';
+import { StepAdvancementCard } from '@/components/tracking/step-advancement-card';
 import { TripRouteCard } from '@/components/tracking/trip-route-card';
 import { ShipmentItemCard } from '@/components/tracking/shipment-item-card';
 import { ContactDetailsCard } from '@/components/tracking/contact-details-card';
@@ -15,6 +17,7 @@ export default function ShipmentDetailsPage() {
   const router = useRouter();
   const shipmentId = params?.id as string;
 
+  const { user, isAdmin } = useRole();
   const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
 
   if (isLoading) {
@@ -22,7 +25,7 @@ export default function ShipmentDetailsPage() {
       <div className="space-y-6 animate-in fade-in duration-300 pb-16">
         {/* Navigation Breadcrumb Skeleton */}
         <div className="flex items-center gap-4 h-6 w-64 bg-slate-100 rounded animate-pulse" />
-        
+
         {/* Timeline Skeleton */}
         <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
 
@@ -58,6 +61,12 @@ export default function ShipmentDetailsPage() {
 
   const shortShipmentId = `SH-${shipment.id.slice(-6).toUpperCase()}`;
 
+  // Check if current user is the traveller for this trip or admin
+  const isTraveller = Boolean(
+    user && shipment.trip?.user?.id === user.id
+  );
+  const canAdvanceStep = (isTraveller || isAdmin) && shipment.status === 'ACTIVE';
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       {/* Navigation & Header */}
@@ -67,7 +76,7 @@ export default function ShipmentDetailsPage() {
             variant="outline"
             size="icon"
             onClick={() => router.back()}
-            className="h-8 w-8 border-slate-200 hover:bg-slate-50 rounded-lg text-slate-600"
+            className="h-8 w-8 border-slate-200 hover:bg-slate-50 rounded-lg text-slate-600 cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -95,12 +104,17 @@ export default function ShipmentDetailsPage() {
         )}
       </div>
 
+      {/* Step Advancement Action Card for Traveller / Admin */}
+      {canAdvanceStep && shipment.shipmentSteps && shipment.shipmentSteps.length > 0 && (
+        <StepAdvancementCard shipment={shipment} steps={shipment.shipmentSteps} />
+      )}
+
       {/* Bottom Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column: Shipment Item & Receiver */}
         <div className="space-y-6">
           <ShipmentItemCard shipment={shipment} />
-          
+
           <ContactDetailsCard
             title="Receiver Details"
             name={shipment.receiverName}
@@ -115,7 +129,7 @@ export default function ShipmentDetailsPage() {
           {shipment.trip ? (
             <>
               <TripRouteCard trip={shipment.trip} showTicketButton={!!shipment.trip.status} />
-              
+
               <ContactDetailsCard
                 title="Traveler Details"
                 name={shipment.trip.user?.name || 'Assigned Traveler'}

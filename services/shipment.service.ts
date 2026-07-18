@@ -29,6 +29,7 @@ export interface ShipmentStep {
   isCurrent: boolean;
   completedAt: string | null;
   notes: string | null;
+  photoUrl?: string | null;
   definition: ShipmentStepDefinition;
 }
 
@@ -134,6 +135,72 @@ export async function getShipmentSteps(shipmentId: string): Promise<ShipmentStep
 export async function getShipmentDetails(shipmentId: string): Promise<ShipmentDetails> {
   const { data } = await apiClient.get<{ data: ShipmentDetails }>(
     `/shipments/${shipmentId}/details`
+  );
+  return data.data;
+}
+
+export async function confirmPickup(
+  shipmentId: string,
+  payload: { photoUrl: string; notes?: string }
+): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.post<{ data: ShipmentStep[] }>(
+    `/shipments/${shipmentId}/steps/confirm-pickup`,
+    payload
+  );
+  return data.data;
+}
+
+export async function confirmCheckin(
+  shipmentId: string,
+  payload?: { notes?: string }
+): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.post<{ data: ShipmentStep[] }>(
+    `/shipments/${shipmentId}/steps/confirm-checkin`,
+    payload ?? {}
+  );
+  return data.data;
+}
+
+export async function confirmTransit(
+  shipmentId: string,
+  payload?: { notes?: string }
+): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.post<{ data: ShipmentStep[] }>(
+    `/shipments/${shipmentId}/steps/confirm-transit`,
+    payload ?? {}
+  );
+  return data.data;
+}
+
+export async function confirmArrival(
+  shipmentId: string,
+  payload?: { notes?: string }
+): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.post<{ data: ShipmentStep[] }>(
+    `/shipments/${shipmentId}/steps/confirm-arrival`,
+    payload ?? {}
+  );
+  return data.data;
+}
+
+export async function confirmOutForDelivery(
+  shipmentId: string,
+  payload?: { notes?: string }
+): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.post<{ data: ShipmentStep[] }>(
+    `/shipments/${shipmentId}/steps/confirm-out-for-delivery`,
+    payload ?? {}
+  );
+  return data.data;
+}
+
+export async function confirmDelivery(
+  shipmentId: string,
+  payload: { photoUrl: string; notes?: string }
+): Promise<ShipmentStep[]> {
+  const { data } = await apiClient.post<{ data: ShipmentStep[] }>(
+    `/shipments/${shipmentId}/steps/confirm-delivery`,
+    payload
   );
   return data.data;
 }

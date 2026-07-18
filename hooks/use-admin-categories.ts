@@ -12,10 +12,10 @@ interface CategoriesResponse {
 interface CategoryPayload {
   name: string;
   slug: string;
-  maxWeight?: number;
+  maxWeight?: number | null;
   minPrice: number;
-  maxPrice?: number;
-  maxQuantity?: number;
+  maxPrice?: number | null;
+  maxQuantity?: number | null;
 }
 
 async function getCategories(params?: { page?: number; limit?: number }) {
