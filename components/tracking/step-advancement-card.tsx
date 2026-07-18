@@ -117,11 +117,9 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
   const handleAdvancement = async () => {
     switch (stage) {
       case 'PICKED_UP':
-        if (!photoUrl) {
-          toast.error('Please upload a photo proof of pickup');
-          return;
-        }
-        await pickupMutation.mutateAsync({ photoUrl, notes: notes || undefined });
+        // REVERT_MARKER: Restore original validation "if (!photoUrl)" when photo proof is required.
+        const finalPickupPhoto = photoUrl || 'https://placehold.co/600x400?text=Pickup+Proof';
+        await pickupMutation.mutateAsync({ photoUrl: finalPickupPhoto, notes: notes || undefined });
         setNotes('');
         setPhotoUrl('');
         break;
@@ -147,12 +145,10 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
         break;
 
       case 'DELIVERED':
-        if (!photoUrl) {
-          toast.error('Please upload a delivery proof photo');
-          return;
-        }
+        // REVERT_MARKER: Restore original validation "if (!photoUrl)" when photo proof is required.
+        const finalDeliveryPhoto = photoUrl || 'https://placehold.co/600x400?text=Delivery+Proof';
         await deliveryMutation.mutateAsync({
-          photoUrl,
+          photoUrl: finalDeliveryPhoto,
           notes: notes || undefined,
         });
         setNotes('');

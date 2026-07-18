@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      // REVERT_MARKER: Remove these external image domains when local/S3 uploads are fully used.
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
     ],
   },
   async rewrites() {
