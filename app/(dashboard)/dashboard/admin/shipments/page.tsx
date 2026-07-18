@@ -90,7 +90,7 @@ const MAIN_TABS: { label: string; value: TabValue; icon: React.ElementType }[] =
   { label: 'Step Definitions', value: 'step-definitions', icon: ListChecks },
 ];
 
-// --- Shipment Constants ---
+// --- Shipment Constants -------
 
 const STATUS_TABS = [
   { label: 'All', value: undefined },
@@ -365,11 +365,10 @@ function ShipmentsTab() {
             <button
               key={tab.label}
               onClick={() => dispatch({ type: 'SET_STATUS', status: tab.value })}
-              className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-all whitespace-nowrap ${
-                isActive
+              className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-all whitespace-nowrap ${isActive
                   ? 'bg-[#0D307A]/10 text-[#0D307A] border-transparent'
                   : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -469,10 +468,10 @@ function ShipmentsTab() {
                       <span className="text-xs text-slate-400 font-medium">
                         {item.createdAt
                           ? new Date(item.createdAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
                           : 'N/A'}
                       </span>
                     </td>
@@ -1273,11 +1272,10 @@ export default function AdminShipmentsPage() {
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-all -mb-px ${
-                  isActive
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-all -mb-px ${isActive
                     ? 'border-[#0B3A8E] text-[#0B3A8E]'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-                }`}
+                  }`}
               >
                 <Icon className="h-4 w-4" />
                 {tab.label}
