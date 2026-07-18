@@ -4,6 +4,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { ImageIcon, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUploadImages } from '@/hooks/use-upload-image';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface UploadingItem {
@@ -157,7 +159,13 @@ export function PhotoDropzone({ value, onChange }: PhotoDropzoneProps) {
         <div className="flex flex-wrap gap-2">
           {value.map((url) => (
             <div key={url} className="group relative">
-              <img src={url} alt="Uploaded" className="h-16 w-16 rounded-md object-cover" />
+              <Image
+                src={toRelativeImageUrl(url)}
+                alt="Uploaded"
+                className="h-16 w-16 rounded-md object-cover"
+                width={64}
+                height={64}
+              />
               <button
                 type="button"
                 className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100"

@@ -24,6 +24,7 @@ export interface Trip {
     name: string;
     email: string;
     image: string | null;
+    phone?: string | null;
   };
   shipments?: Shipment[];
 }
@@ -96,5 +97,10 @@ export async function verifyTrip(
   payload: { approved: boolean; rejectionReason?: string }
 ): Promise<Trip> {
   const { data } = await apiClient.post<{ data: Trip }>(`/trips/${id}/verify`, payload);
+  return data.data;
+}
+
+export async function getTripById(id: string): Promise<Trip> {
+  const { data } = await apiClient.get<{ data: Trip }>(`/trips/${id}`);
   return data.data;
 }

@@ -4,6 +4,8 @@ import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Package, Plane, Pencil } from 'lucide-react';
 import { getCountryByCode } from '@/lib/constants/countries';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 import { CountryFlag } from '../country-flag';
 import { useCategories } from '@/hooks/use-categories';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
@@ -48,10 +50,12 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
         <div className="flex gap-6 items-start">
           <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
             {values.itemPhotos.length > 0 ? (
-              <img
-                src={values.itemPhotos[0]}
+              <Image
+                src={toRelativeImageUrl(values.itemPhotos[0])}
                 alt={values.itemName}
                 className="h-full w-full object-cover"
+                width={120}
+                height={120}
               />
             ) : (
               <Package className="h-10 w-10 text-slate-400" />

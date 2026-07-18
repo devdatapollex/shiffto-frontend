@@ -32,6 +32,30 @@ export interface ShipmentStep {
   definition: ShipmentStepDefinition;
 }
 
+export interface ShipmentTripDetails {
+  id: string;
+  flightNumber: string;
+  fromCountry: string;
+  toCountry: string;
+  flightDate: string;
+  flightTime: string;
+  airportArrivalTime: string | null;
+  status: string;
+  totalCapacity?: number;
+  remainingCapacity?: number;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+    phone?: string | null;
+  };
+}
+
+export interface ShipmentDetails extends Omit<Shipment, 'tripId'> {
+  trip: ShipmentTripDetails | null;
+}
+
 export interface Shipment {
   id: string;
   itemName: string;
@@ -79,11 +103,8 @@ export async function getAvailableShipments(params?: {
   fromCountry?: string;
   toCountry?: string;
 }): Promise<ShipmentsResponse> {
-  const { data } = await apiClient.get<ShipmentsResponse>('/shipments', {
-    params: {
-      type: 'available',
-      ...params,
-    },
+  const { data } = await apiClient.get<ShipmentsResponse>('/trips/available-shipments', {
+    params,
   });
   return data;
 }
@@ -107,5 +128,12 @@ export async function getShipments(params?: {
 
 export async function getShipmentSteps(shipmentId: string): Promise<ShipmentStep[]> {
   const { data } = await apiClient.get<{ data: ShipmentStep[] }>(`/shipments/${shipmentId}/steps`);
+  return data.data;
+}
+
+export async function getShipmentDetails(shipmentId: string): Promise<ShipmentDetails> {
+  const { data } = await apiClient.get<{ data: ShipmentDetails }>(
+    `/shipments/${shipmentId}/details`
+  );
   return data.data;
 }

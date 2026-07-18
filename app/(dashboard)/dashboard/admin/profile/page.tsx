@@ -14,6 +14,8 @@ import { getProfile, updateProfile, changePassword, UserProfile } from '@/servic
 import { uploadPhotos } from '@/services/upload.service';
 import { ROUTES } from '@/config/routes';
 import { RoleGuard } from '@/components/auth/role-guard';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 
 export default function AdminProfilePage() {
   const router = useRouter();
@@ -214,7 +216,13 @@ export default function AdminProfilePage() {
                   <div className="relative group">
                     <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary/20 bg-muted flex items-center justify-center text-primary-foreground font-semibold text-3xl">
                       {image ? (
-                        <img src={image} alt="Profile" className="h-full w-full object-cover" />
+                        <Image
+                          src={toRelativeImageUrl(image)}
+                          alt="Profile"
+                          className="h-full w-full object-cover"
+                          width={96}
+                          height={96}
+                        />
                       ) : (
                         <span className="text-[#0B3A8E]">
                           {name.charAt(0).toUpperCase() || 'A'}

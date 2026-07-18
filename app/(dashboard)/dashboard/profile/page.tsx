@@ -55,6 +55,8 @@ import {
 } from '@/services/profile.service';
 import { uploadPhotos } from '@/services/upload.service';
 import { ROUTES } from '@/config/routes';
+import { toRelativeImageUrl } from '@/lib/image-utils';
+import Image from 'next/image';
 
 const NATIONALITIES = [
   'Bangladeshi',
@@ -443,7 +445,13 @@ export default function ProfilePage() {
                 <div className="relative group">
                   <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary/20 bg-muted flex items-center justify-center text-primary-foreground font-semibold text-3xl">
                     {image ? (
-                      <img src={image} alt="Profile" className="h-full w-full object-cover" />
+                      <Image
+                        src={toRelativeImageUrl(image)}
+                        alt="Profile"
+                        className="h-full w-full object-cover"
+                        width={96}
+                        height={96}
+                      />
                     ) : (
                       <span className="text-[#0B3A8E]">{name.charAt(0).toUpperCase() || 'U'}</span>
                     )}
@@ -741,10 +749,12 @@ export default function ProfilePage() {
                       <div className="relative border-2 border-dashed border-slate-200 rounded-lg p-4 flex flex-col items-center justify-center h-48 bg-slate-50 hover:bg-slate-100 transition-colors">
                         {frontPhotoUrl ? (
                           <div className="absolute inset-0 p-2">
-                            <img
-                              src={frontPhotoUrl}
+                            <Image
+                              src={toRelativeImageUrl(frontPhotoUrl)}
                               alt="Document Front"
                               className="h-full w-full object-contain rounded-md"
+                              width={192}
+                              height={192}
                             />
                             <button
                               type="button"
@@ -789,10 +799,12 @@ export default function ProfilePage() {
                       <div className="relative border-2 border-dashed border-slate-200 rounded-lg p-4 flex flex-col items-center justify-center h-48 bg-slate-50 hover:bg-slate-100 transition-colors">
                         {backPhotoUrl ? (
                           <div className="absolute inset-0 p-2">
-                            <img
-                              src={backPhotoUrl}
+                            <Image
+                              src={toRelativeImageUrl(backPhotoUrl)}
                               alt="Document Back"
                               className="h-full w-full object-contain rounded-md"
+                              width={192}
+                              height={192}
                             />
                             <button
                               type="button"
