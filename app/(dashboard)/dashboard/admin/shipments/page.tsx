@@ -196,7 +196,8 @@ const categorySchema = z.object({
   maxQuantity: z.coerce.number().int().positive().optional().nullable(),
 });
 
-type CategoryFormValues = z.infer<typeof categorySchema>;
+type CategoryFormValues = z.output<typeof categorySchema>;
+type CategoryFormInput = z.input<typeof categorySchema>;
 
 // --- Step Definition Validation ---
 
@@ -621,7 +622,7 @@ function CategoriesTab() {
   const meta = response?.meta ?? { page: 1, limit: 10, total: 0 };
   const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
 
-  const createForm = useForm<CategoryFormValues>({
+  const createForm = useForm<CategoryFormInput, unknown, CategoryFormValues>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: '',
@@ -633,7 +634,7 @@ function CategoriesTab() {
     },
   });
 
-  const editForm = useForm<CategoryFormValues>({
+  const editForm = useForm<CategoryFormInput, unknown, CategoryFormValues>({
     resolver: zodResolver(categorySchema),
   });
 
@@ -652,7 +653,10 @@ function CategoriesTab() {
   const handleEdit = async (data: CategoryFormValues) => {
     if (!selectedCategory) return;
     try {
-      await updateMutation.mutateAsync({ id: selectedCategory.id, payload: data });
+      await updateMutation.mutateAsync({
+        id: selectedCategory.id,
+        payload: data as Partial<CategoryPayload>,
+      });
       toast.success('Category updated successfully');
       setShowEditDialog(false);
       setSelectedCategory(null);
