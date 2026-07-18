@@ -9,10 +9,20 @@ import {
   getTripById,
 } from '@/services/trip.service';
 
-export function useMyTrips(params?: { page?: number; limit?: number; status?: string }) {
+export function useMyTrips(
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    fromCountry?: string;
+    toCountry?: string;
+  },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ['my-trips', params],
     queryFn: () => getMyTrips(params),
+    ...options,
   });
 }
 
