@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -21,6 +21,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { io, Socket } from 'socket.io-client';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -64,7 +65,7 @@ const CATEGORIES = ['Payment', 'Delivery', 'KYC', 'Technical', 'Other'];
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-  IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+  IN_PROGRESS: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800',
   RESOLVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
   CLOSED: 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
 };
@@ -160,6 +161,43 @@ export default function UserSupportPage() {
       toast.error(error?.response?.data?.message || 'Failed to close ticket');
     },
   });
+
+  // Socket.io real-time listener
+  useEffect(() => {
+    if (!expandedTicketId) return;
+
+    const socket: Socket = io();
+
+    socket.emit('join-ticket', expandedTicketId);
+
+    socket.on('new-comment', (newComment: any) => {
+      queryClient.setQueryData(['ticket-details', expandedTicketId], (oldData: any) => {
+        if (!oldData) return oldData;
+        const exists = oldData.comments.some((c: any) => c.id === newComment.id);
+        if (exists) return oldData;
+        return {
+          ...oldData,
+          comments: [...oldData.comments, newComment],
+        };
+      });
+    });
+
+    socket.on('ticket-status-updated', ({ status }: { status: string }) => {
+      queryClient.setQueryData(['ticket-details', expandedTicketId], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          status,
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: ['my-tickets'] });
+    });
+
+    return () => {
+      socket.emit('leave-ticket', expandedTicketId);
+      socket.disconnect();
+    };
+  }, [expandedTicketId, queryClient]);
 
   const resetCreateForm = () => {
     setNewTitle('');

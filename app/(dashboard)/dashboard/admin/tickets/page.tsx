@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
+import { io, Socket } from 'socket.io-client';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -249,6 +250,43 @@ export default function AdminTicketsPage() {
       toast.error(error?.response?.data?.message || 'Failed to post reply');
     },
   });
+
+  // Socket.io real-time listener
+  useEffect(() => {
+    if (!expandedTicketId) return;
+
+    const socket: Socket = io();
+
+    socket.emit('join-ticket', expandedTicketId);
+
+    socket.on('new-comment', (newComment: any) => {
+      queryClient.setQueryData(['admin-ticket-details', expandedTicketId], (oldData: any) => {
+        if (!oldData) return oldData;
+        const exists = oldData.comments.some((c: any) => c.id === newComment.id);
+        if (exists) return oldData;
+        return {
+          ...oldData,
+          comments: [...oldData.comments, newComment],
+        };
+      });
+    });
+
+    socket.on('ticket-status-updated', ({ status }: { status: string }) => {
+      queryClient.setQueryData(['admin-ticket-details', expandedTicketId], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          status,
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-tickets'] });
+    });
+
+    return () => {
+      socket.emit('leave-ticket', expandedTicketId);
+      socket.disconnect();
+    };
+  }, [expandedTicketId, queryClient]);
 
   const handleReplyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
