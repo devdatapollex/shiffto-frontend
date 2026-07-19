@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useReducer, useEffect } from 'react';
+import { useState, useReducer, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   LifeBuoy,
@@ -61,7 +61,7 @@ const STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-  IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+  IN_PROGRESS: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800',
   RESOLVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
   CLOSED: 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
 };
@@ -147,6 +147,22 @@ export default function AdminTicketsPage() {
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const getSocketUrl = () => {
+    if (typeof window !== 'undefined') {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalhost) {
+        return 'http://localhost:5000';
+      }
+    }
+    return '';
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   // Admin reply states
   const [replyMessage, setReplyMessage] = useState('');
   const [replyFiles, setReplyFiles] = useState<File[]>([]);
@@ -182,6 +198,12 @@ export default function AdminTicketsPage() {
     queryFn: () => ticketService.getTicketDetails(expandedTicketId!),
     enabled: !!expandedTicketId,
   });
+
+  useEffect(() => {
+    if (expandedTicket) {
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [expandedTicket?.comments]);
 
   // Fetch admin list for assignees
   const { data: assignees } = useQuery({
@@ -255,7 +277,7 @@ export default function AdminTicketsPage() {
   useEffect(() => {
     if (!expandedTicketId) return;
 
-    const socket: Socket = io();
+    const socket: Socket = io(getSocketUrl());
 
     socket.emit('join-ticket', expandedTicketId);
 
@@ -690,7 +712,7 @@ export default function AdminTicketsPage() {
                               Conversation Thread
                             </h4>
 
-                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                            <div className="space-y-4 h-[300px] overflow-y-auto pr-2">
                               {expandedTicket.comments.length === 0 ? (
                                 <p className="text-xs text-muted-foreground italic text-center py-4">
                                   No replies posted yet.
@@ -755,6 +777,7 @@ export default function AdminTicketsPage() {
                                   );
                                 })
                               )}
+                              <div ref={messagesEndRef} />
                             </div>
                           </div>
 

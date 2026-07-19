@@ -84,6 +84,22 @@ export default function UserSupportPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const getSocketUrl = () => {
+    if (typeof window !== 'undefined') {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalhost) {
+        return 'http://localhost:5000';
+      }
+    }
+    return '';
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   // New ticket form state
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState('');
@@ -120,6 +136,12 @@ export default function UserSupportPage() {
     queryFn: () => ticketService.getTicketDetails(expandedTicketId!),
     enabled: !!expandedTicketId,
   });
+
+  useEffect(() => {
+    if (expandedTicket) {
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [expandedTicket?.comments]);
 
   // Create ticket mutation
   const createTicketMutation = useMutation({
@@ -166,7 +188,7 @@ export default function UserSupportPage() {
   useEffect(() => {
     if (!expandedTicketId) return;
 
-    const socket: Socket = io();
+    const socket: Socket = io(getSocketUrl());
 
     socket.emit('join-ticket', expandedTicketId);
 
@@ -488,7 +510,7 @@ export default function UserSupportPage() {
                             Conversation History
                           </h4>
 
-                          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                          <div className="space-y-4 h-[300px] overflow-y-auto pr-2">
                             {expandedTicket.comments.length === 0 ? (
                               <p className="text-xs text-muted-foreground italic text-center py-4">
                                 No messages yet.
@@ -553,6 +575,7 @@ export default function UserSupportPage() {
                                 );
                               })
                             )}
+                            <div ref={messagesEndRef} />
                           </div>
                         </div>
 
