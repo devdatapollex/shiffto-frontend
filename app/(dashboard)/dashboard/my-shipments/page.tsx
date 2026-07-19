@@ -278,12 +278,15 @@ export default function MyShipmentsPage() {
   // --- Offer actions ---
   const handleAcceptOffer = async (offerId: string, travellerName: string, offeredPrice: number) => {
     try {
-      await acceptOfferMutation.mutateAsync(offerId);
+      const res = await acceptOfferMutation.mutateAsync(offerId);
       toast.success(
-        `You accepted the offer from ${travellerName} for $${offeredPrice}!`
+        `Offer from ${travellerName} selected! Redirecting to payment checkout...`
       );
+      if (res?.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+      }
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to accept offer');
+      toast.error(err?.response?.data?.message || err?.message || 'Failed to accept offer');
     }
   };
 

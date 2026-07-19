@@ -57,6 +57,18 @@ export interface ShipmentDetails extends Omit<Shipment, 'tripId'> {
   trip: ShipmentTripDetails | null;
 }
 
+export interface PaymentTransactionDetails {
+  id: string;
+  transactionId: string;
+  grossAmount: number;
+  currency: string;
+  status: string;
+  gatewayTxnId?: string | null;
+  proofPhotoUrl?: string | null;
+  releasedAt?: string | null;
+  createdAt: string;
+}
+
 export interface Shipment {
   id: string;
   itemName: string;
@@ -79,6 +91,7 @@ export interface Shipment {
   userId: string;
   categoryId: string;
   category?: ShipmentCategory;
+  paymentTransaction?: PaymentTransactionDetails | null;
   shipmentSteps?: ShipmentStep[];
 }
 

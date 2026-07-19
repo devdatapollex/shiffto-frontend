@@ -56,3 +56,14 @@ export function useRejectOffer() {
     },
   });
 }
+
+export function useCancelCheckout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: offerService.cancelCheckout,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['offers'] });
+      queryClient.invalidateQueries({ queryKey: ['shipments'] });
+    },
+  });
+}
