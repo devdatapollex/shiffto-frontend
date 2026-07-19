@@ -10,7 +10,7 @@ export interface Offer {
   senderPrice: number;
   offeredPrice: number;
   bagType: 'cabin' | 'checkIn';
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  status: 'PENDING' | 'PAYMENT_PENDING' | 'ACCEPTED' | 'REJECTED';
   isCounterOffer: boolean;
   createdAt: string;
   traveller?: { id: string; name: string; email: string; image: string | null };
@@ -33,8 +33,19 @@ export async function getOffersForShipment(shipmentId: string): Promise<Offer[]>
   return data.data;
 }
 
-export async function acceptOffer(offerId: string): Promise<Offer> {
-  const { data } = await apiClient.post<{ data: Offer }>(`/offers/${offerId}/accept`);
+export interface AcceptOfferResponse {
+  offer: Offer;
+  transactionId: string;
+  checkoutUrl: string;
+}
+
+export async function acceptOffer(offerId: string): Promise<AcceptOfferResponse> {
+  const { data } = await apiClient.post<{ data: AcceptOfferResponse }>(`/offers/${offerId}/accept`);
+  return data.data;
+}
+
+export async function cancelCheckout(offerId: string): Promise<Offer> {
+  const { data } = await apiClient.post<{ data: Offer }>(`/offers/${offerId}/cancel-checkout`);
   return data.data;
 }
 
