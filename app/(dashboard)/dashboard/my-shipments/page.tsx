@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -50,7 +51,6 @@ import {
 } from '@/components/ui/pagination';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
-import { ShipmentDetailsModal } from '@/components/shipments/shipment-details-modal';
 import Image from 'next/image';
 
 // --- Types ---
@@ -165,8 +165,8 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 // --- Component ---
 
 export default function MyShipmentsPage() {
+  const router = useRouter();
   const { isAdmin } = useRole();
-  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
 
   // --- Offers (mock data, unchanged) ---
   // --- Offers (backend-driven) ---
@@ -602,7 +602,8 @@ export default function MyShipmentsPage() {
                   return (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50/60 transition-colors duration-150"
+                      className="hover:bg-slate-50/60 transition-colors duration-150 cursor-pointer"
+                      onClick={() => router.push(`/dashboard/tracking/shipment/${item.id}`)}
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
@@ -647,7 +648,7 @@ export default function MyShipmentsPage() {
                       <td className="px-5 py-4">
                         <span className="text-xs text-slate-400 font-medium">N/A</span>
                       </td>
-                      <td className="px-5 py-4 text-right">
+                      <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1.5">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -660,7 +661,7 @@ export default function MyShipmentsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setSelectedShipmentId(item.id)}>
+                              <DropdownMenuItem onClick={() => router.push(`/dashboard/tracking/shipment/${item.id}`)}>
                                 View details
                               </DropdownMenuItem>
                               {item.status === 'AWAITING_MATCH' && (
@@ -801,12 +802,6 @@ export default function MyShipmentsPage() {
           </div>
         )}
       </div>
-
-      <ShipmentDetailsModal
-        shipmentId={selectedShipmentId}
-        open={selectedShipmentId !== null}
-        onOpenChange={(open) => !open && setSelectedShipmentId(null)}
-      />
     </div>
   );
 }
