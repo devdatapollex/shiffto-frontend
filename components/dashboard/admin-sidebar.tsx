@@ -17,6 +17,7 @@ import {
   Settings,
   Plane,
   Package,
+  LifeBuoy,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
@@ -63,6 +64,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'Trips',
       href: ROUTES.ADMIN_TRIPS,
       icon: Plane,
+    },
+    {
+      label: 'Support Tickets',
+      href: ROUTES.ADMIN_TICKETS,
+      icon: LifeBuoy,
     },
     {
       label: 'Settlements',
