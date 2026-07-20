@@ -25,6 +25,7 @@ export const ROUTES = {
   RATINGS_REVIEWS: '/dashboard/ratings-reviews',
   SUPPORT: '/dashboard/support',
   PROFILE: '/dashboard/profile',
+  NOTIFICATIONS: '/dashboard/notifications',
 
   // Admin-only Routes
   ADMIN_SHIPMENTS: '/dashboard/admin/shipments',

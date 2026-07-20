@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/config/routes';
 import { toast } from 'sonner';
 
+import { useNotifications } from '@/hooks/use-notifications';
+
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -22,6 +24,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const pathname = usePathname();
   const { role: userRole, hasPermission } = useRole();
   const { data: session } = useSession();
+  const { data: notifications } = useNotifications();
+  const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
   const router = useRouter();
   const role = userRole || 'user';
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -151,6 +155,16 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
                       {item.label === 'My Shipments' && isCollapsed && (
                         <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary" />
+                      )}
+
+                      {item.label === 'Notifications' && unreadCount > 0 && !isCollapsed && (
+                        <span className="ml-auto flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-xs">
+                          {unreadCount}
+                        </span>
+                      )}
+
+                      {item.label === 'Notifications' && unreadCount > 0 && isCollapsed && (
+                        <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary animate-pulse" />
                       )}
 
                       {isActive && (
