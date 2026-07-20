@@ -93,7 +93,11 @@ export function RoutePricingStep() {
                 </FormControl>
                 <SelectContent position="popper">
                   {COUNTRIES.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
+                    <SelectItem
+                      key={country.code}
+                      value={country.code}
+                      disabled={country.code === toCountry}
+                    >
                       <CountryFlag code={country.code} className="h-4 w-6" />
                       {country.name}
                     </SelectItem>
@@ -139,7 +143,11 @@ export function RoutePricingStep() {
                 </FormControl>
                 <SelectContent position="popper">
                   {COUNTRIES.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
+                    <SelectItem
+                      key={country.code}
+                      value={country.code}
+                      disabled={country.code === fromCountry}
+                    >
                       <CountryFlag code={country.code} className="h-4 w-6" />
                       {country.name}
                     </SelectItem>
