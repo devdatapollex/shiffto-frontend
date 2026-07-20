@@ -95,6 +95,54 @@ export async function deleteAccount(payload: Record<string, string>): Promise<vo
   await apiClient.post('/profile/delete', payload);
 }
 
+export interface UserAnalyticsData {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+    trustScore: number;
+    kycStatus: string;
+  };
+  stats: {
+    shipmentsCreated: number;
+    activeShipments: number;
+    deliveredShipments: number;
+    tripsAdded: number;
+    activeTrips: number;
+    completedTrips: number;
+    totalEarnings: number;
+    pendingEarnings: number;
+    totalSpending: number;
+    availableBalance: number;
+    openTicketsCount: number;
+    unreadNotificationsCount: number;
+  };
+  recentShipments: {
+    id: string;
+    itemName: string;
+    status: string;
+    fromCountry: string;
+    toCountry: string;
+    totalCost: number;
+    createdAt: string;
+  }[];
+  recentTrips: {
+    id: string;
+    flightNumber: string;
+    status: string;
+    fromCountry: string;
+    toCountry: string;
+    flightDate: string;
+    createdAt: string;
+  }[];
+}
+
+export async function getUserAnalytics(): Promise<UserAnalyticsData> {
+  const { data } = await apiClient.get<{ success: boolean; data: UserAnalyticsData }>('/profile/analytics');
+  return data.data;
+}
+
 // Admin Services
 export async function getKycSubmissions(params?: {
   page?: number;

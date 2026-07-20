@@ -18,12 +18,15 @@ import {
   Plane,
   Package,
   LifeBuoy,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/config/routes';
 import { toast } from 'sonner';
+
+import { useNotifications } from '@/hooks/use-notifications';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -33,6 +36,8 @@ interface AdminSidebarProps {
 export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { data: notifications } = useNotifications();
+  const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -84,6 +89,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'Users',
       href: ROUTES.USERS,
       icon: Users,
+    },
+    {
+      label: 'Notifications',
+      href: ROUTES.NOTIFICATIONS,
+      icon: Bell,
     },
     {
       label: 'Account Settings',
@@ -190,6 +200,16 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                       >
                         {item.label}
                       </motion.span>
+                    )}
+
+                    {item.label === 'Notifications' && unreadCount > 0 && !isCollapsed && (
+                      <span className="ml-auto flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-xs">
+                        {unreadCount}
+                      </span>
+                    )}
+
+                    {item.label === 'Notifications' && unreadCount > 0 && isCollapsed && (
+                      <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary animate-pulse" />
                     )}
 
                     {isActive && (

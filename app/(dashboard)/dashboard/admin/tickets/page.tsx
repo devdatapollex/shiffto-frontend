@@ -60,10 +60,10 @@ const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 const STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-  IN_PROGRESS: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800',
-  RESOLVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
-  CLOSED: 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
+  OPEN: 'bg-primary text-white border-primary font-bold shadow-xs',
+  IN_PROGRESS: 'bg-primary text-white border-primary font-bold shadow-xs',
+  RESOLVED: 'bg-primary text-white border-primary font-bold shadow-xs',
+  CLOSED: 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -167,6 +167,7 @@ export default function AdminTicketsPage() {
   const [replyMessage, setReplyMessage] = useState('');
   const [replyFiles, setReplyFiles] = useState<File[]>([]);
   const [isUploadingReply, setIsUploadingReply] = useState(false);
+  const [replyVisibleTo, setReplyVisibleTo] = useState<'ALL' | 'SENDER' | 'TRAVELER'>('ALL');
 
   // Build API filter params
   const apiFilters: AdminFilters = {
@@ -257,11 +258,13 @@ export default function AdminTicketsPage() {
       ticketId,
       message,
       attachments,
+      visibleTo,
     }: {
       ticketId: string;
       message: string;
       attachments?: string[];
-    }) => ticketService.addComment(ticketId, message, attachments),
+      visibleTo?: string;
+    }) => ticketService.addComment(ticketId, message, attachments, visibleTo),
     onSuccess: () => {
       setReplyMessage('');
       setReplyFiles([]);
@@ -350,6 +353,7 @@ export default function AdminTicketsPage() {
         ticketId: expandedTicketId,
         message: replyMessage,
         attachments: attachmentUrls,
+        visibleTo: replyVisibleTo,
       });
     } catch (err: any) {
       toast.error('Failed to upload attachments. Please try again.');
@@ -739,6 +743,11 @@ export default function AdminTicketsPage() {
                                           <span className="font-semibold text-foreground">
                                             {comment.user.name} {isAdmin && '(Staff)'}
                                           </span>
+                                          {expandedTicket.senderId && expandedTicket.travelerId && comment.visibleTo && (
+                                            <span className="text-[10px] bg-primary/10 text-primary-foreground text-xs px-1.5 py-0.5 rounded-md font-medium border border-primary/5">
+                                              Visible: {comment.visibleTo === 'ALL' ? 'Both' : comment.visibleTo === 'SENDER' ? 'Sender Only' : 'Traveler Only'}
+                                            </span>
+                                          )}
                                           <span>•</span>
                                           <span>
                                             {new Date(comment.createdAt).toLocaleTimeString([], {
@@ -790,6 +799,46 @@ export default function AdminTicketsPage() {
                               </div>
                             ) : (
                               <form onSubmit={handlePostReply} className="space-y-3">
+                                {expandedTicket.senderId && expandedTicket.travelerId && (
+                                  <div className="flex items-center gap-4 text-xs border border-primary/5 p-2 px-3 rounded-lg bg-primary/[0.01]">
+                                    <span className="font-semibold text-muted-foreground">Send Message to:</span>
+                                    <div className="flex gap-4">
+                                      <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground">
+                                        <input
+                                          type="radio"
+                                          name="replyVisibleTo"
+                                          value="ALL"
+                                          checked={replyVisibleTo === 'ALL'}
+                                          onChange={() => setReplyVisibleTo('ALL')}
+                                          className="text-primary focus:ring-primary h-3.5 w-3.5"
+                                        />
+                                        Both (Sender & Traveler)
+                                      </label>
+                                      <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground">
+                                        <input
+                                          type="radio"
+                                          name="replyVisibleTo"
+                                          value="SENDER"
+                                          checked={replyVisibleTo === 'SENDER'}
+                                          onChange={() => setReplyVisibleTo('SENDER')}
+                                          className="text-primary focus:ring-primary h-3.5 w-3.5"
+                                        />
+                                        Sender Only
+                                      </label>
+                                      <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground">
+                                        <input
+                                          type="radio"
+                                          name="replyVisibleTo"
+                                          value="TRAVELER"
+                                          checked={replyVisibleTo === 'TRAVELER'}
+                                          onChange={() => setReplyVisibleTo('TRAVELER')}
+                                          className="text-primary focus:ring-primary h-3.5 w-3.5"
+                                        />
+                                        Traveler Only
+                                      </label>
+                                    </div>
+                                  </div>
+                                )}
                                 <div className="flex gap-2">
                                   <Input
                                     placeholder="Type staff response..."
@@ -935,7 +984,7 @@ export default function AdminTicketsPage() {
 
                           {/* Management drop-downs */}
                           <div className="space-y-4">
-                            {/* Assignee */}
+                            {/* Assignee - Commented out as requested
                             <div className="space-y-1.5">
                               <Label className="text-xs font-semibold text-muted-foreground uppercase">
                                 Assign Ticket
@@ -969,6 +1018,7 @@ export default function AdminTicketsPage() {
                                 </SelectContent>
                               </Select>
                             </div>
+                            */}
 
                             {/* Status */}
                             <div className="space-y-1.5">
