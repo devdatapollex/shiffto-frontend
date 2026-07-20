@@ -206,12 +206,17 @@ export default function UserSupportPage() {
         const exists = oldData.comments.some((c: any) => c.id === newComment.id);
         if (exists) return oldData;
 
-        // Filter comments based on visibility parameters for the user
-        const isSender = oldData.senderId === currentUserId;
-        const isTraveler = oldData.travelerId === currentUserId;
-        if (isSender || isTraveler) {
-          const allowedVisibility = ['ALL', isSender ? 'SENDER' : 'TRAVELER'];
-          if (!allowedVisibility.includes(newComment.visibleTo)) {
+        // Strict privacy check for real-time socket comments
+        const isCommentFromAdmin = newComment.user?.role === 'admin';
+        if (isCommentFromAdmin) {
+          const isTraveler = oldData.travelerId === currentUserId && oldData.senderId !== currentUserId;
+          const myRoleTag = isTraveler ? 'TRAVELER' : 'SENDER';
+          if (newComment.visibleTo !== 'ALL' && newComment.visibleTo !== myRoleTag) {
+            return oldData;
+          }
+        } else {
+          // If comment is from a regular user, only display if I am the author
+          if (newComment.userId !== currentUserId) {
             return oldData;
           }
         }
