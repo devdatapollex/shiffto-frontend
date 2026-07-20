@@ -43,26 +43,34 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import { userService, type AdminUserListItem } from '@/services/user.service';
 
 const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900',
-  SUSPENDED: 'bg-red-50 text-red-700 border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900',
-  DEACTIVATED: 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
-  PENDING_KYC: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900',
+  ACTIVE: 'bg-primary text-white border-primary font-bold shadow-xs',
+  SUSPENDED: 'bg-primary text-white border-primary font-bold shadow-xs',
+  DEACTIVATED: 'bg-primary text-white border-primary font-bold shadow-xs',
+  PENDING_KYC: 'bg-primary text-white border-primary font-bold shadow-xs',
 };
 
 const KYC_COLORS: Record<string, string> = {
-  APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900',
-  PENDING: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900',
-  REJECTED: 'bg-red-50 text-red-700 border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900',
-  NOT_SUBMITTED: 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
+  APPROVED: 'bg-primary text-white border-primary font-bold shadow-xs',
+  PENDING: 'bg-primary text-white border-primary font-bold shadow-xs',
+  REJECTED: 'bg-primary text-white border-primary font-bold shadow-xs',
+  NOT_SUBMITTED: 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
 };
 
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
+  const [limitPerPage, setLimitPerPage] = useState(12);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -87,11 +95,11 @@ export default function AdminUsersPage() {
     isRefetching: isUsersRefetching,
     refetch,
   } = useQuery({
-    queryKey: ['admin-users-list', currentPage, statusFilter, debouncedSearch],
+    queryKey: ['admin-users-list', currentPage, limitPerPage, statusFilter, debouncedSearch],
     queryFn: () =>
       userService.getAllUsers({
         page: currentPage,
-        limit: 10,
+        limit: limitPerPage,
         status: statusFilter === 'ALL' ? undefined : statusFilter,
         search: debouncedSearch || undefined,
       }),
@@ -281,7 +289,7 @@ export default function AdminUsersPage() {
             <span>Select All Visible Users</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {usersData.data.map((user) => {
               const isSelected = selectedUserIds.includes(user.id);
               return (
@@ -393,10 +401,35 @@ export default function AdminUsersPage() {
             })}
           </div>
 
-          {/* Pagination */}
-          {usersData.meta.total > 10 && (
-            <div className="pt-4">
-              <Pagination>
+          {/* Pagination & Limit Selector */}
+          <div className="pt-6 border-t border-primary/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Show per page:</span>
+              <Select
+                value={String(limitPerPage)}
+                onValueChange={(val) => {
+                  setLimitPerPage(Number(val));
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="w-20 h-8 text-xs border-primary/10">
+                  <SelectValue placeholder="12" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="6">6</SelectItem>
+                  <SelectItem value="12">12</SelectItem>
+                  <SelectItem value="24">24</SelectItem>
+                  <SelectItem value="48">48</SelectItem>
+                  <SelectItem value="96">96</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="ml-2">
+                Showing {usersData.data.length} of {usersData.meta.total} users
+              </span>
+            </div>
+
+            {usersData.meta.total > limitPerPage && (
+              <Pagination className="m-0 w-auto justify-end">
                 <PaginationContent>
                   <PaginationItem>
                     <Button
@@ -404,16 +437,17 @@ export default function AdminUsersPage() {
                       size="sm"
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 h-8 px-2"
                     >
                       <PaginationPrevious className="h-4 w-4" />
                     </Button>
                   </PaginationItem>
-                  {Array.from({ length: Math.ceil(usersData.meta.total / 10) }).map((_, idx) => (
+                  {Array.from({ length: Math.ceil(usersData.meta.total / limitPerPage) }).map((_, idx) => (
                     <PaginationItem key={idx}>
                       <PaginationLink
                         isActive={currentPage === idx + 1}
                         onClick={() => setCurrentPage(idx + 1)}
+                        className="h-8 w-8 text-xs cursor-pointer"
                       >
                         {idx + 1}
                       </PaginationLink>
@@ -423,17 +457,17 @@ export default function AdminUsersPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      disabled={currentPage >= Math.ceil(usersData.meta.total / 10)}
+                      disabled={currentPage >= Math.ceil(usersData.meta.total / limitPerPage)}
                       onClick={() => setCurrentPage((p) => p + 1)}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 h-8 px-2"
                     >
                       <PaginationNext className="h-4 w-4" />
                     </Button>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>
