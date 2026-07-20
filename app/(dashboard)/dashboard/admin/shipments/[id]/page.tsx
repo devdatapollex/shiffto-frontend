@@ -2,6 +2,8 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useShipmentDetails } from '@/hooks/use-shipment-details';
+import { releasePayment } from '@/services/payment.service';
+import { toast } from 'sonner';
 import { ShipmentTimeline } from '@/components/tracking/shipment-timeline';
 import { StepAdvancementCard } from '@/components/tracking/step-advancement-card';
 import { TripRouteCard } from '@/components/tracking/trip-route-card';
@@ -50,6 +52,25 @@ export default function AdminShipmentDetailsPage() {
 
   const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; title: string } | null>(null);
+  const [isReleasing, setIsReleasing] = useState(false);
+
+  const handleReleasePayment = async () => {
+    const txId = (shipment as any)?.paymentTransaction?.transactionId;
+    if (!txId) {
+      toast.error('No payment transaction ID found for this shipment');
+      return;
+    }
+    setIsReleasing(true);
+    try {
+      await releasePayment(txId);
+      toast.success('Payment successfully released to traveler!');
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to release payment');
+    } finally {
+      setIsReleasing(false);
+    }
+  };
 
   const formatStepTime = (dateStr: string | null) => {
     if (!dateStr) return '—';
@@ -154,6 +175,90 @@ export default function AdminShipmentDetailsPage() {
             </div>
           </div>
         </div>
+
+        {/* Payment Verification & Release Card for Admin */}
+        {(shipment as any)?.paymentTransaction && (
+          <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Escrow Payment Verification & Release
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Verify proof of delivery uploaded by traveler and release escrowed funds.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-500 font-medium">Status:</span>
+                <span
+                  className={`px-3 py-1 rounded-full font-bold text-xs ${
+                    (shipment as any).paymentTransaction.status === 'RELEASED'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : (shipment as any).paymentTransaction.status === 'PENDING_RELEASE'
+                      ? 'bg-amber-100 text-amber-800 animate-pulse'
+                      : 'bg-blue-100 text-blue-800'
+                  }`}
+                >
+                  {(shipment as any).paymentTransaction.status}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <div className="space-y-1">
+                <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
+                <p className="text-2xl font-extrabold text-slate-900">
+                  ${(shipment as any).paymentTransaction.grossAmount?.toFixed(2)}
+                </p>
+                <p className="text-[11px] text-slate-400 font-mono">
+                  Txn ID: #{(shipment as any).paymentTransaction.transactionId}
+                </p>
+              </div>
+
+              {(shipment as any).paymentTransaction.proofPhotoUrl && (
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 relative rounded-lg border border-slate-200 overflow-hidden bg-white">
+                    <Image
+                      src={toRelativeImageUrl((shipment as any).paymentTransaction.proofPhotoUrl)}
+                      alt="Delivery proof"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      setSelectedPhoto({
+                        url: (shipment as any).paymentTransaction.proofPhotoUrl,
+                        title: 'Delivery Proof',
+                      })
+                    }
+                    className="text-xs text-slate-700 font-semibold"
+                  >
+                    View Proof
+                  </Button>
+                </div>
+              )}
+
+              {(shipment as any).paymentTransaction.status !== 'RELEASED' ? (
+                <Button
+                  onClick={handleReleasePayment}
+                  disabled={isReleasing}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-5 text-sm shadow-md"
+                >
+                  {isReleasing ? 'Releasing...' : 'Release Payment to Traveler'}
+                </Button>
+              ) : (
+                <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4" /> Released to Traveler
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Progress Timeline Tracker Card */}
         <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 overflow-hidden">

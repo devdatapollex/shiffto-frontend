@@ -13,6 +13,7 @@ import {
   Users,
   User,
   ShieldCheck,
+  Bell,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
@@ -43,6 +44,12 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         label: 'Profile & KYC',
         href: ROUTES.PROFILE,
         icon: User,
+        roles: ['user', 'admin'],
+      },
+      {
+        label: 'Notifications',
+        href: ROUTES.NOTIFICATIONS,
+        icon: Bell,
         roles: ['user', 'admin'],
       },
     ],

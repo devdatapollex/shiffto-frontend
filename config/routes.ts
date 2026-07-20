@@ -25,6 +25,7 @@ export const ROUTES = {
   RATINGS_REVIEWS: '/dashboard/ratings-reviews',
   SUPPORT: '/dashboard/support',
   PROFILE: '/dashboard/profile',
+  NOTIFICATIONS: '/dashboard/notifications',
 
   // Admin-only Routes
   ADMIN_SHIPMENTS: '/dashboard/admin/shipments',
@@ -34,6 +35,7 @@ export const ROUTES = {
   ADMIN_KYC: '/dashboard/admin/kyc',
   ADMIN_PROFILE: '/dashboard/admin/profile',
   ADMIN_TRIPS: '/dashboard/admin/trips',
+  ADMIN_TICKETS: '/dashboard/admin/tickets',
 } as const;
 
 export const PUBLIC_ROUTES = [
