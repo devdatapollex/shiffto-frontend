@@ -5,14 +5,20 @@ import { toast } from 'sonner';
 
 import { sendShipmentOtp } from '@/services/shipment.service';
 
+export interface SendOtpResult {
+  success: boolean;
+  status?: number;
+  message?: string;
+}
+
 export function useShipmentOtp() {
   const [isSending, setIsSending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
   const inFlightRef = useRef(false);
 
-  async function sendOtp(showToast = true): Promise<boolean> {
-    if (inFlightRef.current || cooldown > 0) return false;
+  async function sendOtp(showToast = true): Promise<SendOtpResult> {
+    if (inFlightRef.current || cooldown > 0) return { success: false };
 
     inFlightRef.current = true;
     setIsSending(true);
@@ -22,12 +28,16 @@ export function useShipmentOtp() {
         toast.success('Verification code sent!');
       }
       setCooldown(60);
-      return true;
+      return { success: true };
     } catch (error) {
-      const message =
-        (error as { message?: string })?.message || 'Failed to send verification code';
-      toast.error(message);
-      return false;
+      const err = error as { status?: number; message?: string };
+      const message = err?.message || 'Failed to send verification code';
+      const status = err?.status;
+
+      if (status !== 403 && !message.toLowerCase().includes('kyc')) {
+        toast.error(message);
+      }
+      return { success: false, status, message };
     } finally {
       setIsSending(false);
       inFlightRef.current = false;
