@@ -36,11 +36,13 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || ROUTES.DASHBOARD;
 
+  const queryEmail = searchParams.get('email') || '';
+
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: queryEmail, password: '' },
   });
 
   const onSubmit = async (values: LoginValues) => {
@@ -49,6 +51,17 @@ export default function LoginPage() {
       password: values.password,
     });
     if (error) {
+      const isUnverified =
+        error.code === 'EMAIL_NOT_VERIFIED' ||
+        error.status === 403 ||
+        error.message?.toLowerCase().includes('email verification') ||
+        error.message?.toLowerCase().includes('email is not verified');
+
+      if (isUnverified) {
+        router.push(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
+        return;
+      }
+
       toast.error(error.message || 'Failed to sign in');
       return;
     }
