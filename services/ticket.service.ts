@@ -13,6 +13,8 @@ export interface Ticket {
   assigneeId: string | null;
   slaFirstResponseAt: string | null;
   slaResolvedAt: string | null;
+  senderId?: string | null;
+  travelerId?: string | null;
   createdAt: string;
   updatedAt: string;
   user?: {
@@ -47,6 +49,7 @@ export interface TicketComment {
   userId: string;
   message: string;
   attachments: string[];
+  visibleTo: 'ALL' | 'SENDER' | 'TRAVELER';
   createdAt: string;
   user: {
     id: string;
@@ -134,11 +137,13 @@ const getTicketDetails = async (id: string): Promise<Ticket & { comments: Ticket
 const addComment = async (
   ticketId: string,
   message: string,
-  attachments?: string[]
+  attachments?: string[],
+  visibleTo?: string
 ): Promise<TicketComment> => {
   const { data } = await apiClient.post<{ data: TicketComment }>(`/tickets/${ticketId}/comments`, {
     message,
     attachments,
+    visibleTo,
   });
   return data.data;
 };

@@ -60,8 +60,9 @@ import {
 
 import { ticketService, type Ticket } from '@/services/ticket.service';
 import { uploadPhotos } from '@/services/upload.service';
+import { useSession } from '@/lib/auth-client';
 
-const CATEGORIES = ['Payment', 'Delivery', 'KYC', 'Technical', 'Other'];
+const CATEGORIES = ['Order', 'Trip', 'Payment', 'Delivery', 'KYC', 'Technical', 'Other'];
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
@@ -78,6 +79,8 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 export default function UserSupportPage() {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -107,6 +110,11 @@ export default function UserSupportPage() {
   const [newRelationId, setNewRelationId] = useState<string>('NONE');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Reset relation ID on category change to keep options aligned
+  useEffect(() => {
+    setNewRelationId('NONE');
+  }, [newCategory]);
 
   // Comment input state
   const [commentMessage, setCommentMessage] = useState('');
@@ -197,6 +205,17 @@ export default function UserSupportPage() {
         if (!oldData) return oldData;
         const exists = oldData.comments.some((c: any) => c.id === newComment.id);
         if (exists) return oldData;
+
+        // Filter comments based on visibility parameters for the user
+        const isSender = oldData.senderId === currentUserId;
+        const isTraveler = oldData.travelerId === currentUserId;
+        if (isSender || isTraveler) {
+          const allowedVisibility = ['ALL', isSender ? 'SENDER' : 'TRAVELER'];
+          if (!allowedVisibility.includes(newComment.visibleTo)) {
+            return oldData;
+          }
+        }
+
         return {
           ...oldData,
           comments: [...oldData.comments, newComment],
@@ -260,6 +279,16 @@ export default function UserSupportPage() {
 
     if (!newTitle.trim() || !newCategory || !newDescription.trim()) {
       toast.error('Please fill in all mandatory fields');
+      return;
+    }
+
+    if (newCategory === 'Order' && (newRelationId === 'NONE' || !newRelationId.startsWith('shipment:'))) {
+      toast.error('Please select a related order/shipment');
+      return;
+    }
+
+    if (newCategory === 'Trip' && (newRelationId === 'NONE' || !newRelationId.startsWith('trip:'))) {
+      toast.error('Please select a related trip');
       return;
     }
 
@@ -715,51 +744,63 @@ export default function UserSupportPage() {
             </div>
 
             {/* Relation (Order / Trip Dropdown) */}
-            <div className="space-y-1.5">
-              <Label htmlFor="relation" className="text-sm font-semibold">
-                Related Order/Trip <span className="text-destructive">*</span>
-              </Label>
-              <Select value={newRelationId} onValueChange={setNewRelationId}>
-                <SelectTrigger id="relation" className="w-full">
-                  <SelectValue placeholder="Select active/recent shipment or trip" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NONE" disabled>
-                    Select an order or trip
-                  </SelectItem>
-                  {associatedRecords?.shipments && associatedRecords.shipments.length > 0 && (
-                    <>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase bg-muted/40 rounded-sm">
-                        Shipments (Active / Recently Delivered)
-                      </div>
-                      {associatedRecords.shipments.map((shipment) => (
+            {newCategory === 'Order' && (
+              <div className="space-y-1.5">
+                <Label htmlFor="relation" className="text-sm font-semibold">
+                  Related Order <span className="text-destructive">*</span>
+                </Label>
+                <Select value={newRelationId} onValueChange={setNewRelationId}>
+                  <SelectTrigger id="relation" className="w-full">
+                    <SelectValue placeholder="Select active/recent shipment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE" disabled>
+                      Select an order
+                    </SelectItem>
+                    {associatedRecords?.shipments && associatedRecords.shipments.length > 0 ? (
+                      associatedRecords.shipments.map((shipment) => (
                         <SelectItem key={shipment.id} value={`shipment:${shipment.id}`}>
                           Shipment: {shipment.itemName} ({shipment.status})
                         </SelectItem>
-                      ))}
-                    </>
-                  )}
-                  {associatedRecords?.trips && associatedRecords.trips.length > 0 && (
-                    <>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase bg-muted/40 rounded-sm mt-1">
-                        Trips (Active / Recently Completed)
-                      </div>
-                      {associatedRecords.trips.map((trip) => (
+                      ))
+                    ) : (
+                      <SelectItem value="NONE" disabled>
+                        No active/recent shipments found.
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {newCategory === 'Trip' && (
+              <div className="space-y-1.5">
+                <Label htmlFor="relation" className="text-sm font-semibold">
+                  Related Trip <span className="text-destructive">*</span>
+                </Label>
+                <Select value={newRelationId} onValueChange={setNewRelationId}>
+                  <SelectTrigger id="relation" className="w-full">
+                    <SelectValue placeholder="Select active/recent trip" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE" disabled>
+                      Select a trip
+                    </SelectItem>
+                    {associatedRecords?.trips && associatedRecords.trips.length > 0 ? (
+                      associatedRecords.trips.map((trip) => (
                         <SelectItem key={trip.id} value={`trip:${trip.id}`}>
                           Trip: {trip.flightNumber} ({trip.status})
                         </SelectItem>
-                      ))}
-                    </>
-                  )}
-                  {(!associatedRecords?.shipments || associatedRecords.shipments.length === 0) &&
-                    (!associatedRecords?.trips || associatedRecords.trips.length === 0) && (
+                      ))
+                    ) : (
                       <SelectItem value="NONE" disabled>
-                        No active/recent orders or trips found.
+                        No active/recent trips found.
                       </SelectItem>
                     )}
-                </SelectContent>
-              </Select>
-            </div>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Title */}
             <div className="space-y-1.5">
