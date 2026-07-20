@@ -1,5 +1,6 @@
 import apiClient from '@/lib/api-client';
 import type { CreateShipmentPayload } from '@/lib/validations/shipment';
+import type { Offer } from '@/services/offer.service';
 
 export type ShipmentStatus = 'AWAITING_MATCH' | 'ACTIVE' | 'DELIVERED' | 'CANCELED';
 
@@ -93,6 +94,7 @@ export interface Shipment {
   category?: ShipmentCategory;
   paymentTransaction?: PaymentTransactionDetails | null;
   shipmentSteps?: ShipmentStep[];
+  offers?: Offer[];
 }
 
 interface ShipmentsResponse {
