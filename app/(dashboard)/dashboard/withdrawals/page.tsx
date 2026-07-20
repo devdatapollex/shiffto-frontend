@@ -181,7 +181,9 @@ export default function AdminWithdrawalsPage() {
                         {wdr.status}
                       </Badge>
                       {wdr.payoutTxnId && (
-                        <p className="text-[10px] text-slate-500 font-mono mt-0.5">Txn: {wdr.payoutTxnId}</p>
+                        <p className="text-xs text-slate-500 font-mono mt-1">
+                          Txn ID: <span className="font-semibold text-slate-700">{wdr.payoutTxnId}</span>
+                        </p>
                       )}
                     </TableCell>
                     <TableCell className="text-right">

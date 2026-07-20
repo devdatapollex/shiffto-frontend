@@ -164,8 +164,13 @@ export function CreateShipmentWizard() {
     }
 
     if (step === 4) {
-      const sent = await sendOtp(false);
-      if (!sent) return;
+      const res = await sendOtp(false);
+      if (!res.success) {
+        if (res.status === 403 || res.message?.toLowerCase().includes('kyc')) {
+          setShowKycDialog(true);
+        }
+        return;
+      }
     }
 
     markStepComplete(step);

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Package, Plane, Pencil } from 'lucide-react';
+import { Package, Plane, Pencil, CheckCircle2 } from 'lucide-react';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
@@ -153,6 +153,16 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
             ${Number(values.pricePerKg || 0).toFixed(2)}/kg
           </span>
           <span className="text-[#0b3a8e] font-bold text-base">Total price : ${totalPrice}</span>
+        </div>
+      </div>
+
+      {/* Identity & KYC Notice */}
+      <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 flex gap-3 text-xs md:text-sm text-slate-600">
+        <CheckCircle2 className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+        <div>
+          <p className="font-semibold text-blue-900 mb-0.5">Identity &amp; KYC verification</p>
+          Creating a shipment requires an approved KYC Verification. Once verified, your shipment
+          will be active and visible to Travelers on your route.
         </div>
       </div>
     </div>
