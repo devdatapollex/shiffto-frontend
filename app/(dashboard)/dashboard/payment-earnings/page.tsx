@@ -327,10 +327,19 @@ export default function PaymentEarningsPage() {
                         </p>
                       </div>
 
-                      {wdr.status === 'APPROVED' && wdr.processedAt && (
-                        <p className="text-[11px] text-emerald-600 font-medium">
-                          Paid on: {new Date(wdr.processedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </p>
+                      {wdr.status === 'APPROVED' && (
+                        <div className="space-y-1">
+                          {wdr.processedAt && (
+                            <p className="text-[11px] text-emerald-600 font-medium">
+                              Paid on: {new Date(wdr.processedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </p>
+                          )}
+                          {wdr.payoutTxnId && (
+                            <p className="text-xs text-slate-500 font-mono">
+                              Txn ID: <span className="font-semibold text-slate-700">{wdr.payoutTxnId}</span>
+                            </p>
+                          )}
+                        </div>
                       )}
 
                       {wdr.status === 'REJECTED' && (

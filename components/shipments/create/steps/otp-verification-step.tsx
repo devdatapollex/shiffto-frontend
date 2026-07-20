@@ -8,8 +8,10 @@ import { maskEmail } from '@/lib/utils';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 
+import type { SendOtpResult } from '@/hooks/use-shipment-otp';
+
 interface OtpVerificationStepProps {
-  sendOtp: (showToast?: boolean) => Promise<boolean>;
+  sendOtp: (showToast?: boolean) => Promise<SendOtpResult>;
   isSending: boolean;
   cooldown: number;
   isSubmitting: boolean;

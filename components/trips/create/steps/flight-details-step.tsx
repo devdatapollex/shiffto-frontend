@@ -19,22 +19,18 @@ import { DatePicker, TimePicker } from '@/components/ui/custom-picker';
 
 export function FlightDetailsStep() {
   const { control, setValue, watch } = useFormContext<CreateTripValues>();
-  const [recentFlights, setRecentFlights] = useState<string[]>([]);
-
-  useEffect(() => {
+  const [recentFlights, setRecentFlights] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return ['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309'];
     try {
       const stored = localStorage.getItem('recent_flights');
-      if (stored) {
-        setRecentFlights(JSON.parse(stored));
-      } else {
-        const defaultFlights = ['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309'];
-        setRecentFlights(defaultFlights);
-        localStorage.setItem('recent_flights', JSON.stringify(defaultFlights));
-      }
-    } catch (e) {
-      setRecentFlights(['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309']);
+      if (stored) return JSON.parse(stored);
+      const defaultFlights = ['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309'];
+      localStorage.setItem('recent_flights', JSON.stringify(defaultFlights));
+      return defaultFlights;
+    } catch {
+      return ['BG-0306', 'BG-0307', 'BG-0308', 'BG-0309'];
     }
-  }, []);
+  });
 
   const fromCountry = watch('fromCountry');
   const toCountry = watch('toCountry');
@@ -111,7 +107,11 @@ export function FlightDetailsStep() {
                 </FormControl>
                 <SelectContent position="popper" className="max-h-[300px]">
                   {COUNTRIES.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
+                    <SelectItem
+                      key={country.code}
+                      value={country.code}
+                      disabled={country.code === toCountry}
+                    >
                       <CountryFlag code={country.code} className="h-4 w-6 mr-2" />
                       {country.name}
                     </SelectItem>
@@ -157,7 +157,11 @@ export function FlightDetailsStep() {
                 </FormControl>
                 <SelectContent position="popper" className="max-h-[300px]">
                   {COUNTRIES.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
+                    <SelectItem
+                      key={country.code}
+                      value={country.code}
+                      disabled={country.code === fromCountry}
+                    >
                       <CountryFlag code={country.code} className="h-4 w-6 mr-2" />
                       {country.name}
                     </SelectItem>

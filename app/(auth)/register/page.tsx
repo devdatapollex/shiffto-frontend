@@ -56,7 +56,8 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
+    toast.success('Account created successfully! Please sign in to verify your email.');
+    router.push(`${ROUTES.LOGIN}?email=${encodeURIComponent(values.email)}&registered=true`);
   };
 
   const handleGoogleSignUp = () => {
