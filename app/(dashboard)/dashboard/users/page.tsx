@@ -1,0 +1,441 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  Users,
+  Search,
+  CheckCircle,
+  AlertTriangle,
+  UserMinus,
+  UserCheck,
+  Calendar,
+  Award,
+  Package,
+  Plane,
+  ChevronRight,
+  ShieldAlert,
+  Trash2,
+  Lock,
+  RefreshCw,
+  MoreVertical,
+  CheckCircle2,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import Link from 'next/link';
+
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+
+import { userService, type AdminUserListItem } from '@/services/user.service';
+
+const STATUS_COLORS: Record<string, string> = {
+  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900',
+  SUSPENDED: 'bg-red-50 text-red-700 border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900',
+  DEACTIVATED: 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
+  PENDING_KYC: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900',
+};
+
+const KYC_COLORS: Record<string, string> = {
+  APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900',
+  PENDING: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900',
+  REJECTED: 'bg-red-50 text-red-700 border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900',
+  NOT_SUBMITTED: 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
+};
+
+export default function AdminUsersPage() {
+  const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1); // reset to page 1 on search
+    }, 400);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Fetch paginated admin users
+  const {
+    data: usersData,
+    isLoading: isUsersLoading,
+    isRefetching: isUsersRefetching,
+    refetch,
+  } = useQuery({
+    queryKey: ['admin-users-list', currentPage, statusFilter, debouncedSearch],
+    queryFn: () =>
+      userService.getAllUsers({
+        page: currentPage,
+        limit: 10,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        search: debouncedSearch || undefined,
+      }),
+  });
+
+  // Bulk actions mutation
+  const bulkMutation = useMutation({
+    mutationFn: ({
+      userIds,
+      action,
+    }: {
+      userIds: string[];
+      action: 'SUSPEND' | 'DEACTIVATE' | 'DELETE';
+    }) => userService.bulkAction(userIds, action),
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully executed bulk ${variables.action.toLowerCase()} action`);
+      setSelectedUserIds([]);
+      queryClient.invalidateQueries({ queryKey: ['admin-users-list'] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Bulk action failed');
+    },
+  });
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && usersData?.data) {
+      setSelectedUserIds(usersData.data.map((u) => u.id));
+    } else {
+      setSelectedUserIds([]);
+    }
+  };
+
+  const handleSelectUser = (userId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedUserIds((prev) => [...prev, userId]);
+    } else {
+      setSelectedUserIds((prev) => prev.filter((id) => id !== userId));
+    }
+  };
+
+  const executeBulkAction = (action: 'SUSPEND' | 'DEACTIVATE' | 'DELETE') => {
+    if (selectedUserIds.length === 0) {
+      toast.error('Please select at least one user');
+      return;
+    }
+    const confirmMsg =
+      action === 'DELETE'
+        ? `Are you sure you want to delete these ${selectedUserIds.length} users? This cannot be undone.`
+        : `Execute bulk ${action.toLowerCase()} on ${selectedUserIds.length} users?`;
+
+    if (window.confirm(confirmMsg)) {
+      bulkMutation.mutate({ userIds: selectedUserIds, action });
+    }
+  };
+
+  const isAllSelected =
+    usersData?.data && usersData.data.length > 0 && selectedUserIds.length === usersData.data.length;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <Users className="h-6 w-6 text-primary" />
+            User Management
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Monitor, inspect profiles, update commissions, approve KYC, and manage users.
+          </p>
+        </div>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          className="flex items-center gap-1 border-primary/10 hover:bg-primary/5 self-start sm:self-auto"
+        >
+          <RefreshCw className={`h-4 w-4 ${isUsersRefetching ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-primary/5 pb-4">
+        <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-xl border border-primary/5">
+          {[
+            { id: 'ALL', label: 'All Users' },
+            { id: 'ACTIVE', label: 'Active' },
+            { id: 'INACTIVE', label: 'Inactive' },
+            { id: 'PENDING_KYC', label: 'Pending KYC' },
+            { id: 'SUSPENDED', label: 'Suspended' },
+            { id: 'DEACTIVATED', label: 'Deactivated' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setStatusFilter(tab.id);
+                setCurrentPage(1);
+                setSelectedUserIds([]);
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                statusFilter === tab.id
+                  ? 'bg-white shadow-sm text-primary font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Search */}
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search name, email, phone..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 border-primary/10 focus-visible:ring-primary bg-card/50"
+          />
+        </div>
+      </div>
+
+      {/* Bulk Actions Header */}
+      {selectedUserIds.length > 0 && (
+        <div className="flex items-center gap-3 p-3 px-4 bg-primary/5 border border-primary/10 rounded-xl animate-in fade-in slide-in-from-top-1">
+          <span className="text-xs font-semibold text-primary">
+            {selectedUserIds.length} users selected
+          </span>
+          <div className="h-4 w-px bg-primary/15" />
+          <div className="flex gap-2">
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => executeBulkAction('SUSPEND')}
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 text-xs py-1 h-7"
+            >
+              <Lock className="h-3 w-3 mr-1" />
+              Suspend
+            </Button>
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => executeBulkAction('DEACTIVATE')}
+              className="text-slate-600 border-slate-200 hover:bg-slate-50 text-xs py-1 h-7"
+            >
+              <UserMinus className="h-3 w-3 mr-1" />
+              Deactivate
+            </Button>
+            <Button
+              size="xs"
+              variant="destructive"
+              onClick={() => executeBulkAction('DELETE')}
+              className="text-xs py-1 h-7"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* User cards / table */}
+      {isUsersLoading ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <RefreshCw className="h-8 w-8 text-primary animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading users...</p>
+        </div>
+      ) : !usersData?.data || usersData.data.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-primary/5 rounded-2xl">
+          <Users className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+          <h3 className="font-semibold text-foreground">No users found</h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
+            No users matched the selected filter criteria or search query.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Select all header for table view option */}
+          <div className="flex items-center gap-3 px-4 py-2 border-b border-primary/5 text-xs text-muted-foreground">
+            <Checkbox
+              checked={isAllSelected}
+              onCheckedChange={(checked) => handleSelectAll(!!checked)}
+              aria-label="Select all users"
+            />
+            <span>Select All Visible Users</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {usersData.data.map((user) => {
+              const isSelected = selectedUserIds.includes(user.id);
+              return (
+                <motion.div
+                  key={user.id}
+                  layout
+                  className={`relative flex flex-col p-5 border rounded-2xl bg-card transition-all duration-300 ${
+                    isSelected
+                      ? 'border-primary/30 ring-1 ring-primary/10 shadow-sm'
+                      : 'border-primary/5 hover:border-primary/20 hover:shadow-md'
+                  }`}
+                >
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      {/* Checkbox */}
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) => handleSelectUser(user.id, !!checked)}
+                        aria-label={`Select ${user.name}`}
+                        className="mt-1 shrink-0"
+                      />
+
+                      {/* Avatar */}
+                      <div className="h-11 w-11 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground bg-primary shrink-0 overflow-hidden shadow-inner">
+                        {user.image ? (
+                          <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+                        ) : (
+                          user.name.charAt(0).toUpperCase()
+                        )}
+                      </div>
+
+                      {/* Name/Email */}
+                      <div className="overflow-hidden">
+                        <h3 className="font-semibold text-foreground truncate hover:text-primary transition-colors flex items-center gap-1.5">
+                          <Link href={`/dashboard/users/${user.id}`}>{user.name}</Link>
+                          {user.trustScore >= 90 && (
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500 fill-emerald-50" />
+                          )}
+                        </h3>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    <Badge className={`border uppercase text-[9px] font-bold py-0.5 px-2 ${STATUS_COLORS[user.status]}`}>
+                      {user.status.replace('_', ' ')}
+                    </Badge>
+                  </div>
+
+                  {/* Card Content stats */}
+                  <div className="grid grid-cols-3 gap-2 border-y border-primary/5 my-4 py-3 bg-primary/[0.01] rounded-xl px-2">
+                    <div className="text-center">
+                      <span className="text-[10px] text-muted-foreground block">Shipments</span>
+                      <span className="text-sm font-bold text-foreground flex items-center justify-center gap-1 mt-0.5">
+                        <Package className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        {user.activity.shipmentsCreated}
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[10px] text-muted-foreground block">Trips</span>
+                      <span className="text-sm font-bold text-foreground flex items-center justify-center gap-1 mt-0.5">
+                        <Plane className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        {user.activity.tripsAdded}
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[10px] text-muted-foreground block">Deliveries</span>
+                      <span className="text-sm font-bold text-foreground flex items-center justify-center gap-1 mt-0.5">
+                        <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
+                        {user.activity.deliveriesCompleted}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Meta Details */}
+                  <div className="grid grid-cols-2 gap-y-2 text-xs text-muted-foreground pb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Award className="h-3.5 w-3.5 text-amber-500" />
+                      <span>Trust Score: <strong className="text-foreground">{user.trustScore}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <ShieldAlert className="h-3.5 w-3.5 text-muted-foreground/60" />
+                      <span>KYC: <Badge variant="outline" className={`py-0 px-1.5 text-[9px] font-bold ${KYC_COLORS[user.kycStatus]}`}>{user.kycStatus.replace('_', ' ')}</Badge></span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
+                      <span>Joined: {new Date(user.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="text-right text-[10px] text-muted-foreground truncate">
+                      ID: {user.id.substring(0, 8)}...
+                    </div>
+                  </div>
+
+                  {/* View details footer button */}
+                  <div className="border-t border-primary/5 pt-3 mt-2 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Commission: <strong className="text-foreground">{user.commissionRate}%</strong>
+                    </span>
+                    <Button asChild size="sm" variant="ghost" className="text-primary hover:text-primary-foreground hover:bg-primary text-xs flex items-center gap-1 rounded-xl">
+                      <Link href={`/dashboard/users/${user.id}`}>
+                        View Profile
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Pagination */}
+          {usersData.meta.total > 10 && (
+            <div className="pt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="flex items-center gap-1"
+                    >
+                      <PaginationPrevious className="h-4 w-4" />
+                    </Button>
+                  </PaginationItem>
+                  {Array.from({ length: Math.ceil(usersData.meta.total / 10) }).map((_, idx) => (
+                    <PaginationItem key={idx}>
+                      <PaginationLink
+                        isActive={currentPage === idx + 1}
+                        onClick={() => setCurrentPage(idx + 1)}
+                      >
+                        {idx + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={currentPage >= Math.ceil(usersData.meta.total / 10)}
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                      className="flex items-center gap-1"
+                    >
+                      <PaginationNext className="h-4 w-4" />
+                    </Button>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
