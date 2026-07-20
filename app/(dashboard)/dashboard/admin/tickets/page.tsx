@@ -60,10 +60,10 @@ const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 const STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-  IN_PROGRESS: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800',
-  RESOLVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
-  CLOSED: 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800',
+  OPEN: 'bg-primary text-white border-primary font-bold shadow-xs',
+  IN_PROGRESS: 'bg-primary text-white border-primary font-bold shadow-xs',
+  RESOLVED: 'bg-primary text-white border-primary font-bold shadow-xs',
+  CLOSED: 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -984,7 +984,7 @@ export default function AdminTicketsPage() {
 
                           {/* Management drop-downs */}
                           <div className="space-y-4">
-                            {/* Assignee */}
+                            {/* Assignee - Commented out as requested
                             <div className="space-y-1.5">
                               <Label className="text-xs font-semibold text-muted-foreground uppercase">
                                 Assign Ticket
@@ -1018,6 +1018,7 @@ export default function AdminTicketsPage() {
                                 </SelectContent>
                               </Select>
                             </div>
+                            */}
 
                             {/* Status */}
                             <div className="space-y-1.5">
