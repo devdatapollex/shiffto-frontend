@@ -1,17 +1,16 @@
 import {
-  LayoutDashboard,
+  Home,
+  Truck,
   Package,
-  Search,
   MapPin,
   Plane,
-  DollarSign,
+  CreditCard,
   Wallet,
   Star,
-  LifeBuoy,
+  HelpCircle,
   Scale,
   Banknote,
   Users,
-  User,
   ShieldCheck,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
@@ -36,30 +35,23 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
       {
         label: 'Home',
         href: ROUTES.DASHBOARD,
-        icon: LayoutDashboard,
-        roles: ['user', 'admin'],
-      },
-      {
-        label: 'Profile & KYC',
-        href: ROUTES.PROFILE,
-        icon: User,
+        icon: Home,
         roles: ['user', 'admin'],
       },
     ],
   },
   {
-    label: 'Shipments',
     items: [
       {
         label: 'My Shipments',
         href: ROUTES.MY_SHIPMENTS,
-        icon: Package,
+        icon: Truck,
         roles: ['user', 'admin'],
       },
       {
         label: 'Browse Shipment',
         href: ROUTES.BROWSE_SHIPMENT,
-        icon: Search,
+        icon: Package,
         roles: ['user', 'admin'],
       },
       {
@@ -68,32 +60,20 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
         icon: MapPin,
         roles: ['user', 'admin'],
       },
-    ],
-  },
-  {
-    label: 'Trips',
-    items: [
       {
         label: 'My Trips',
         href: ROUTES.MY_TRIPS,
         icon: Plane,
         roles: ['user', 'admin'],
       },
-      // {
-      //   label: 'Add Trip',
-      //   href: ROUTES.CREATE_TRIP,
-      //   icon: PlusCircle,
-      //   roles: ['user', 'admin'],
-      // },
     ],
   },
   {
-    label: 'Finance',
     items: [
       {
-        label: 'Payment & Earnings',
+        label: 'Payments & Earnings',
         href: ROUTES.PAYMENT_EARNINGS,
-        icon: DollarSign,
+        icon: CreditCard,
         roles: ['user', 'admin'],
       },
       {
@@ -115,7 +95,7 @@ export const DASHBOARD_MENU_SECTIONS: MenuSection[] = [
       {
         label: 'Support',
         href: ROUTES.SUPPORT,
-        icon: LifeBuoy,
+        icon: HelpCircle,
         roles: ['user', 'admin'],
       },
     ],

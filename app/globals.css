@@ -32,6 +32,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
 
   --color-border: var(--border);
+  --color-border-layout: var(--border-layout);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
@@ -97,6 +98,7 @@
     --destructive: hsla(0, 84%, 60%, 1);
     --destructive-foreground: hsla(0, 0%, 100%, 1);
     --border: hsla(220, 13%, 91%, 1);
+    --border-layout: #e5e5e5;
     --input: hsla(220, 13%, 91%, 1);
     --ring: hsla(21, 88%, 54%, 1);
     --chart-1: hsl(12 76% 61%);
