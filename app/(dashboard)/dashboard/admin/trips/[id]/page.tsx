@@ -2,8 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useTripDetails, useVerifyTrip } from '@/hooks/use-trips';
-import { TripRouteCard } from '@/components/tracking/trip-route-card';
-import { ContactDetailsCard } from '@/components/tracking/contact-details-card';
+import { CountryFlag } from '@/components/shipments/create/country-flag';
 import {
   ChevronLeft,
   ChevronRight,
@@ -28,6 +27,36 @@ import { getCountryByCode } from '@/lib/constants/countries';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { useState } from 'react';
 import { toast } from 'sonner';
+
+function formatDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function formatTime(timeStr: string | null | undefined): string {
+  if (!timeStr) return '';
+  try {
+    const [hoursStr, minutesStr] = timeStr.split(':');
+    const hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+    if (isNaN(hours) || isNaN(minutes)) return timeStr;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    return `${displayHours}:${displayMinutes} ${ampm}`;
+  } catch {
+    return timeStr;
+  }
+}
 
 const STATUS_DISPLAY_MAP: Record<string, string> = {
   PENDING: 'Pending Verification',
@@ -140,6 +169,9 @@ export default function AdminTripDetailsPage() {
   const statusClass = STATUS_BADGE_CLASS[trip.status] || STATUS_BADGE_CLASS['PENDING'];
   const displayStatus = STATUS_DISPLAY_MAP[trip.status] || trip.status;
 
+  const totalCap = (trip.cabinBagCapacity ?? 0) + (trip.checkInBagCapacity ?? 0);
+  const remainingCap = (trip.remainingCabinCapacity ?? 0) + (trip.remainingCheckInCapacity ?? 0);
+
   return (
     <RoleGuard
       roles={['admin']}
@@ -177,51 +209,176 @@ export default function AdminTripDetailsPage() {
           </div>
         </div>
 
-        {/* Top Section Grid: Route info & Traveler details */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            {/* Route card */}
-            <TripRouteCard trip={trip} showTicketButton={!!trip.status} />
+        {/* Verification action panel for Admin */}
+        {trip.status === 'PENDING' && (
+          <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-amber-800 uppercase tracking-wider">
+                Verification Actions
+              </h3>
+              <p className="text-xs text-amber-700">
+                Review the traveler's ticket scans and details to verify the legitimacy of this trip.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 sm:shrink-0 w-full sm:w-auto">
+              <Button
+                variant="destructive"
+                onClick={() => setShowRejectDialog(true)}
+                disabled={verifyTripMutation.isPending}
+                className="flex-1 sm:flex-none sm:px-6 rounded-xl h-11 font-semibold"
+              >
+                <X className="mr-1.5 h-4 w-4" /> Reject
+              </Button>
+              <Button
+                onClick={handleApprove}
+                disabled={verifyTripMutation.isPending}
+                className="flex-1 sm:flex-none sm:px-6 bg-green-600 hover:bg-green-700 text-white rounded-xl h-11 font-semibold"
+              >
+                {verifyTripMutation.isPending ? (
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="mr-1.5 h-4 w-4" />
+                )}
+                Approve
+              </Button>
+            </div>
+          </div>
+        )}
 
-            {/* Verification action panel for Admin */}
-            {trip.status === 'PENDING' && (
-              <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-6 shadow-sm space-y-4">
-                <div>
-                  <h3 className="text-sm font-bold text-amber-800 uppercase tracking-wider">
-                    Verification Actions
-                  </h3>
-                  <p className="text-xs text-amber-700 mt-1">
-                    Review the traveler's ticket scans and details to verify the legitimacy of this trip.
-                  </p>
+        {/* Top Section Grid: Route info & Traveler details */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <div className="flex flex-col gap-6">
+            {/* Combined Card: Trip details & Traveler details */}
+            <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <span className="text-base font-bold text-slate-800">
+                  Trip : #{shortTripId}
+                </span>
+                {trip.ticketPhoto && trip.ticketPhoto !== 'pending' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPreviewPhotoUrl(trip.ticketPhoto)}
+                    className="h-9 px-4 text-xs font-semibold border-[#0D307A] text-[#0D307A] hover:bg-[#0D307A]/5 hover:text-[#0D307A] rounded-lg gap-2 cursor-pointer transition-colors"
+                  >
+                    <Eye className="h-4 w-4" />
+                    View ticket
+                  </Button>
+                )}
+              </div>
+
+              {/* Flight Route Details */}
+              <div className="space-y-4">
+                {/* Departure & Arrival labels */}
+                <div className="flex justify-between items-center text-xs font-medium text-slate-400">
+                  <span>Departure</span>
+                  <span>Arrival</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="destructive"
-                    onClick={() => setShowRejectDialog(true)}
-                    disabled={verifyTripMutation.isPending}
-                    className="flex-1 rounded-xl h-11 font-semibold"
-                  >
-                    <X className="mr-1.5 h-4 w-4" /> Reject
-                  </Button>
-                  <Button
-                    onClick={handleApprove}
-                    disabled={verifyTripMutation.isPending}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl h-11 font-semibold"
-                  >
-                    {verifyTripMutation.isPending ? (
-                      <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Check className="mr-1.5 h-4 w-4" />
-                    )}
-                    Approve
-                  </Button>
+
+                {/* Route Row with flags & dashed line */}
+                <div className="flex items-center justify-between gap-4">
+                  {/* Departure details */}
+                  <div className="flex items-center gap-3 max-w-[42%]">
+                    <CountryFlag code={trip.fromCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
+                        {getCountryByCode(trip.fromCountry)?.name ?? trip.fromCountry}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
+                        {formatTime(trip.flightTime)}, {formatDate(trip.flightDate)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dashed orange line with plane icon in the center */}
+                  <div className="flex-1 flex items-center justify-center relative">
+                    <div className="w-full flex items-center justify-between relative">
+                      <div className="flex-1 border-t-2 border-dashed border-orange-300 relative flex justify-center items-center">
+                        <Plane className="h-5 w-5 text-[#0D307A] fill-slate-800 rotate-90 absolute -top-2.5 bg-white px-0.5" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Arrival details */}
+                  <div className="flex items-center gap-3 max-w-[42%] text-right justify-end">
+                    <div className="flex flex-col items-end min-w-0">
+                      <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
+                        {getCountryByCode(trip.toCountry)?.name ?? trip.toCountry}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
+                        {trip.airportArrivalTime ? formatTime(trip.airportArrivalTime) : formatTime(trip.flightTime)}, {formatDate(trip.flightDate)}
+                      </span>
+                    </div>
+                    <CountryFlag code={trip.toCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                  </div>
                 </div>
               </div>
-            )}
+
+              {/* Capacities Box */}
+              <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-4 space-y-2.5">
+                <div className="flex justify-between items-center text-xs md:text-sm">
+                  <span className="text-slate-500 font-medium">Total capacity</span>
+                  <span className="font-semibold text-slate-700">{totalCap} KG</span>
+                </div>
+                <div className="flex justify-between items-center text-xs md:text-sm">
+                  <span className="text-slate-500 font-medium">Remaining capacity</span>
+                  <span className="font-extrabold text-[#0D307A] text-[15px]">
+                    {String(remainingCap).padStart(2, '0')} KG
+                  </span>
+                </div>
+              </div>
+
+              {/* Traveler Details Section */}
+              <div className="space-y-4 pt-5 border-t border-slate-100">
+                <h3 className="text-base font-bold text-slate-800">
+                  Traveler Details
+                </h3>
+
+                <div className="space-y-3.5 text-xs md:text-sm">
+                  {/* Name Row */}
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-slate-400 font-medium">Name</span>
+                    <div className="flex items-center gap-2">
+                      {trip.user?.image ? (
+                        <div className="w-5 h-5 rounded-full border border-slate-200 overflow-hidden shrink-0">
+                          <Image
+                            src={toRelativeImageUrl(trip.user.image)}
+                            alt={trip.user.name || 'Traveler'}
+                            width={20}
+                            height={20}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-600 shrink-0">
+                          {(trip.user?.name || 'Traveler').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="font-bold text-[#0D307A] underline hover:text-[#092E72] cursor-pointer">
+                        {trip.user?.name || 'Traveler'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Phone Row */}
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-slate-400 font-medium">Phone</span>
+                    <span className="font-semibold text-slate-700">{trip.user?.phone || 'N/A'}</span>
+                  </div>
+
+                  {/* Email Row */}
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-slate-400 font-medium">Email</span>
+                    <span className="font-semibold text-slate-700">{trip.user?.email || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Rejection Banner */}
             {trip.status === 'REJECTED' && trip.rejectionReason && (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm flex gap-3 items-start">
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm flex gap-3 items-start shrink-0">
                 <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-red-800 text-sm">Trip Rejected</h4>
@@ -233,17 +390,10 @@ export default function AdminTripDetailsPage() {
             )}
           </div>
 
-          <div className="space-y-6">
-            <ContactDetailsCard
-              title="Traveler Details"
-              name={trip.user?.name || 'Traveler'}
-              phone={trip.user?.phone || 'N/A'}
-              avatar={trip.user?.image || undefined}
-            />
-
+          <div className="flex flex-col gap-6">
             {/* Ticket scan preview card inline */}
-            <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex flex-col flex-1 space-y-4">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
                   Ticket Document Scan
                 </h3>
@@ -260,11 +410,14 @@ export default function AdminTripDetailsPage() {
               </div>
 
               {trip.ticketPhoto && trip.ticketPhoto !== 'pending' ? (
-                <div className="relative group overflow-hidden border border-slate-200 rounded-xl bg-slate-900 flex items-center justify-center max-h-64 w-full cursor-zoom-in" onClick={() => setPreviewPhotoUrl(trip.ticketPhoto)}>
+                <div
+                  className="relative group overflow-hidden border border-slate-200 rounded-xl bg-slate-900 flex items-center justify-center flex-1 min-h-[240px] w-full cursor-zoom-in"
+                  onClick={() => setPreviewPhotoUrl(trip.ticketPhoto)}
+                >
                   <Image
                     src={toRelativeImageUrl(trip.ticketPhoto)}
                     alt="Flight Ticket document"
-                    className="object-contain max-h-64 w-full transition-all group-hover:scale-102"
+                    className="object-contain w-full h-full transition-all group-hover:scale-102"
                     fill
                   />
                   <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-semibold text-sm gap-2">
@@ -273,7 +426,7 @@ export default function AdminTripDetailsPage() {
                   </div>
                 </div>
               ) : (
-                <div className="h-44 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm">
+                <div className="flex-1 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm min-h-[240px]">
                   <FileText className="h-8 w-8 mb-2" />
                   No flight ticket file uploaded
                 </div>
