@@ -45,9 +45,9 @@ export function constructMetadata({
       creator: seoConfig.twitterHandle,
     },
     icons: {
-      icon: '/favicon.ico',
-      shortcut: '/favicon.ico',
-      apple: '/apple-touch-icon.png',
+      icon: '/shiffto-icon.svg',
+      shortcut: '/shiffto-icon.svg',
+      apple: '/shiffto-icon.svg',
     },
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
     ...(noIndex && {
