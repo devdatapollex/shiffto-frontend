@@ -295,7 +295,7 @@ export default function AdminTripDetailsPage() {
                   <div className="flex-1 flex items-center justify-center relative">
                     <div className="w-full flex items-center justify-between relative">
                       <div className="flex-1 border-t-2 border-dashed border-orange-300 relative flex justify-center items-center">
-                        <Plane className="h-5 w-5 text-[#0D307A] fill-slate-800 rotate-90 absolute -top-2.5 bg-white px-0.5" />
+                        <Plane className="h-5 w-5 text-[#0D307A] fill-slate-800 rotate-45 absolute -top-2.5 bg-white px-0.5" />
                       </div>
                     </div>
                   </div>
