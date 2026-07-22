@@ -61,6 +61,7 @@ export default function TripDetailsPage() {
   const router = useRouter();
   const tripId = params?.id as string;
 
+  const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
   const { data: trip, isLoading, error } = useTripDetails(tripId, !!tripId);
 
   if (isLoading) {
@@ -95,8 +96,6 @@ export default function TripDetailsPage() {
       </div>
     );
   }
-
-  const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
 
   const shortTripId = `TR-${trip.id.slice(-6).toUpperCase()}`;
   const totalCap = (trip.cabinBagCapacity ?? 0) + (trip.checkInBagCapacity ?? 0);
