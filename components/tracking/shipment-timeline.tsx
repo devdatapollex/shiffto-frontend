@@ -177,7 +177,7 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
                 <div
                   className={cn(
                     'z-10 flex items-center justify-center',
-                    isCurrent && 'text-blue-600 animate-pulse'
+                    isCurrent && 'text-[#0D307A] animate-pulse'
                   )}
                 >
                   <IconComponent
