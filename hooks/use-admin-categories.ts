@@ -24,17 +24,17 @@ async function getCategories(params?: { page?: number; limit?: number }) {
 }
 
 async function createCategory(payload: CategoryPayload) {
-  const { data } = await apiClient.post('/shipments/categories', payload);
+  const { data } = await apiClient.post('/shipment-categories', payload);
   return data;
 }
 
 async function updateCategory(id: string, payload: Partial<CategoryPayload>) {
-  const { data } = await apiClient.patch(`/shipments/categories/${id}`, payload);
+  const { data } = await apiClient.patch(`/shipment-categories/${id}`, payload);
   return data;
 }
 
 async function deleteCategory(id: string) {
-  const { data } = await apiClient.delete(`/shipments/categories/${id}`);
+  const { data } = await apiClient.delete(`/shipment-categories/${id}`);
   return data;
 }
 

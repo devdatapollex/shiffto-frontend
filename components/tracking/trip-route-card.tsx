@@ -120,7 +120,7 @@ export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, cl
           <div className="w-full flex items-center justify-between relative px-2">
             <div className="h-1.5 w-1.5 rounded-full bg-slate-300 shrink-0" />
             <div className="flex-1 border-t border-dashed border-slate-300 mx-2 relative flex justify-center items-center">
-              <Plane className="h-4 w-4 text-[#0D307A] rotate-90 absolute -top-2 bg-white" />
+              <Plane className="h-4 w-4 text-[#0D307A] rotate-45 absolute -top-2 bg-white" />
             </div>
             <div className="h-1.5 w-1.5 rounded-full bg-[#0D307A] shrink-0" />
           </div>

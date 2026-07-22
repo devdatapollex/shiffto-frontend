@@ -1,5 +1,10 @@
+import { KycGuard } from '@/components/auth/kyc-guard';
 import { CreateShipmentWizard } from '@/components/shipments/create/create-shipment-wizard';
 
 export default function CreateShipmentPage() {
-  return <CreateShipmentWizard />;
+  return (
+    <KycGuard>
+      <CreateShipmentWizard />
+    </KycGuard>
+  );
 }

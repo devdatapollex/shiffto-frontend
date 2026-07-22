@@ -3,7 +3,16 @@
 import { useSession } from '@/lib/auth-client';
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
-import { Menu, Bell, Search, User, ChevronLeft, ChevronRight, Plus, Package } from 'lucide-react';
+import {
+  Menu,
+  Bell,
+  Search,
+  User,
+  ChevronLeft,
+  ChevronRight,
+  PlaneTakeoff,
+  Package,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -38,8 +47,20 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
     router.refresh();
   };
 
+  // Helper for greeting based on current time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   // Determine dynamic page title
   const getPageTitle = () => {
+    if (pathname === '/dashboard') {
+      const firstName = session?.user?.name ? session.user.name.trim().split(' ')[0] : 'User';
+      return `${getGreeting()}, ${firstName}!`;
+    }
     if (pathname.includes('/dashboard/my-shipments')) return 'My Shipments';
     if (pathname.includes('/dashboard/shipments/create')) return 'Create Shipment';
     if (pathname.includes('/dashboard/browse-shipment')) return 'Browse Shipment';
@@ -64,45 +85,38 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
   const hasUnread = notifications ? notifications.some((n) => !n.read) : false;
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur-sm sm:px-8">
-      {/* Left side: Navigation & Title */}
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border-layout bg-background/95 px-4 backdrop-blur-sm sm:px-8">
+      {/* Left side: Navigation, Title & Search */}
+      <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="lg:hidden" onClick={onMenuClick}>
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
 
-        {/* Desktop History Navigation Chevrons & Page Title */}
-        <div className="hidden items-center gap-3 lg:flex">
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 rounded-md border-slate-200 text-slate-400 hover:text-slate-600 bg-white"
-              onClick={() => router.back()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 rounded-md border-slate-200 text-slate-400 hover:text-slate-600 bg-white"
-              onClick={() => router.forward()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <h1 className="text-lg font-bold text-[#0B3A8E] tracking-tight">{title}</h1>
+        {/* History Nav */}
+        <div className="hidden lg:flex items-center border border-slate-200 rounded-md bg-white overflow-hidden h-8">
+          <button
+            onClick={() => router.back()}
+            className="h-full px-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 border-r border-slate-100 transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => router.forward()}
+            className="h-full px-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
+
+        {/* Title */}
+        <h1 className="text-xl font-bold text-[#0B3A8E] tracking-tight hidden lg:block">{title}</h1>
 
         {/* Mobile Page Title */}
         <h1 className="text-base font-bold text-[#0B3A8E] tracking-tight lg:hidden">{title}</h1>
-      </div>
 
-      {/* Right side: Search, Bell and Buttons */}
-      <div className="flex items-center gap-3 md:gap-4">
-        {/* Search bar */}
-        <div className="relative hidden items-center md:flex">
+        {/* Search bar next to title (on desktop) */}
+        <div className="relative hidden items-center md:flex ml-2">
           <Search className="absolute left-3 h-4 w-4 text-slate-400" />
           <input
             type="search"
@@ -113,20 +127,19 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
             <span>⌘</span>F
           </kbd>
         </div>
+      </div>
 
+      {/* Right side: Bell and Buttons */}
+      <div className="flex items-center gap-3 md:gap-4">
         {/* Notifications Bell Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-9 w-9 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full"
-            >
-              <Bell className="h-5 w-5" />
+            <button className="relative text-[#0B3A8E] hover:text-primary transition-colors cursor-pointer outline-none focus:outline-none flex items-center justify-center p-0 bg-transparent border-0">
+              <Bell className="size-5" />
               {hasUnread && (
-                <span className="absolute right-2 top-2 flex h-2 w-2 rounded-full bg-[#FF6F3F] ring-2 ring-background animate-pulse" />
+                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary" />
               )}
-            </Button>
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
@@ -197,21 +210,17 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
         <Link href={ROUTES.CREATE_TRIP} className="hidden sm:inline-block">
           <Button
             variant="outline"
-            size="sm"
-            className="h-9 border-primary text-primary hover:bg-primary/5 hover:text-primary font-medium"
+            className="h-10 border-primary! bg-white! text-primary! hover:bg-primary/[0.04]! hover:text-primary! font-semibold px-5 rounded-lg cursor-pointer flex items-center gap-2"
           >
-            <Plus className="mr-1.5 h-4 w-4 stroke-[2.5]" />
+            <PlaneTakeoff className="h-4 w-4" />
             Add trip
           </Button>
         </Link>
 
         {/* Create Shipment Button */}
         <Link href={ROUTES.CREATE_SHIPMENT}>
-          <Button
-            size="sm"
-            className="h-9 bg-primary hover:bg-primary/95 text-white font-medium shadow-sm"
-          >
-            <Package className="mr-1.5 h-4 w-4" />
+          <Button className="h-10 bg-primary hover:bg-primary/95 text-white font-semibold px-5 rounded-lg shadow-sm cursor-pointer flex items-center gap-2">
+            <Package className="h-4 w-4" />
             Create shipment
           </Button>
         </Link>

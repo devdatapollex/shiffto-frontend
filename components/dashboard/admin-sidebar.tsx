@@ -119,25 +119,25 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out lg:static lg:translate-x-0',
-          'border-primary/5',
+          'border-border-layout',
           isCollapsed ? 'w-[80px]' : 'w-[280px]',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Logo Section */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-primary/5 bg-primary/[0.02]">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-border-layout bg-primary/[0.02]">
           {!isCollapsed ? (
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span className="text-lg font-bold tracking-tight text-primary drop-shadow-sm flex items-center gap-1.5">
-                SHIFFTO{' '}
-                <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary uppercase font-bold">
-                  Admin
-                </span>
+            <Link href={ROUTES.DASHBOARD} className="flex items-center gap-2">
+              <img src="/shiffto-icon.svg" alt="SHIFFTO Icon" className="h-9 w-auto shrink-0" />
+              <img src="/shiffto-name.svg" alt="SHIFFTO Name" className="h-2 w-auto shrink-0" />
+              <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary uppercase font-bold">
+                Admin
               </span>
-            </div>
+            </Link>
           ) : (
-            <Shield className="h-5 w-5 text-primary mx-auto" />
+            <Link href={ROUTES.DASHBOARD} className="mx-auto flex items-center justify-center">
+              <img src="/shiffto-icon.svg" alt="SHIFFTO Icon" className="h-9 w-auto" />
+            </Link>
           )}
           <Button
             variant="ghost"
