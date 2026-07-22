@@ -143,6 +143,49 @@ export async function getUserAnalytics(): Promise<UserAnalyticsData> {
   return data.data;
 }
 
+export interface RevenueChartData {
+  totalAmount: string;
+  percentageChange: string;
+  dateRangeText: string;
+  chartData: {
+    day: string;
+    spent: number;
+    earned: number;
+  }[];
+}
+
+export async function getRevenueChart(params?: {
+  range?: string;
+  startDate?: string;
+  endDate?: string;
+}): Promise<RevenueChartData> {
+  const { data } = await apiClient.get<{ success: boolean; data: RevenueChartData }>(
+    '/profile/revenue-chart',
+    { params }
+  );
+  return data.data;
+}
+
+export interface ShipmentChartData {
+  totalDeliveries: string;
+  percentageChange: string;
+  selectedYear: string;
+  availableYears?: string[];
+  data: {
+    month: string;
+    canceled: number;
+    completed: number;
+  }[];
+}
+
+export async function getShipmentChart(year?: string): Promise<ShipmentChartData> {
+  const { data } = await apiClient.get<{ success: boolean; data: ShipmentChartData }>(
+    '/profile/shipment-chart',
+    { params: { year } }
+  );
+  return data.data;
+}
+
 // Admin Services
 export async function getKycSubmissions(params?: {
   page?: number;

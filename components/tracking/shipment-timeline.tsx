@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import {
-  Check,
+  CircleCheck,
   Hourglass,
   Plane,
   Package,
@@ -16,12 +16,7 @@ import type { ShipmentStep } from '@/services/shipment.service';
 import { cn } from '@/lib/utils';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ShipmentTimelineProps {
   steps: ShipmentStep[];
@@ -29,7 +24,11 @@ interface ShipmentTimelineProps {
 
 const STAGE_CONFIG: Record<
   string,
-  { label: string; activeIcon: React.ComponentType<any>; defaultIcon: React.ComponentType<any> }
+  {
+    label: string;
+    activeIcon: React.ComponentType<{ className?: string }>;
+    defaultIcon: React.ComponentType<{ className?: string }>;
+  }
 > = {
   PAYMENT_CONFIRMED: {
     label: 'Payment confirmed',
@@ -63,7 +62,7 @@ const STAGE_CONFIG: Record<
   },
   DELIVERED: {
     label: 'Delivered',
-    activeIcon: Check,
+    activeIcon: CircleCheck,
     defaultIcon: Hourglass,
   },
 };
@@ -137,7 +136,11 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
           const isCompleted = status === 'completed';
           const isCurrent = status === 'current';
 
-          const IconComponent = isCompleted ? Check : isCurrent ? config.activeIcon : config.defaultIcon;
+          const IconComponent = isCompleted
+            ? CircleCheck
+            : isCurrent
+              ? config.activeIcon
+              : config.defaultIcon;
 
           return (
             <div key={stage} className="flex-1 flex flex-col items-center relative group">
@@ -145,10 +148,10 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
               {idx < STAGES_ORDER.length - 1 && (
                 <div
                   className={cn(
-                    'absolute top-5 left-[50%] right-[-50%] h-[2px] z-0 transition-colors duration-300',
+                    'absolute top-5 left-[50%] right-[-50%] z-0 transition-all duration-300 -translate-y-[1.5px]',
                     getStepData(STAGES_ORDER[idx + 1]).status !== 'pending'
-                      ? 'bg-emerald-500'
-                      : 'bg-slate-200'
+                      ? 'h-[3px] bg-[#56CB4E]'
+                      : 'h-0 border-t-[3px] border-dashed border-slate-300'
                   )}
                 />
               )}
@@ -156,27 +159,36 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
               {/* Circle Icon */}
               <div
                 className={cn(
-                  'h-10 w-10 rounded-full flex items-center justify-center border-2 z-10 transition-all duration-300 shadow-sm',
-                  isCompleted
-                    ? 'bg-emerald-50 border-emerald-500 text-emerald-500'
-                    : isCurrent
-                      ? 'bg-indigo-50 border-indigo-600 text-indigo-600 animate-pulse'
-                      : 'bg-white border-slate-200 text-slate-400'
+                  'h-10 w-10 rounded-full flex items-center justify-center z-10 transition-all duration-300 shadow-sm relative bg-white',
+                  isCompleted && 'border-4 border-[#56CB4E] text-[#56CB4E]',
+                  !isCompleted && !isCurrent && 'border border-slate-200 text-slate-400'
                 )}
               >
-                <IconComponent className={cn('h-5 w-5', isCurrent && stage === 'IN_TRANSIT' && 'rotate-45')} />
+                {/* For current step, render double borders to get the thick green bottom-half border and thin grey top-half border */}
+                {isCurrent && (
+                  <>
+                    <div className="absolute inset-0 rounded-full border border-slate-200" />
+                    <div
+                      className="absolute inset-0 rounded-full border-4 border-[#56CB4E]"
+                      style={{ clipPath: 'inset(50% 0 0 0)' }}
+                    />
+                  </>
+                )}
+                <div
+                  className={cn(
+                    'z-10 flex items-center justify-center',
+                    isCurrent && 'text-[#0D307A] animate-pulse'
+                  )}
+                >
+                  <IconComponent
+                    className={cn('h-5 w-5', isCurrent && stage === 'IN_TRANSIT' && 'rotate-45')}
+                  />
+                </div>
               </div>
 
               {/* Step Info */}
               <div className="mt-3 text-center px-2 max-w-[130px] z-10">
-                <span
-                  className={cn(
-                    'text-xs font-bold block transition-colors duration-300',
-                    isCompleted ? 'text-emerald-700' : isCurrent ? 'text-indigo-900' : 'text-slate-500'
-                  )}
-                >
-                  {config.label}
-                </span>
+                <span className="text-xs font-bold block text-foreground">{config.label}</span>
 
                 {/* Photo proof badge if present */}
                 {photoUrl && (

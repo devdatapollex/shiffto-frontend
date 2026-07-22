@@ -47,7 +47,7 @@ export const constructMetadata = (overrides?: Partial<Metadata>): Metadata => {
       images: [seoConfig.ogImage],
     },
     icons: {
-      icon: '/favicon.ico',
+      icon: '/shiffto-icon.svg',
     },
   };
 
