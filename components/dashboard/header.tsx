@@ -47,8 +47,20 @@ export function DashboardHeader({ onMenuClick }: HeaderProps) {
     router.refresh();
   };
 
+  // Helper for greeting based on current time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   // Determine dynamic page title
   const getPageTitle = () => {
+    if (pathname === '/dashboard') {
+      const firstName = session?.user?.name ? session.user.name.trim().split(' ')[0] : 'User';
+      return `${getGreeting()}, ${firstName}!`;
+    }
     if (pathname.includes('/dashboard/my-shipments')) return 'My Shipments';
     if (pathname.includes('/dashboard/shipments/create')) return 'Create Shipment';
     if (pathname.includes('/dashboard/browse-shipment')) return 'Browse Shipment';

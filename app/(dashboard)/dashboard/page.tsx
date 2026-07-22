@@ -25,6 +25,9 @@ import {
 import { ROUTES } from '@/config/routes';
 import Link from 'next/link';
 
+import { HomeQuickActions } from '@/components/dashboard/home-quick-actions';
+import { HomeStatsOverview } from '@/components/dashboard/home-stats-overview';
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const userName = session?.user?.name || 'there';
@@ -46,7 +49,12 @@ export default function DashboardPage() {
   const recentTrips = analytics?.recentTrips || [];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto pb-10">
+      {/* Top Quick Actions Section from Figma */}
+      <HomeQuickActions />
+
+      {/* Stats Overview Section from Figma */}
+      <HomeStatsOverview stats={stats} isLoading={isLoading} />
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/10 p-6 sm:p-8 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
@@ -88,10 +96,16 @@ export default function DashboardPage() {
               onClick={() => refetch()}
               className="border-primary/10 hover:bg-primary/5 text-xs h-9 gap-1.5"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-primary ${isRefetching ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-3.5 w-3.5 text-primary ${isRefetching ? 'animate-spin' : ''}`}
+              />
               Sync Stats
             </Button>
-            <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-white text-xs h-9 gap-1.5 shadow-sm">
+            <Button
+              asChild
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-white text-xs h-9 gap-1.5 shadow-sm"
+            >
               <Link href={ROUTES.CREATE_SHIPMENT}>
                 <PlusCircle className="h-3.5 w-3.5" />
                 New Shipment
@@ -111,7 +125,9 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h3 className="font-bold text-foreground text-sm">Create Shipment</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Send a package safely with a verified traveler</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Send a package safely with a verified traveler
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -125,7 +141,9 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h3 className="font-bold text-foreground text-sm">Add Trip</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Traveling? Earn income carrying packages</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Traveling? Earn income carrying packages
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -139,7 +157,9 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h3 className="font-bold text-foreground text-sm">Browse Shipments</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Find available shipments along your travel route</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Find available shipments along your travel route
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -163,7 +183,10 @@ export default function DashboardPage() {
                   Shipments Created
                 </span>
                 {stats?.activeShipments !== undefined && (
-                  <Badge variant="outline" className="text-[9px] font-bold border-primary/20 text-primary">
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] font-bold border-primary/20 text-primary"
+                  >
                     {stats.activeShipments} Active
                   </Badge>
                 )}
@@ -188,7 +211,10 @@ export default function DashboardPage() {
                   Trips Added
                 </span>
                 {stats?.activeTrips !== undefined && (
-                  <Badge variant="outline" className="text-[9px] font-bold border-emerald-200 text-emerald-700 bg-emerald-50">
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] font-bold border-emerald-200 text-emerald-700 bg-emerald-50"
+                  >
                     {stats.activeTrips} Active
                   </Badge>
                 )}
@@ -238,9 +264,7 @@ export default function DashboardPage() {
               <div className="text-3xl font-extrabold text-primary">
                 ${isLoading ? '0.00' : (stats?.totalSpending || 0).toFixed(2)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Paid for shipment deliveries
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Paid for shipment deliveries</p>
             </CardContent>
           </Card>
         </div>
@@ -255,7 +279,12 @@ export default function DashboardPage() {
                 <Wallet className="h-5 w-5 text-primary" />
                 Available Wallet Balance
               </CardTitle>
-              <Button asChild size="xs" variant="ghost" className="text-primary hover:bg-primary/10 text-xs">
+              <Button
+                asChild
+                size="xs"
+                variant="ghost"
+                className="text-primary hover:bg-primary/10 text-xs"
+              >
                 <Link href={ROUTES.WALLET}>
                   Manage Wallet
                   <ChevronRight className="h-3.5 w-3.5 ml-1" />
@@ -278,14 +307,21 @@ export default function DashboardPage() {
                 <Clock className="h-5 w-5 text-amber-600" />
                 Escrow Held Balance
               </CardTitle>
-              <Button asChild size="xs" variant="ghost" className="text-amber-600 hover:bg-amber-50 text-xs">
+              <Button
+                asChild
+                size="xs"
+                variant="ghost"
+                className="text-amber-600 hover:bg-amber-50 text-xs"
+              >
                 <Link href={ROUTES.PAYMENT_EARNINGS}>
                   View Transactions
                   <ChevronRight className="h-3.5 w-3.5 ml-1" />
                 </Link>
               </Button>
             </div>
-            <CardDescription>Protected in escrow until shipment delivery confirmation</CardDescription>
+            <CardDescription>
+              Protected in escrow until shipment delivery confirmation
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-black text-amber-600">
@@ -306,7 +342,12 @@ export default function DashboardPage() {
                 Your Recent Shipments
               </CardTitle>
             </div>
-            <Button asChild variant="ghost" size="xs" className="text-xs text-primary hover:bg-primary/5">
+            <Button
+              asChild
+              variant="ghost"
+              size="xs"
+              className="text-xs text-primary hover:bg-primary/5"
+            >
               <Link href={ROUTES.MY_SHIPMENTS}>View All</Link>
             </Button>
           </CardHeader>
@@ -351,7 +392,12 @@ export default function DashboardPage() {
                 Your Recent Trips
               </CardTitle>
             </div>
-            <Button asChild variant="ghost" size="xs" className="text-xs text-primary hover:bg-primary/5">
+            <Button
+              asChild
+              variant="ghost"
+              size="xs"
+              className="text-xs text-primary hover:bg-primary/5"
+            >
               <Link href={ROUTES.MY_TRIPS}>View All</Link>
             </Button>
           </CardHeader>
