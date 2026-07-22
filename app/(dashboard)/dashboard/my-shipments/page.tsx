@@ -22,7 +22,7 @@ import {
 import { toast } from 'sonner';
 import { getShipments, type Shipment } from '@/services/shipment.service';
 import { useRole } from '@/hooks/use-role';
-import { useReceivedOffers, useAcceptOffer, useRejectOffer } from '@/hooks/use-offers';
+import { useReceivedOffers, useAcceptOffer, useRejectOffer, useCancelCheckout } from '@/hooks/use-offers';
 import type { Offer as RealOffer } from '@/services/offer.service';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -175,6 +175,7 @@ export default function MyShipmentsPage() {
 
   const acceptOfferMutation = useAcceptOffer();
   const rejectOfferMutation = useRejectOffer();
+  const cancelCheckoutMutation = useCancelCheckout();
 
   const getFlightTimeStatus = (flightDateStr?: string) => {
     if (!flightDateStr) return { label: 'Upcoming', class: 'bg-emerald-50 text-emerald-600 border-emerald-100' };
@@ -296,6 +297,15 @@ export default function MyShipmentsPage() {
       toast.success(`Offer from ${travellerName} declined.`);
     } catch (err: any) {
       toast.error(err?.message || 'Failed to decline offer');
+    }
+  };
+
+  const handleCancelCheckout = async (offerId: string, travellerName: string) => {
+    try {
+      await cancelCheckoutMutation.mutateAsync(offerId);
+      toast.success(`Checkout for ${travellerName}'s offer canceled.`);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || err?.message || 'Failed to cancel checkout');
     }
   };
 
@@ -460,23 +470,47 @@ export default function MyShipmentsPage() {
                     </div>
 
                     <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
-                        onClick={() => handleRejectOffer(offer.id, travelerName)}
-                        className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
-                      >
-                        {rejectOfferMutation.isPending ? 'Declining...' : 'Reject'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
-                        onClick={() => handleAcceptOffer(offer.id, travelerName, offeredPrice)}
-                        className="flex-1 bg-[#0B3A8E] hover:bg-[#092E72] text-white font-semibold shadow-sm"
-                      >
-                        {acceptOfferMutation.isPending ? 'Accepting...' : 'Accept'}
-                      </Button>
+                      {offer.status === 'PAYMENT_PENDING' ? (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={cancelCheckoutMutation.isPending || acceptOfferMutation.isPending}
+                            onClick={() => handleCancelCheckout(offer.id, travelerName)}
+                            className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
+                          >
+                            {cancelCheckoutMutation.isPending ? 'Canceling...' : 'Cancel Checkout'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={cancelCheckoutMutation.isPending || acceptOfferMutation.isPending}
+                            onClick={() => handleAcceptOffer(offer.id, travelerName, offeredPrice)}
+                            className="flex-1 bg-[#0B3A8E] hover:bg-[#092E72] text-white font-semibold shadow-sm"
+                          >
+                            {acceptOfferMutation.isPending ? 'Redirecting...' : 'Pay Now'}
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
+                            onClick={() => handleRejectOffer(offer.id, travelerName)}
+                            className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
+                          >
+                            {rejectOfferMutation.isPending ? 'Declining...' : 'Reject'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
+                            onClick={() => handleAcceptOffer(offer.id, travelerName, offeredPrice)}
+                            className="flex-1 bg-[#0B3A8E] hover:bg-[#092E72] text-white font-semibold shadow-sm"
+                          >
+                            {acceptOfferMutation.isPending ? 'Accepting...' : 'Accept'}
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </motion.div>
                 );
