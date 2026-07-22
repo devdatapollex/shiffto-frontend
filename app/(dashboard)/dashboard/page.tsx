@@ -27,6 +27,9 @@ import Link from 'next/link';
 
 import { HomeQuickActions } from '@/components/dashboard/home-quick-actions';
 import { HomeStatsOverview } from '@/components/dashboard/home-stats-overview';
+import { OffersReceivedSection } from '@/components/shipments/offers-received-section';
+import { RevenueChartCard } from '@/components/dashboard/revenue-chart-card';
+import { ShipmentChartCard } from '@/components/dashboard/shipment-chart-card';
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -55,6 +58,21 @@ export default function DashboardPage() {
 
       {/* Stats Overview Section from Figma */}
       <HomeStatsOverview stats={stats} isLoading={isLoading} />
+
+      {/* Offers Received Section from My Shipments Page (Horizontal Scroll) */}
+      <OffersReceivedSection
+        layoutMode="horizontal-scroll"
+        titleClassName="text-[#0B3A8E] text-lg sm:text-xl font-bold tracking-tight"
+      />
+
+      {/* 2-Column Split Grid below Offers Received */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Half: Revenue Line Chart Card */}
+        <RevenueChartCard />
+
+        {/* Right Half: Shipment Deliveries Bar Chart Card */}
+        <ShipmentChartCard />
+      </div>
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/10 p-6 sm:p-8 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
