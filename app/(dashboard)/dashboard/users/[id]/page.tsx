@@ -148,7 +148,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Form Info */}
         <div className="space-y-6 lg:col-span-1">
-          <div className="p-6 border border-primary/5 rounded-2xl bg-card space-y-6">
+          <div className="p-6 border border-primary/5 rounded-lg bg-card space-y-6">
             {/* Header info */}
             <div className="flex flex-col items-center text-center pb-4 border-b border-primary/5">
               <div className="h-20 w-20 rounded-full flex items-center justify-center text-2xl font-bold text-primary-foreground bg-primary shrink-0 overflow-hidden shadow">
@@ -277,7 +277,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           </div>
 
           {/* Tab Content Box */}
-          <div className="p-6 border border-primary/5 rounded-2xl bg-card min-h-[400px]">
+          <div className="p-6 border border-primary/5 rounded-lg bg-card min-h-[400px]">
             {/* Timeline Tab */}
             {activeTab === 'timeline' && (
               <div className="space-y-6">
@@ -478,7 +478,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
             {activeTab === 'trust' && (
               <div className="space-y-6">
                 {/* Stats Breakdown */}
-                <div className="flex flex-col sm:flex-row justify-between gap-4 p-4 border border-primary/5 rounded-2xl bg-primary/[0.01] items-center">
+                <div className="flex flex-col sm:flex-row justify-between gap-4 p-4 border border-primary/5 rounded-lg bg-primary/[0.01] items-center">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg font-bold shrink-0">
                       <Star className="h-6 w-6 fill-amber-500 text-amber-500" />

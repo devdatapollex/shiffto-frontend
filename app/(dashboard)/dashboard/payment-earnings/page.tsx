@@ -139,7 +139,7 @@ export default function PaymentEarningsPage() {
   const calculatedNetPayout = Math.max(0, parsedWithdrawAmount - calculatedCommissionCut);
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-[1144px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Earnings & Payments</h1>
@@ -478,7 +478,7 @@ export default function PaymentEarningsPage() {
                             Retry Payment
                           </Button>
                         ) : (
-                          <Button size="sm" variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 text-xs gap-1.5">
+                          <Button size="sm" variant="outline" className="text-xs gap-1.5">
                             <Download className="w-3.5 h-3.5" />
                             Download Invoice
                           </Button>

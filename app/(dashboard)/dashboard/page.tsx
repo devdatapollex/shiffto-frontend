@@ -54,7 +54,7 @@ export default function DashboardPage() {
   const recentTrips = analytics?.recentTrips || [];
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 sm:space-y-8 max-w-[1144px] mx-auto pb-10">
       {/* Top Quick Actions Section from Figma */}
       <HomeQuickActions />
 

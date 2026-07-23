@@ -302,7 +302,7 @@ function ShipmentsTab() {
   const showingTo = Math.min(meta.page * meta.limit, meta.total);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       {/* Controls Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
         <h3 className="text-xl text-muted-foreground tracking-tight">All Shipments</h3>
@@ -707,7 +707,7 @@ function CategoriesTab() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       <div className="flex items-center justify-between border-b border-slate-100 pb-5">
         <h3 className="text-xl text-muted-foreground tracking-tight">Shipment Categories</h3>
         <Button
@@ -1102,7 +1102,7 @@ function StepDefinitionsTab() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       <div className="border-b border-slate-100 pb-5">
         <h3 className="text-xl text-muted-foreground tracking-tight">Step Definitions</h3>
         <p className="text-sm text-slate-400 mt-1">

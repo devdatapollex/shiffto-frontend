@@ -255,7 +255,7 @@ export default function MyShipmentsPage() {
       <OffersReceivedSection layoutMode="grid" />
 
       {/* 2. SHIPMENT HISTORY SECTION */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+      <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
         {/* Title and Controls Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
           <h3 className="text-xl text-muted-foreground tracking-tight">Shipment History</h3>

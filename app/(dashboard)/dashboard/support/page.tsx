@@ -414,7 +414,7 @@ export default function UserSupportPage() {
             <p>Loading tickets...</p>
           </div>
         ) : !ticketsData?.tickets || ticketsData.tickets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4 border border-dashed rounded-2xl bg-card">
+          <div className="flex flex-col items-center justify-center py-20 gap-4 border border-dashed rounded-lg bg-card">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <FolderOpen className="h-6 w-6" />
             </div>
@@ -445,7 +445,7 @@ export default function UserSupportPage() {
                 <AccordionItem
                   key={ticket.id}
                   value={ticket.id}
-                  className="bg-card border border-primary/5 rounded-2xl overflow-hidden px-0"
+                  className="bg-card border border-primary/5 rounded-lg overflow-hidden px-0"
                 >
                   <AccordionTrigger className="hover:no-underline px-6 py-5 flex items-center justify-between text-left group">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-5 w-full mr-4">
@@ -580,7 +580,7 @@ export default function UserSupportPage() {
                                         </span>
                                       </div>
                                       <div
-                                        className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm whitespace-pre-line ${
+                                        className={`rounded-lg px-4 py-2.5 text-sm shadow-sm whitespace-pre-line ${
                                           isAdmin
                                             ? 'bg-muted text-foreground rounded-tl-none'
                                             : 'bg-primary text-white rounded-tr-none'
@@ -717,7 +717,7 @@ export default function UserSupportPage() {
 
       {/* Create Ticket Modal */}
       <Dialog open={isCreateOpen} onOpenChange={(open) => setIsCreateOpen(open)}>
-        <DialogContent className="sm:max-w-[550px] rounded-2xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="sm:max-w-[550px] rounded-lg overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2 text-primary">
               <LifeBuoy className="h-6 w-6" />

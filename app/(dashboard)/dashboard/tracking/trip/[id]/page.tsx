@@ -72,12 +72,12 @@ export default function TripDetailsPage() {
 
         {/* Content Columns Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
-          <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+          <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
+          <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
         </div>
 
         {/* Shipments List Skeleton */}
-        <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+        <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
       </div>
     );
   }
@@ -128,7 +128,7 @@ export default function TripDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <div className="flex flex-col gap-6">
           {/* Combined Card: Trip details & Traveler details */}
-          <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
+          <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <span className="text-base font-bold text-slate-800">
@@ -258,7 +258,7 @@ export default function TripDetailsPage() {
 
         <div className="flex flex-col gap-6">
           {/* Ticket scan preview card inline */}
-          <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex flex-col flex-1 space-y-4">
+          <div className="bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm flex flex-col flex-1 space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
               <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
                 Ticket Document Scan
@@ -302,7 +302,7 @@ export default function TripDetailsPage() {
       </div>
 
       {/* Accepted Shipments Section */}
-      <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm space-y-4">
+      <div className="bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-4">
         <h3 className="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 uppercase tracking-wider text-xs">
           Shipments Under This Trip
         </h3>

@@ -121,7 +121,7 @@ export default function AdminWithdrawalsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-[1144px] mx-auto">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Withdrawals & Payouts</h1>
         <p className="text-sm text-slate-500">Process traveler withdrawal requests and enter transfer references</p>

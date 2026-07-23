@@ -385,7 +385,7 @@ export default function MyTripsPage() {
                 return (
                   <Card
                     key={shipment.id}
-                    className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-2xl overflow-hidden bg-white shadow-xs"
+                    className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-lg overflow-hidden bg-white shadow-xs"
                   >
                     <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
                       {/* Time limit badge / Offered badge */}
@@ -443,7 +443,7 @@ export default function MyTripsPage() {
                       <div className="grid grid-cols-2 gap-3 pt-2">
                         <Button
                           variant="outline"
-                          className="border-[#e2e8f0] text-slate-700 hover:bg-slate-50 rounded-xl h-10 font-semibold text-sm"
+                          className="h-10 font-semibold text-sm text-foreground!"
                           onClick={() => handleOpenCounterDialog(shipment)}
                           disabled={isOffered}
                         >
@@ -478,7 +478,7 @@ export default function MyTripsPage() {
       </div>
 
       {/* 2. Trips History section (inside card) */}
-      <Card className="border border-[#e2e8f0] rounded-2xl bg-white shadow-xs overflow-hidden">
+      <Card className="border border-[#e2e8f0] rounded-lg bg-white shadow-xs overflow-hidden">
         <CardHeader className="pb-4 pt-6 px-6 border-b border-[#e2e8f0]/60 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-[#0B3A8E] tracking-tight">Trips History</h2>
@@ -784,7 +784,7 @@ export default function MyTripsPage() {
         open={selectedShipment !== null}
         onOpenChange={(open) => !open && setSelectedShipment(null)}
       >
-        <DialogContent className="max-w-md rounded-2xl border-[#e2e8f0] p-6 bg-white">
+        <DialogContent className="max-w-md rounded-lg border-[#e2e8f0] p-6 bg-white">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-[#0B3A8E] flex items-center gap-2">
               <Navigation className="h-5 w-5 text-orange-500" />
@@ -896,7 +896,7 @@ export default function MyTripsPage() {
         open={selectedCounterShipment !== null}
         onOpenChange={(open) => !open && setSelectedCounterShipment(null)}
       >
-        <DialogContent className="max-w-md w-full rounded-2xl border-[#e2e8f0] p-6 bg-white">
+        <DialogContent className="max-w-md w-full rounded-lg border-[#e2e8f0] p-6 bg-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-[#0B3A8E]">
               Submit Counter-Offer

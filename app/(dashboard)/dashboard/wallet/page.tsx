@@ -179,7 +179,7 @@ export default function WalletPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-[1144px] mx-auto">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Wallet</h1>
         <p className="text-sm text-slate-500">Manage your payment methods</p>

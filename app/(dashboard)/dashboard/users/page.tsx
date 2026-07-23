@@ -270,7 +270,7 @@ export default function AdminUsersPage() {
           <p className="text-sm text-muted-foreground">Loading users...</p>
         </div>
       ) : !usersData?.data || usersData.data.length === 0 ? (
-        <div className="text-center py-16 bg-card border border-primary/5 rounded-2xl">
+        <div className="text-center py-16 bg-card border border-primary/5 rounded-lg">
           <Users className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
           <h3 className="font-semibold text-foreground">No users found</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -296,7 +296,7 @@ export default function AdminUsersPage() {
                 <motion.div
                   key={user.id}
                   layout
-                  className={`relative flex flex-col p-5 border rounded-2xl bg-card transition-all duration-300 ${
+                  className={`relative flex flex-col p-5 border rounded-lg bg-card transition-all duration-300 ${
                     isSelected
                       ? 'border-primary/30 ring-1 ring-primary/10 shadow-sm'
                       : 'border-primary/5 hover:border-primary/20 hover:shadow-md'

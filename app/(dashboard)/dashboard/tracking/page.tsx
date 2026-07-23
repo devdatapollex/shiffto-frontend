@@ -357,7 +357,7 @@ export default function TrackingPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       {/* Track your consignment header */}
-      <div className="relative rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm p-6 sm:p-8">
+      <div className="relative rounded-lg border border-slate-200/60 bg-white/60 backdrop-blur-sm p-6 sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0D307A]/10 text-[#0D307A]">
@@ -400,7 +400,7 @@ export default function TrackingPage() {
       </div>
 
       {/* Consignment History */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+      <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
         {/* Title and Controls Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
           <h3 className="text-xl text-muted-foreground tracking-tight">Consignment History</h3>

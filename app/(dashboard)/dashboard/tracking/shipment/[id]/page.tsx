@@ -58,17 +58,17 @@ export default function ShipmentDetailsPage() {
         <div className="flex items-center gap-4 h-6 w-64 bg-slate-100 rounded animate-pulse" />
 
         {/* Timeline Skeleton */}
-        <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+        <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
 
         {/* Content Columns Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
-            <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
-            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+            <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
+            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
           </div>
           <div className="space-y-6">
-            <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
-            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+            <div className="h-44 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
+            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
           </div>
         </div>
       </div>
@@ -122,7 +122,7 @@ export default function ShipmentDetailsPage() {
       </div>
 
       {/* Progress Timeline Tracker Card */}
-      <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 overflow-hidden">
+      <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 overflow-hidden">
         <h2 className="text-sm font-bold text-slate-800 px-4 pb-2 border-b border-slate-100 uppercase tracking-wider">
           Progress Timeline
         </h2>
@@ -144,7 +144,7 @@ export default function ShipmentDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         {/* Left Column: Shipment Item & Receiver Details */}
         <div className="flex flex-col gap-6">
-          <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
+          <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <span className="text-base font-bold text-slate-800">
@@ -226,7 +226,7 @@ export default function ShipmentDetailsPage() {
         {/* Right Column: Trip details / Traveler Details */}
         <div className="flex flex-col gap-6">
           {shipment.trip ? (
-            <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
+            <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <span className="text-base font-bold text-slate-800">
@@ -375,7 +375,7 @@ export default function ShipmentDetailsPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-slate-200/60 rounded-2xl p-8 shadow-sm flex flex-col items-center justify-center text-center h-full min-h-[300px]">
+            <div className="bg-white border border-slate-200/60 rounded-lg p-8 shadow-sm flex flex-col items-center justify-center text-center h-full min-h-[300px]">
               <div className="h-12 w-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-[#0D307A] mb-4">
                 <User className="h-6 w-6" />
               </div>

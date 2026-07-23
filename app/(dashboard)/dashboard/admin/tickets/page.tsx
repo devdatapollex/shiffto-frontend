@@ -405,7 +405,7 @@ export default function AdminTicketsPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-card border border-primary/5 rounded-2xl p-5 space-y-4 shadow-sm">
+      <div className="bg-card border border-primary/5 rounded-lg p-5 space-y-4 shadow-sm">
         <div className="flex flex-col md:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -597,7 +597,7 @@ export default function AdminTicketsPage() {
             <p>Loading administration tickets...</p>
           </div>
         ) : !ticketsData?.tickets || ticketsData.tickets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 border border-dashed rounded-2xl bg-card">
+          <div className="flex flex-col items-center justify-center py-20 border border-dashed rounded-lg bg-card">
             <LifeBuoy className="h-12 w-12 text-muted-foreground mb-3" />
             <p className="font-semibold text-lg">No support tickets found</p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -617,7 +617,7 @@ export default function AdminTicketsPage() {
                 <AccordionItem
                   key={ticket.id}
                   value={ticket.id}
-                  className="bg-card border border-primary/5 rounded-2xl overflow-hidden px-0"
+                  className="bg-card border border-primary/5 rounded-lg overflow-hidden px-0"
                 >
                   <AccordionTrigger className="hover:no-underline px-6 py-5 flex items-center justify-between text-left group">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-5 w-full mr-4">
@@ -757,7 +757,7 @@ export default function AdminTicketsPage() {
                                           </span>
                                         </div>
                                         <div
-                                          className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm whitespace-pre-line ${
+                                          className={`rounded-lg px-4 py-2.5 text-sm shadow-sm whitespace-pre-line ${
                                             isAdmin
                                               ? 'bg-primary text-white rounded-tr-none'
                                               : 'bg-muted text-foreground rounded-tl-none'
