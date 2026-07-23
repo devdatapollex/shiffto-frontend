@@ -8,7 +8,6 @@ import {
   ChevronLeft,
   LogOut,
   X,
-  Shield,
   ArrowLeftRight,
   Scale,
   Banknote,
@@ -19,6 +18,7 @@ import {
   Package,
   LifeBuoy,
   Bell,
+  Percent,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
@@ -84,6 +84,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'Withdrawals',
       href: ROUTES.WITHDRAWALS,
       icon: Banknote,
+    },
+    {
+      label: 'Commission Settings',
+      href: ROUTES.ADMIN_COMMISSION,
+      icon: Percent,
     },
     {
       label: 'Users',
