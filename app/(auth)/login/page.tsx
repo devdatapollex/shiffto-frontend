@@ -80,7 +80,7 @@ export default function LoginPage() {
 
   return (
     <Card className="border-none shadow-none">
-      <CardHeader>
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>Sign in to your SHIFFTO account</CardDescription>
       </CardHeader>

@@ -72,7 +72,7 @@ export default function AdminLoginPage() {
 
   return (
     <Card className="border-none shadow-none">
-      <CardHeader className="space-y-3 pb-6">
+      <CardHeader className="space-y-3 pb-6 text-center flex flex-col items-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-100">
           <Shield className="h-6 w-6" />
         </div>

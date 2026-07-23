@@ -6,12 +6,8 @@ import { Package, Shield, Wallet } from 'lucide-react';
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-primary p-12 text-primary-foreground">
-        <Link href={ROUTES.HOME} className="text-2xl font-bold">
-          SHIFFTO
-        </Link>
-
-        <div className="space-y-8">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-primary to-accent-foreground p-12 text-primary-foreground">
+        <div className="space-y-8 my-auto">
           <h1 className="text-4xl font-bold leading-tight">
             One account.
             <br />
@@ -50,8 +46,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
-          <Link href={ROUTES.HOME} className="mb-8 block text-2xl font-bold text-primary lg:hidden">
-            SHIFFTO
+          <Link href={ROUTES.HOME} className="mb-8 flex items-center justify-center gap-3">
+            <img src="/shiffto-icon.svg" alt="SHIFFTO Icon" className="h-12 w-auto shrink-0" />
+            <img src="/shiffto-name.svg" alt="SHIFFTO Name" className="h-4 w-auto shrink-0" />
           </Link>
           {children}
         </div>
