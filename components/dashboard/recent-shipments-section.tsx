@@ -91,12 +91,12 @@ export function RecentShipmentsSection({ shipments, isLoading }: RecentShipments
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-[320px] sm:w-[360px] shrink-0 h-64 rounded-2xl bg-slate-50 border border-slate-100 animate-pulse"
+              className="w-[320px] sm:w-[360px] shrink-0 h-64 rounded-lg bg-slate-50 border border-slate-100 animate-pulse"
             />
           ))}
         </div>
       ) : !shipments || shipments.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-xs">
+        <div className="bg-white rounded-lg border border-slate-100 p-8 text-center text-slate-400 text-xs">
           <Package className="h-8 w-8 mx-auto mb-2 opacity-30 text-primary" />
           No recent shipments available.
         </div>
@@ -129,7 +129,7 @@ export function RecentShipmentsSection({ shipments, isLoading }: RecentShipments
               return (
                 <div
                   key={s.id}
-                  className="w-[320px] sm:w-[360px] shrink-0 bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                  className="w-[320px] sm:w-[360px] shrink-0 bg-white border border-slate-200/70 rounded-lg p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                 >
                   {/* Header: Shipment ID + Status Badge */}
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">

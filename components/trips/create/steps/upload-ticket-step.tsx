@@ -100,7 +100,7 @@ export function UploadTicketStep() {
                       role="button"
                       tabIndex={0}
                       className={cn(
-                        'flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-200 p-8 text-center transition-colors cursor-pointer hover:border-orange-500 hover:bg-orange-50/10'
+                        'flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-slate-200 p-8 text-center transition-colors cursor-pointer hover:border-orange-500 hover:bg-orange-50/10'
                       )}
                       onDrop={handleDrop}
                       onDragOver={handleDragOver}
@@ -122,7 +122,7 @@ export function UploadTicketStep() {
 
                   {/* Uploading loader state */}
                   {uploading && (
-                    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-200 p-8 text-center bg-slate-50">
+                    <div className="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-slate-200 p-8 text-center bg-slate-50">
                       <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
                       <div className="text-sm text-slate-600 font-medium">Uploading ticket...</div>
                     </div>
@@ -130,7 +130,7 @@ export function UploadTicketStep() {
 
                   {/* Uploaded state preview */}
                   {isUploaded && !uploading && (
-                    <div className="relative rounded-xl border border-slate-200 p-4 bg-slate-50 flex items-center justify-between gap-4">
+                    <div className="relative rounded-lg border border-slate-200 p-4 bg-slate-50 flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3 min-w-0">
                         {isPdf ? (
                           <div className="rounded-lg bg-red-50 p-2.5 text-red-500 shrink-0">

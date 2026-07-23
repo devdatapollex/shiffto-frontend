@@ -79,7 +79,7 @@ export function OffersReceivedSection({
   const isHorizontal = layoutMode === 'horizontal-scroll';
 
   return (
-    <div className="space-y-4 bg-background p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs">
+    <div className="space-y-4 bg-background p-4 sm:p-6 rounded-lg border border-slate-200/80 shadow-xs">
       {/* Header */}
       <div className="flex items-center gap-2.5">
         <h2 className={titleClassName}>Offers received</h2>
@@ -128,7 +128,7 @@ export function OffersReceivedSection({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center justify-center py-10 px-4 rounded-2xl border border-slate-100 bg-white shadow-xs text-center"
+            className="flex flex-col items-center justify-center py-10 px-4 rounded-lg border border-slate-100 bg-white shadow-xs text-center"
           >
             <Package className="h-10 w-10 text-slate-300 mb-3" />
             <p className="text-slate-500 font-medium">All caught up!</p>
@@ -165,8 +165,8 @@ export function OffersReceivedSection({
                     exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                     className={
                       isHorizontal
-                        ? 'w-[330px] sm:w-[360px] shrink-0 relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200'
-                        : 'relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md duration-200'
+                        ? 'w-[330px] sm:w-[360px] shrink-0 relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200'
+                        : 'relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md duration-200'
                     }
                   >
                     <div>
@@ -290,7 +290,7 @@ export function OffersReceivedSection({
                             size="sm"
                             disabled={cancelCheckoutMutation.isPending || acceptOfferMutation.isPending}
                             onClick={() => handleCancelCheckout(offer.id, travelerName)}
-                            className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
+                            className="flex-1 font-semibold text-foreground!"
                           >
                             {cancelCheckoutMutation.isPending ? 'Canceling...' : 'Cancel Checkout'}
                           </Button>
@@ -310,7 +310,7 @@ export function OffersReceivedSection({
                             size="sm"
                             disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
                             onClick={() => handleRejectOffer(offer.id, travelerName)}
-                            className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
+                            className="flex-1 font-semibold text-foreground!"
                           >
                             {rejectOfferMutation.isPending ? 'Declining...' : 'Reject'}
                           </Button>

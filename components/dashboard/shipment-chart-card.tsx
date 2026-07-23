@@ -103,7 +103,7 @@ export function ShipmentChartCard({
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-6 flex flex-col justify-between">
+    <div className="w-full bg-white rounded-lg border border-slate-200/80 shadow-xs p-6 space-y-6 flex flex-col justify-between">
       {/* Top Header & Legend */}
       <div className="space-y-4">
         {/* Row 1: Title & Year Selector Dropdown */}
@@ -115,14 +115,14 @@ export function ShipmentChartCard({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer outline-hidden shadow-2xs"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer outline-hidden shadow-2xs"
               >
                 <Calendar className="h-3.5 w-3.5 text-slate-400" />
                 <span>{year}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 rounded-xl bg-white border border-slate-200 p-1.5 shadow-md z-50">
+            <DropdownMenuContent align="end" className="w-32 rounded-lg bg-white border border-slate-200 p-1.5 shadow-md z-50">
               {yearsList.map((yr) => (
                 <DropdownMenuItem
                   key={yr}

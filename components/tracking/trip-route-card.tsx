@@ -73,7 +73,7 @@ export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, cl
   const shortTripId = `#TR-${trip.id.slice(-4).toUpperCase()}`;
 
   return (
-    <div className={cn('bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm space-y-6', className)}>
+    <div className={cn('bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
@@ -89,7 +89,7 @@ export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, cl
             variant="outline"
             size="sm"
             onClick={onViewTicket}
-            className="h-8 text-xs font-semibold border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg gap-1.5"
+            className="h-8 text-xs font-semibold gap-1.5"
           >
             <Eye className="h-3.5 w-3.5" />
             View ticket

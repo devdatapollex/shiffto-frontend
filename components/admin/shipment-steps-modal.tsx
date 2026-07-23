@@ -84,11 +84,11 @@ export function ShipmentStepsModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 bg-white space-y-6">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg p-6 bg-white space-y-6">
           <DialogHeader className="border-b border-slate-100 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-[#0D307A]/10 border border-[#0D307A]/20 flex items-center justify-center text-[#0D307A]">
+                <div className="h-10 w-10 rounded-lg bg-[#0D307A]/10 border border-[#0D307A]/20 flex items-center justify-center text-[#0D307A]">
                   <Package className="h-5 w-5" />
                 </div>
                 <div>
@@ -154,7 +154,7 @@ export function ShipmentStepsModal({
               </div>
 
               {/* Step Timeline */}
-              <div className="border border-slate-100 rounded-2xl p-4 bg-white shadow-xs">
+              <div className="border border-slate-100 rounded-lg p-4 bg-white shadow-xs">
                 <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                   Timeline Progress
                 </h4>
@@ -275,7 +275,7 @@ export function ShipmentStepsModal({
 
       {/* Full-size Photo Preview Modal */}
       <Dialog open={selectedPhoto !== null} onOpenChange={(o) => !o && setSelectedPhoto(null)}>
-        <DialogContent className="max-w-lg rounded-2xl p-6 bg-white">
+        <DialogContent className="max-w-lg rounded-lg p-6 bg-white">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
               <ImageIcon className="h-5 w-5 text-emerald-600" />

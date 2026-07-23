@@ -76,14 +76,14 @@ export function HomeQuickActions() {
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-5 sm:p-7 space-y-6">
+    <div className="w-full bg-white rounded-lg border border-slate-200/80 shadow-xs p-5 sm:p-7 space-y-6">
       {/* Navigation Tabs */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => setActiveTab('shipment')}
           className={cn(
-            'flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer',
+            'flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer',
             activeTab === 'shipment'
               ? 'bg-[#eef4ff] text-[#0B3A8E]'
               : 'text-slate-600 hover:text-[#0B3A8E] hover:bg-slate-50'
@@ -97,7 +97,7 @@ export function HomeQuickActions() {
           type="button"
           onClick={() => setActiveTab('trip')}
           className={cn(
-            'flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer',
+            'flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer',
             activeTab === 'trip'
               ? 'bg-[#eef4ff] text-[#0B3A8E]'
               : 'text-slate-600 hover:text-[#0B3A8E] hover:bg-slate-50'

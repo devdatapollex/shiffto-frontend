@@ -35,7 +35,7 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
   return (
     <div className="space-y-6">
       {/* Product Details Card */}
-      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[#8292a1] text-lg font-medium">Product details</h3>
           <button
@@ -48,7 +48,7 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
         </div>
 
         <div className="flex gap-6 items-start">
-          <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
+          <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
             {values.itemPhotos.length > 0 ? (
               <Image
                 src={toRelativeImageUrl(values.itemPhotos[0])}
@@ -92,7 +92,7 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
       </div>
 
       {/* Route & Pricing Card */}
-      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[#8292a1] text-lg font-medium">Route &amp; pricing</h3>
           <button
@@ -148,7 +148,7 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
         </div>
 
         {/* Pricing Bar */}
-        <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between mt-6">
+        <div className="bg-white border border-[#e2e8f0] rounded-lg py-3 px-5 flex items-center justify-between mt-6">
           <span className="text-[#8292a1] text-sm font-medium">
             ${Number(values.pricePerKg || 0).toFixed(2)}/kg
           </span>
