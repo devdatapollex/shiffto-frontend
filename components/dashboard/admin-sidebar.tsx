@@ -125,7 +125,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out lg:static lg:translate-x-0',
           'border-border-layout',
-          isCollapsed ? 'w-[80px]' : 'w-[280px]',
+          isCollapsed ? 'w-[80px]' : 'w-[248px]',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >

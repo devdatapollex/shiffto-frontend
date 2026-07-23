@@ -265,7 +265,7 @@ export function CreateShipmentWizard() {
   }
 
   return (
-    <div className="mx-auto max-w-[850px]">
+    <div className="mx-auto max-w-[700px]">
       <FormProvider {...form}>
         <form onSubmit={handleSubmit}>
           <WizardCard

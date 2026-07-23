@@ -148,7 +148,7 @@ export function CreateTripWizard() {
   }
 
   return (
-    <div className="mx-auto max-w-[850px]">
+    <div className="mx-auto max-w-[700px]">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <WizardCard
