@@ -2,6 +2,9 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { ROUTES } from '@/config/routes';
 import { Package, Shield, Wallet } from 'lucide-react';
+import Image from 'next/image';
+import logo from '@/public/shiffto-icon.png';
+import name from '@/public/shiffto-name.png';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -46,10 +49,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
-          <Link href={ROUTES.HOME} className="mb-8 flex items-center justify-center gap-3">
-            <img src="/shiffto-icon.svg" alt="SHIFFTO Icon" className="h-12 w-auto shrink-0" />
-            <img src="/shiffto-name.svg" alt="SHIFFTO Name" className="h-4 w-auto shrink-0" />
-          </Link>
+          <div className="mb-8 flex items-center justify-center gap-3">
+            <Image src={logo} alt="SHIFFTO Icon" width={48} height={48} className="" />
+            <Image src={name} alt="SHIFFTO Name" width={100} height={20} className="" />
+          </div>
           {children}
         </div>
       </div>
