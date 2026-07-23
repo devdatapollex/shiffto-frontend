@@ -442,7 +442,7 @@ export default function TrackingPage() {
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+              className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
             >
               <Crosshair className="h-4 w-4" />
             </Button>
@@ -453,7 +453,7 @@ export default function TrackingPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+                  className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>

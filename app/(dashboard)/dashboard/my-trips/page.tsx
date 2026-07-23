@@ -513,14 +513,14 @@ export default function MyTripsPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="border-[#e2e8f0] h-10 w-10 rounded-xl text-slate-600"
+                className="border-[#e2e8f0] h-10 w-10 rounded-lg text-foreground! hover:text-foreground! bg-white"
               >
                 <SlidersHorizontal className="h-4.5 w-4.5" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="border-[#e2e8f0] h-10 w-10 rounded-xl text-slate-600"
+                className="border-[#e2e8f0] h-10 w-10 rounded-lg text-foreground! hover:text-foreground! bg-white"
               >
                 <ArrowUpDown className="h-4.5 w-4.5" />
               </Button>
@@ -608,7 +608,7 @@ export default function MyTripsPage() {
                           <div className="flex items-center justify-end gap-2">
                             <Button
                               variant="outline"
-                              className="border-[#e2e8f0] hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs md:text-sm h-9 px-4"
+                              className="border-[#e2e8f0] hover:bg-slate-50 text-foreground! font-semibold rounded-lg text-xs md:text-sm h-9 px-4"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 router.push(`/dashboard/tracking/trip/${trip.id}`);
@@ -717,7 +717,7 @@ export default function MyTripsPage() {
                   size="sm"
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                  className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-foreground! px-3 cursor-pointer text-xs"
                 >
                   Previous
                 </Button>
@@ -756,7 +756,7 @@ export default function MyTripsPage() {
                       className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer ${
                         currentPage === page
                           ? 'bg-[#0B3A8E] hover:bg-[#082a66] text-white border-transparent'
-                          : 'border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600'
+                          : 'border-[#e2e8f0] bg-white hover:bg-slate-50 text-foreground!'
                       }`}
                     >
                       {page}
@@ -769,7 +769,7 @@ export default function MyTripsPage() {
                   size="sm"
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                  className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-foreground! px-3 cursor-pointer text-xs"
                 >
                   Next
                 </Button>

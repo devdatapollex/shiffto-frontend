@@ -572,13 +572,13 @@ export default function PaymentEarningsPage() {
             )}
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsWithdrawModalOpen(false)}>
+              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsWithdrawModalOpen(false)}>
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmittingWithdraw || paymentMethods.length === 0}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                className="bg-primary! hover:bg-primary/90! text-white! font-semibold"
               >
                 {isSubmittingWithdraw ? 'Submitting...' : 'Submit Request'}
               </Button>

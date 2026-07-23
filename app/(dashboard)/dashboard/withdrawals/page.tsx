@@ -246,7 +246,7 @@ export default function AdminWithdrawalsPage() {
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsApproveModalOpen(false)}>
+              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsApproveModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmittingApprove} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
@@ -279,7 +279,7 @@ export default function AdminWithdrawalsPage() {
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsRejectModalOpen(false)}>
+              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsRejectModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmittingReject} className="bg-rose-600 hover:bg-rose-700 text-white font-semibold">

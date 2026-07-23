@@ -197,7 +197,7 @@ export default function WalletPage() {
           <h2 className="text-lg font-bold text-slate-900">My Payment Methods</h2>
           <Button
             onClick={handleOpenAddModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm gap-2"
+            className="bg-primary! hover:bg-primary/90! text-white! font-medium shadow-sm gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Payment Method
@@ -246,7 +246,7 @@ export default function WalletPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleSetPrimary(method.id)}
-                        className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50"
+                        className="text-xs border-slate-300! text-foreground! hover:bg-slate-50!"
                       >
                         Set as Primary
                       </Button>
@@ -255,7 +255,7 @@ export default function WalletPage() {
                       size="sm"
                       variant="outline"
                       onClick={() => handleOpenEditModal(method)}
-                      className="text-xs border-slate-200 text-slate-700 hover:bg-slate-50 gap-1"
+                      className="text-xs border-slate-300! text-foreground! hover:bg-slate-50! gap-1"
                     >
                       <Edit2 className="w-3.5 h-3.5" /> Edit
                     </Button>
@@ -383,10 +383,10 @@ export default function WalletPage() {
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+              <Button type="submit" disabled={isSubmitting} className="bg-primary! hover:bg-primary/90! text-white! font-semibold">
                 {isSubmitting ? 'Saving...' : 'Save Method'}
               </Button>
             </DialogFooter>
