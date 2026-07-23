@@ -274,6 +274,13 @@ export function OffersReceivedSection({
                       </div>
                     </div>
 
+                    {offer.status === 'PAYMENT_CANCELED' && (
+                      <div className="text-rose-600 bg-rose-50/50 border border-rose-100/80 rounded-xl p-2.5 text-xs font-bold text-center mb-4 flex items-center justify-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+                        Previous payment canceled
+                      </div>
+                    )}
+
                     {/* Action buttons */}
                     <div className="flex gap-3">
                       {offer.status === 'PAYMENT_PENDING' ? (
