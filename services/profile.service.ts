@@ -124,8 +124,19 @@ export interface UserAnalyticsData {
     status: string;
     fromCountry: string;
     toCountry: string;
+    weight: number;
+    quantity: number;
+    pricePerKg: number;
     totalCost: number;
+    itemPhotos?: string[];
     createdAt: string;
+    trip?: {
+      flightDate: string;
+      flightTime: string;
+      airportArrivalTime?: string | null;
+      fromCountry: string;
+      toCountry: string;
+    } | null;
   }[];
   recentTrips: {
     id: string;
@@ -134,12 +145,19 @@ export interface UserAnalyticsData {
     fromCountry: string;
     toCountry: string;
     flightDate: string;
+    flightTime?: string | null;
+    airportArrivalTime?: string | null;
+    totalCapacity?: number;
+    remainingCapacity?: number;
+    shipmentsCount?: number;
     createdAt: string;
   }[];
 }
 
 export async function getUserAnalytics(): Promise<UserAnalyticsData> {
-  const { data } = await apiClient.get<{ success: boolean; data: UserAnalyticsData }>('/profile/analytics');
+  const { data } = await apiClient.get<{ success: boolean; data: UserAnalyticsData }>(
+    '/profile/analytics'
+  );
   return data.data;
 }
 
