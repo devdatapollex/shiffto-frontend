@@ -30,6 +30,8 @@ import { HomeStatsOverview } from '@/components/dashboard/home-stats-overview';
 import { OffersReceivedSection } from '@/components/shipments/offers-received-section';
 import { RevenueChartCard } from '@/components/dashboard/revenue-chart-card';
 import { ShipmentChartCard } from '@/components/dashboard/shipment-chart-card';
+import { RecentShipmentsSection } from '@/components/dashboard/recent-shipments-section';
+import { RecentTripsSection } from '@/components/dashboard/recent-trips-section';
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -73,116 +75,12 @@ export default function DashboardPage() {
         {/* Right Half: Shipment Deliveries Bar Chart Card */}
         <ShipmentChartCard />
       </div>
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/10 p-6 sm:p-8 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-primary text-primary-foreground font-bold text-2xl flex items-center justify-center shadow-md overflow-hidden shrink-0">
-              {user?.image ? (
-                <img src={user.image} alt={userName} className="h-full w-full object-cover" />
-              ) : (
-                userName.charAt(0).toUpperCase()
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                  Welcome back, {userName}!
-                </h1>
-                {user?.kycStatus === 'APPROVED' && (
-                  <Badge className="bg-emerald-500 text-white border-emerald-500 text-[10px] font-bold py-0.5 px-2">
-                    Verified
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
-                <span>Manage shipments, trips, and finances in one place.</span>
-                {user && (
-                  <span className="flex items-center gap-1 text-xs font-semibold text-foreground bg-background/80 px-2 py-0.5 rounded-lg border border-primary/10">
-                    <Award className="h-3.5 w-3.5 text-amber-500" />
-                    Trust Score: {user.trustScore}
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              className="border-primary/10 hover:bg-primary/5 text-xs h-9 gap-1.5"
-            >
-              <RefreshCw
-                className={`h-3.5 w-3.5 text-primary ${isRefetching ? 'animate-spin' : ''}`}
-              />
-              Sync Stats
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-white text-xs h-9 gap-1.5 shadow-sm"
-            >
-              <Link href={ROUTES.CREATE_SHIPMENT}>
-                <PlusCircle className="h-3.5 w-3.5" />
-                New Shipment
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* Recent Shipments Section */}
+      <RecentShipmentsSection shipments={recentShipments} isLoading={isLoading} />
 
-      {/* Quick Actions Bar */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Link href={ROUTES.CREATE_SHIPMENT}>
-          <Card className="hover:border-primary/50 hover:shadow-md transition-all duration-200 cursor-pointer h-full border-primary/10">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Package className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm">Create Shipment</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Send a package safely with a verified traveler
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href={ROUTES.CREATE_TRIP}>
-          <Card className="hover:border-primary/50 hover:shadow-md transition-all duration-200 cursor-pointer h-full border-primary/10">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                <Plane className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm">Add Trip</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Traveling? Earn income carrying packages
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href={ROUTES.BROWSE_SHIPMENT}>
-          <Card className="hover:border-primary/50 hover:shadow-md transition-all duration-200 cursor-pointer h-full border-primary/10">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="h-12 w-12 rounded-2xl bg-sky-500/10 text-sky-600 flex items-center justify-center shrink-0">
-                <Search className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm">Browse Shipments</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Find available shipments along your travel route
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
+      {/* Recent Trips Section */}
+      <RecentTripsSection trips={recentTrips} isLoading={isLoading} />
 
       {/* Overview Analytics Cards */}
       <div>
@@ -345,109 +243,6 @@ export default function DashboardPage() {
             <div className="text-4xl font-black text-amber-600">
               ${isLoading ? '0.00' : (stats?.pendingEarnings || 0).toFixed(2)}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity Lists (2 columns) */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent Shipments */}
-        <Card className="border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-primary/5">
-            <div>
-              <CardTitle className="text-base font-bold flex items-center gap-2">
-                <Package className="h-4 w-4 text-primary" />
-                Your Recent Shipments
-              </CardTitle>
-            </div>
-            <Button
-              asChild
-              variant="ghost"
-              size="xs"
-              className="text-xs text-primary hover:bg-primary/5"
-            >
-              <Link href={ROUTES.MY_SHIPMENTS}>View All</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="p-4 space-y-3">
-            {recentShipments.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-xs">
-                <Package className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                No shipments created yet.
-              </div>
-            ) : (
-              recentShipments.map((s) => (
-                <div
-                  key={s.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-primary/5 bg-muted/20 text-xs hover:border-primary/20 transition-all"
-                >
-                  <div>
-                    <span className="font-bold text-foreground block">{s.itemName}</span>
-                    <span className="text-[11px] text-muted-foreground mt-0.5 block">
-                      {s.fromCountry} → {s.toCountry}
-                    </span>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <Badge className="bg-primary text-white border-primary font-bold text-[9px]">
-                      {s.status}
-                    </Badge>
-                    <span className="text-[11px] font-semibold text-foreground block">
-                      ${s.totalCost.toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Trips */}
-        <Card className="border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-primary/5">
-            <div>
-              <CardTitle className="text-base font-bold flex items-center gap-2">
-                <Plane className="h-4 w-4 text-emerald-600" />
-                Your Recent Trips
-              </CardTitle>
-            </div>
-            <Button
-              asChild
-              variant="ghost"
-              size="xs"
-              className="text-xs text-primary hover:bg-primary/5"
-            >
-              <Link href={ROUTES.MY_TRIPS}>View All</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="p-4 space-y-3">
-            {recentTrips.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-xs">
-                <Plane className="h-8 w-8 mx-auto mb-2 opacity-30 text-emerald-600" />
-                No trips added yet.
-              </div>
-            ) : (
-              recentTrips.map((t) => (
-                <div
-                  key={t.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-primary/5 bg-muted/20 text-xs hover:border-primary/20 transition-all"
-                >
-                  <div>
-                    <span className="font-bold text-foreground block">Flight {t.flightNumber}</span>
-                    <span className="text-[11px] text-muted-foreground mt-0.5 block">
-                      {t.fromCountry} → {t.toCountry}
-                    </span>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <Badge className="bg-emerald-600 text-white border-emerald-600 font-bold text-[9px]">
-                      {t.status}
-                    </Badge>
-                    <span className="text-[11px] text-muted-foreground block">
-                      {new Date(t.flightDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
           </CardContent>
         </Card>
       </div>

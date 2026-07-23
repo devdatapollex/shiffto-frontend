@@ -66,7 +66,7 @@ export default function RegisterPage() {
 
   return (
     <Card className="border-none shadow-none">
-      <CardHeader>
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl">Create your account</CardTitle>
         <CardDescription>One signup. Send and travel with a single account.</CardDescription>
       </CardHeader>

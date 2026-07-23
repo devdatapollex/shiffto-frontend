@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <Card className="border-none shadow-none">
-      <CardHeader>
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl">Reset your password</CardTitle>
         <CardDescription>Enter your email and choose a new password</CardDescription>
       </CardHeader>
