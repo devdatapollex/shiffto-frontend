@@ -92,7 +92,7 @@ export function DatePicker({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center justify-between h-11! px-3.5 bg-white border border-slate-200 text-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0B3A8E] focus:border-[#0B3A8E] hover:border-slate-300 transition-colors w-full text-left cursor-pointer shadow-xs text-sm',
+          'flex items-center justify-between h-11 px-3.5 bg-white border border-slate-200 text-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0B3A8E] focus:border-[#0B3A8E] hover:border-slate-300 transition-colors w-full text-left cursor-pointer shadow-xs text-sm',
           className
         )}
       >
@@ -103,7 +103,7 @@ export function DatePicker({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-2 p-4 bg-white border border-[#e2e8f0] rounded-2xl shadow-xl w-[290px] animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="absolute top-full left-0 z-50 mt-2 p-4 bg-white border border-[#e2e8f0] rounded-lg shadow-xl w-[290px] animate-in fade-in slide-in-from-top-1 duration-200">
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"
@@ -257,7 +257,7 @@ export function TimePicker({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-3 h-11 px-4 bg-white border border-[#e2e8f0] text-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0B3A8E] focus:border-[#0B3A8E] hover:border-slate-300 transition-colors w-full text-left cursor-pointer shadow-xs',
+          'flex items-center gap-3 h-11 px-4 bg-white border border-[#e2e8f0] text-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0B3A8E] focus:border-[#0B3A8E] hover:border-slate-300 transition-colors w-full text-left cursor-pointer shadow-xs',
           className
         )}
       >
@@ -268,7 +268,7 @@ export function TimePicker({
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full left-0 z-50 mb-2 p-4 bg-white border border-[#e2e8f0] rounded-2xl shadow-xl w-[260px] animate-in fade-in slide-in-from-bottom-1 duration-200">
+        <div className="absolute bottom-full left-0 z-50 mb-2 p-4 bg-white border border-[#e2e8f0] rounded-lg shadow-xl w-[260px] animate-in fade-in slide-in-from-bottom-1 duration-200">
           <div className="grid grid-cols-3 gap-2">
             {/* Hours Column */}
             <div className="space-y-1">
