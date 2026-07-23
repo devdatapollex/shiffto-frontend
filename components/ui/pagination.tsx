@@ -46,6 +46,7 @@ function PaginationLink({ className, isActive, size = 'icon', ...props }: Pagina
           variant: isActive ? 'outline' : 'ghost',
           size,
         }),
+        'text-foreground! cursor-pointer',
         className
       )}
       {...props}
