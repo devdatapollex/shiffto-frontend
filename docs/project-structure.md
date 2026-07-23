@@ -42,8 +42,10 @@ app/
 │
 └── (dashboard)/            Route group — app shell (sidebar + header)
     ├── layout.tsx          Client layout: <Sidebar> + <DashboardHeader> + main (max-w-7xl).
-    └── dashboard/
-        └── page.tsx        Dashboard home. Static data (hardcoded zeros). Session greeting.
+    ├── dashboard/
+    │   └── page.tsx        Dashboard home. Static data (hardcoded zeros). Session greeting.
+    └── admin/
+        └── commission/page.tsx   Admin Commission Settings page.
 ```
 
 **Note:** No Route Handlers (`route.ts`) exist. All API calls are proxied through `next.config.ts` rewrites to `BACKEND_URL`. Only `/`, `/login`, `/register`, `/dashboard` have page components. Other routes declared in `config/routes.ts` are not yet implemented.
@@ -136,6 +138,14 @@ components/
 | `api-client.ts`       | Preconfigured axios instance. `baseURL: env.NEXT_PUBLIC_API_URL` (default `/api/v1`), `withCredentials: true`, 15s timeout. Request interceptor logs via logger. Response interceptor: 401 → redirect `/login`, 403 → warning log. Rejects normalized `{ message, status, data, originalError }`. **Not yet imported anywhere in the codebase.** |
 | `logger.ts`           | Leveled logger (`log`/`info`/`warn`/`error`/`debug`/`table`). Non-error logs disabled outside development. Timestamps + colors. **Redacts sensitive keys** (`password`, `token`, `secret`, `auth`, `key`).                                                                                                                                       |
 | `validations/auth.ts` | Zod schemas: `loginSchema` (email + password), `registerSchema` (name + email + password + terms boolean). Co-located inferred types: `LoginValues`, `RegisterValues`.                                                                                                                                                                           |
+
+---
+
+## `services/` — API Service Layer
+
+| File                       | Purpose                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `admin-setting.service.ts` | Service wrapper for `/admin/settings` and `/admin/settings/commission-rate` API calls. |
 
 ---
 

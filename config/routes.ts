@@ -36,6 +36,7 @@ export const ROUTES = {
   ADMIN_PROFILE: '/dashboard/admin/profile',
   ADMIN_TRIPS: '/dashboard/admin/trips',
   ADMIN_TICKETS: '/dashboard/admin/tickets',
+  ADMIN_COMMISSION: '/dashboard/admin/commission',
 } as const;
 
 export const PUBLIC_ROUTES = [

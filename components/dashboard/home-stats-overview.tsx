@@ -25,7 +25,6 @@ interface HomeStatsOverviewProps {
 
 export function HomeStatsOverview({ stats, isLoading }: HomeStatsOverviewProps) {
   const formatValue = (val?: number) => {
-    if (isLoading) return '00';
     const num = val ?? 0;
     return num < 10 && num >= 0 ? `0${num}` : `${num}`;
   };
@@ -94,9 +93,13 @@ export function HomeStatsOverview({ stats, isLoading }: HomeStatsOverviewProps) 
 
             {/* Value & Label */}
             <div className="space-y-0.5">
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
-                {item.value}
-              </div>
+              {isLoading ? (
+                <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+              ) : (
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
+                  {item.value}
+                </div>
+              )}
               <div className="text-xs sm:text-sm font-medium text-slate-400 truncate">
                 {item.label}
               </div>
