@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 flex flex-col min-w-0">
           <DashboardHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
-          <div className="flex-1 overflow-hidden p-6 relative">
+          <div className="flex-1 overflow-hidden relative">
             <div
               className="absolute top-0 left-0 right-0 h-[200px] pointer-events-none z-0"
               style={{
@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               }}
               aria-hidden="true"
             />
-            <div className="relative z-10 h-full overflow-y-auto">
+            <div className="relative z-10 h-full overflow-y-auto p-4 sm:p-6">
               <div className="mx-auto max-w-[1144px] animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {children}
               </div>
