@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, Plane, Scale, Boxes, Tag, Calendar, Package } from 'lucide-react';
+import { Clock, Plane, Scale, Boxes, Tag, Calendar, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useReceivedOffers, useAcceptOffer, useRejectOffer, useCancelCheckout } from '@/hooks/use-offers';
 import { Button } from '@/components/ui/button';
@@ -275,9 +275,9 @@ export function OffersReceivedSection({
                     </div>
 
                     {offer.status === 'PAYMENT_CANCELED' && (
-                      <div className="text-rose-600 bg-rose-50/50 border border-rose-100/80 rounded-xl p-2.5 text-xs font-bold text-center mb-4 flex items-center justify-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-                        Previous payment canceled
+                      <div className="text-[11px] text-red-500 font-semibold flex items-center justify-center gap-1 mb-3.5 animate-in fade-in duration-200">
+                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                        <span>Previous payment canceled</span>
                       </div>
                     )}
 
