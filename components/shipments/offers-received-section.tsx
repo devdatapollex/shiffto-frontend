@@ -275,7 +275,7 @@ export function OffersReceivedSection({
                     </div>
 
                     {offer.status === 'PAYMENT_CANCELED' && (
-                      <div className="text-[11px] text-red-500 font-semibold flex items-center justify-center gap-1 mb-3.5 animate-in fade-in duration-200">
+                      <div className="text-[11px] text-red-500 font-semibold flex items-center justify-start gap-1 mb-3.5 animate-in fade-in duration-200">
                         <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                         <span>Previous payment canceled</span>
                       </div>
