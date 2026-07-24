@@ -20,7 +20,7 @@ import {
   Filter,
   RefreshCw,
   SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
@@ -63,7 +63,8 @@ const STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-primary text-white border-primary font-bold shadow-xs',
   IN_PROGRESS: 'bg-primary text-white border-primary font-bold shadow-xs',
   RESOLVED: 'bg-primary text-white border-primary font-bold shadow-xs',
-  CLOSED: 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
+  CLOSED:
+    'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -151,7 +152,8 @@ export default function AdminTicketsPage() {
 
   const getSocketUrl = () => {
     if (typeof window !== 'undefined') {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isLocalhost =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isLocalhost) {
         return 'http://localhost:5000';
       }
@@ -371,7 +373,10 @@ export default function AdminTicketsPage() {
       return `Responded in ${diffHrs}h`;
     }
     // Calculate elapsed hours
-    const elapsedHrs = ((Date.now() - new Date(ticket.createdAt).getTime()) / (1000 * 60 * 60)).toFixed(1);
+    const elapsedHrs = (
+      (Date.now() - new Date(ticket.createdAt).getTime()) /
+      (1000 * 60 * 60)
+    ).toFixed(1);
     return `Pending response (${elapsedHrs}h elapsed)`;
   };
 
@@ -385,7 +390,10 @@ export default function AdminTicketsPage() {
     if (ticket.status === 'CLOSED' || ticket.status === 'RESOLVED') {
       return 'Resolved';
     }
-    const elapsedDays = ((Date.now() - new Date(ticket.createdAt).getTime()) / (1000 * 60 * 60 * 24)).toFixed(1);
+    const elapsedDays = (
+      (Date.now() - new Date(ticket.createdAt).getTime()) /
+      (1000 * 60 * 60 * 24)
+    ).toFixed(1);
     return `Active (${elapsedDays} days open)`;
   };
 
@@ -573,7 +581,7 @@ export default function AdminTicketsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-xl border border-primary/5 self-start w-fit">
+      <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-lg border border-primary/5 self-start w-fit">
         {['ALL', 'OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'].map((status) => (
           <button
             key={status}
@@ -653,10 +661,14 @@ export default function AdminTicketsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0 self-start sm:self-center mt-2 sm:mt-0">
-                        <Badge className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${STATUS_COLORS[ticket.status]}`}>
+                        <Badge
+                          className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${STATUS_COLORS[ticket.status]}`}
+                        >
                           {ticket.status.replace('_', ' ')}
                         </Badge>
-                        <Badge className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${PRIORITY_COLORS[ticket.priority]}`}>
+                        <Badge
+                          className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${PRIORITY_COLORS[ticket.priority]}`}
+                        >
                           {ticket.priority}
                         </Badge>
                       </div>
@@ -676,7 +688,7 @@ export default function AdminTicketsPage() {
                         {/* Discussion thread column */}
                         <div className="lg:col-span-2 space-y-6">
                           {/* Description box */}
-                          <div className="bg-white p-5 rounded-xl border border-primary/5 space-y-3 shadow-sm">
+                          <div className="bg-white p-5 rounded-lg border border-primary/5 space-y-3 shadow-sm">
                             <div>
                               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                                 User Query Description
@@ -686,27 +698,28 @@ export default function AdminTicketsPage() {
                               </p>
                             </div>
 
-                            {expandedTicket.attachments && expandedTicket.attachments.length > 0 && (
-                              <div className="pt-2 border-t border-dashed mt-3">
-                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                                  User Attachments
-                                </span>
-                                <div className="flex flex-wrap gap-2">
-                                  {expandedTicket.attachments.map((url, idx) => (
-                                    <a
-                                      key={idx}
-                                      href={url}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="flex items-center gap-2 p-2 border rounded-lg bg-card hover:bg-primary/5 transition-all text-xs font-medium max-w-[200px] truncate"
-                                    >
-                                      <FileText className="h-4 w-4 shrink-0 text-primary" />
-                                      <span className="truncate">Attachment {idx + 1}</span>
-                                    </a>
-                                  ))}
+                            {expandedTicket.attachments &&
+                              expandedTicket.attachments.length > 0 && (
+                                <div className="pt-2 border-t border-dashed mt-3">
+                                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
+                                    User Attachments
+                                  </span>
+                                  <div className="flex flex-wrap gap-2">
+                                    {expandedTicket.attachments.map((url, idx) => (
+                                      <a
+                                        key={idx}
+                                        href={url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex items-center gap-2 p-2 border rounded-lg bg-card hover:bg-primary/5 transition-all text-xs font-medium max-w-[200px] truncate"
+                                      >
+                                        <FileText className="h-4 w-4 shrink-0 text-primary" />
+                                        <span className="truncate">Attachment {idx + 1}</span>
+                                      </a>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
                           </div>
 
                           {/* Chat thread */}
@@ -728,12 +741,16 @@ export default function AdminTicketsPage() {
                                     <div
                                       key={comment.id}
                                       className={`flex gap-3 max-w-[85%] ${
-                                        isAdmin ? 'ml-auto flex-row-reverse text-right' : 'mr-auto text-left'
+                                        isAdmin
+                                          ? 'ml-auto flex-row-reverse text-right'
+                                          : 'mr-auto text-left'
                                       }`}
                                     >
                                       <div
                                         className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                                          isAdmin ? 'bg-primary text-white' : 'bg-slate-200 text-slate-700'
+                                          isAdmin
+                                            ? 'bg-primary text-white'
+                                            : 'bg-slate-200 text-slate-700'
                                         }`}
                                       >
                                         {isAdmin ? 'A' : 'U'}
@@ -743,11 +760,18 @@ export default function AdminTicketsPage() {
                                           <span className="font-semibold text-foreground">
                                             {comment.user.name} {isAdmin && '(Staff)'}
                                           </span>
-                                          {expandedTicket.senderId && expandedTicket.travelerId && comment.visibleTo && (
-                                            <span className="text-[10px] bg-primary/10 text-primary-foreground text-xs px-1.5 py-0.5 rounded-md font-medium border border-primary/5">
-                                              Visible: {comment.visibleTo === 'ALL' ? 'Both' : comment.visibleTo === 'SENDER' ? 'Sender Only' : 'Traveler Only'}
-                                            </span>
-                                          )}
+                                          {expandedTicket.senderId &&
+                                            expandedTicket.travelerId &&
+                                            comment.visibleTo && (
+                                              <span className="text-[10px] bg-primary/10 text-primary-foreground text-xs px-1.5 py-0.5 rounded-md font-medium border border-primary/5">
+                                                Visible:{' '}
+                                                {comment.visibleTo === 'ALL'
+                                                  ? 'Both'
+                                                  : comment.visibleTo === 'SENDER'
+                                                    ? 'Sender Only'
+                                                    : 'Traveler Only'}
+                                              </span>
+                                            )}
                                           <span>•</span>
                                           <span>
                                             {new Date(comment.createdAt).toLocaleTimeString([], {
@@ -792,8 +816,9 @@ export default function AdminTicketsPage() {
 
                           {/* Reply Box with attachment support */}
                           <div className="border-t border-primary/5 pt-4">
-                            {expandedTicket.status === 'CLOSED' || expandedTicket.status === 'RESOLVED' ? (
-                              <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-xs">
+                            {expandedTicket.status === 'CLOSED' ||
+                            expandedTicket.status === 'RESOLVED' ? (
+                              <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-xs">
                                 <AlertCircle className="h-4 w-4 text-slate-500" />
                                 Ticket is {expandedTicket.status.toLowerCase()}. Actions are locked.
                               </div>
@@ -801,7 +826,9 @@ export default function AdminTicketsPage() {
                               <form onSubmit={handlePostReply} className="space-y-3">
                                 {expandedTicket.senderId && expandedTicket.travelerId && (
                                   <div className="flex items-center gap-4 text-xs border border-primary/5 p-2 px-3 rounded-lg bg-primary/[0.01]">
-                                    <span className="font-semibold text-muted-foreground">Send Message to:</span>
+                                    <span className="font-semibold text-muted-foreground">
+                                      Send Message to:
+                                    </span>
                                     <div className="flex gap-4">
                                       <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground">
                                         <input
@@ -918,7 +945,7 @@ export default function AdminTicketsPage() {
                         </div>
 
                         {/* Admin Action Control Column */}
-                        <div className="bg-white p-5 rounded-xl border border-primary/5 space-y-5 shadow-sm self-start">
+                        <div className="bg-white p-5 rounded-lg border border-primary/5 space-y-5 shadow-sm self-start">
                           <h4 className="text-sm font-bold border-b border-primary/5 pb-2 text-foreground">
                             Control Panel
                           </h4>
@@ -926,7 +953,9 @@ export default function AdminTicketsPage() {
                           {/* Ticket Meta Context */}
                           <div className="space-y-3 text-xs border-b border-primary/5 pb-4">
                             <div>
-                              <span className="text-muted-foreground block font-medium">Requester</span>
+                              <span className="text-muted-foreground block font-medium">
+                                Requester
+                              </span>
                               <span className="font-semibold text-foreground block">
                                 {expandedTicket.user?.name}
                               </span>
@@ -937,7 +966,9 @@ export default function AdminTicketsPage() {
 
                             {expandedTicket.shipment && (
                               <div>
-                                <span className="text-muted-foreground block font-medium">Related Shipment</span>
+                                <span className="text-muted-foreground block font-medium">
+                                  Related Shipment
+                                </span>
                                 <span className="font-semibold text-primary block">
                                   {expandedTicket.shipment.itemName}
                                 </span>
@@ -946,9 +977,13 @@ export default function AdminTicketsPage() {
 
                             {expandedTicket.trip && (
                               <div>
-                                <span className="text-muted-foreground block font-medium">Related Trip</span>
+                                <span className="text-muted-foreground block font-medium">
+                                  Related Trip
+                                </span>
                                 <span className="font-semibold text-emerald-600 block">
-                                  {expandedTicket.trip.flightNumber} ({expandedTicket.trip.fromCountry} → {expandedTicket.trip.toCountry})
+                                  {expandedTicket.trip.flightNumber} (
+                                  {expandedTicket.trip.fromCountry} →{' '}
+                                  {expandedTicket.trip.toCountry})
                                 </span>
                               </div>
                             )}
@@ -1098,26 +1133,29 @@ export default function AdminTicketsPage() {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          if (filters.page > 1) dispatch({ type: 'SET_PAGE', page: filters.page - 1 });
+                          if (filters.page > 1)
+                            dispatch({ type: 'SET_PAGE', page: filters.page - 1 });
                         }}
                         aria-disabled={filters.page === 1}
                         className={filters.page === 1 ? 'pointer-events-none opacity-50' : ''}
                       />
                     </PaginationItem>
-                    {Array.from({ length: ticketsData.meta.totalPages }, (_, i) => i + 1).map((p) => (
-                      <PaginationItem key={p}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            dispatch({ type: 'SET_PAGE', page: p });
-                          }}
-                          isActive={filters.page === p}
-                        >
-                          {p}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                    {Array.from({ length: ticketsData.meta.totalPages }, (_, i) => i + 1).map(
+                      (p) => (
+                        <PaginationItem key={p}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              dispatch({ type: 'SET_PAGE', page: p });
+                            }}
+                            isActive={filters.page === p}
+                          >
+                            {p}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
                     <PaginationItem>
                       <PaginationNext
                         href="#"

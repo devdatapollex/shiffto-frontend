@@ -186,7 +186,7 @@ export default function WalletPage() {
       </div>
 
       {/* Security Banner */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-4 flex items-center gap-3 text-sm text-blue-900">
+      <div className="rounded-lg border border-blue-100 bg-blue-50/70 p-4 flex items-center gap-3 text-sm text-blue-900">
         <Lock className="w-4 h-4 text-blue-600 flex-shrink-0" />
         <p className="font-medium">Your payment details are used for withdrawal purposes only</p>
       </div>
@@ -211,17 +211,22 @@ export default function WalletPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {methods.map((method) => (
-              <Card key={method.id} className="border-slate-200 shadow-sm bg-white hover:shadow-md transition-all">
+              <Card
+                key={method.id}
+                className="border-slate-200 shadow-sm bg-white hover:shadow-md transition-all"
+              >
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
                         {getMethodIcon(method.type)}
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 text-base">{method.type}</h3>
                         <p className="text-xs text-slate-500 font-mono">
-                          {method.cryptoAddress ? maskAccountNumber(method.cryptoAddress) : maskAccountNumber(method.accountNumber)}
+                          {method.cryptoAddress
+                            ? maskAccountNumber(method.cryptoAddress)
+                            : maskAccountNumber(method.accountNumber)}
                         </p>
                       </div>
                     </div>
@@ -375,18 +380,32 @@ export default function WalletPage() {
               <Checkbox
                 id="isPrimary"
                 checked={formData.isPrimary}
-                onCheckedChange={(checked) => setFormData({ ...formData, isPrimary: Boolean(checked) })}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isPrimary: Boolean(checked) })
+                }
               />
-              <Label htmlFor="isPrimary" className="text-xs font-medium text-slate-700 cursor-pointer">
+              <Label
+                htmlFor="isPrimary"
+                className="text-xs font-medium text-slate-700 cursor-pointer"
+              >
                 Set as Primary Payment Method
               </Label>
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="text-foreground!"
+                onClick={() => setIsModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-primary! hover:bg-primary/90! text-white! font-semibold">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-primary! hover:bg-primary/90! text-white! font-semibold"
+              >
                 {isSubmitting ? 'Saving...' : 'Save Method'}
               </Button>
             </DialogFooter>

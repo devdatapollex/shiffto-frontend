@@ -81,7 +81,8 @@ export default function ShipmentDetailsPage() {
         <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
         <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-md">
-          We couldn't retrieve details for this shipment. It may have been deleted, or you might not have authorization to view it.
+          We couldn't retrieve details for this shipment. It may have been deleted, or you might not
+          have authorization to view it.
         </p>
         <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
           <Link href="/dashboard/tracking">Back to Tracking</Link>
@@ -93,9 +94,7 @@ export default function ShipmentDetailsPage() {
   const shortShipmentId = `SH-${shipment.id.slice(-6).toUpperCase()}`;
 
   // Check if current user is the traveller for this trip or admin
-  const isTraveller = Boolean(
-    user && shipment.trip?.user?.id === user.id
-  );
+  const isTraveller = Boolean(user && shipment.trip?.user?.id === user.id);
   const canAdvanceStep = (isTraveller || isAdmin) && shipment.status === 'ACTIVE';
 
   return (
@@ -153,7 +152,7 @@ export default function ShipmentDetailsPage() {
             </div>
 
             {/* Shipment Item box */}
-            <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-3 flex items-center justify-between gap-4">
+            <div className="bg-slate-50/70 border border-slate-100/50 rounded-lg p-3 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                   {shipment.itemPhotos?.[0] ? (
@@ -184,9 +183,7 @@ export default function ShipmentDetailsPage() {
 
             {/* Receiver Details Section */}
             <div className="space-y-4 pt-5 border-t border-slate-100">
-              <h3 className="text-base font-bold text-slate-800">
-                Receiver Details
-              </h3>
+              <h3 className="text-base font-bold text-slate-800">Receiver Details</h3>
 
               <div className="space-y-3.5 text-xs md:text-sm">
                 {/* Name Row */}
@@ -198,7 +195,9 @@ export default function ShipmentDetailsPage() {
                 {/* Phone Row */}
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-slate-400 font-medium">Phone</span>
-                  <span className="font-semibold text-slate-700">{shipment.receiverPhone || 'N/A'}</span>
+                  <span className="font-semibold text-slate-700">
+                    {shipment.receiverPhone || 'N/A'}
+                  </span>
                 </div>
 
                 {/* Address Row */}
@@ -261,13 +260,18 @@ export default function ShipmentDetailsPage() {
                 <div className="flex items-center justify-between gap-4">
                   {/* Departure details */}
                   <div className="flex items-center gap-3 max-w-[42%]">
-                    <CountryFlag code={shipment.trip.fromCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                    <CountryFlag
+                      code={shipment.trip.fromCountry}
+                      className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                    />
                     <div className="flex flex-col min-w-0">
                       <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
-                        {getCountryByCode(shipment.trip.fromCountry)?.name ?? shipment.trip.fromCountry}
+                        {getCountryByCode(shipment.trip.fromCountry)?.name ??
+                          shipment.trip.fromCountry}
                       </span>
                       <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
-                        {formatTime(shipment.trip.flightTime)}, {formatDate(shipment.trip.flightDate)}
+                        {formatTime(shipment.trip.flightTime)},{' '}
+                        {formatDate(shipment.trip.flightDate)}
                       </span>
                     </div>
                   </div>
@@ -288,21 +292,29 @@ export default function ShipmentDetailsPage() {
                         {getCountryByCode(shipment.trip.toCountry)?.name ?? shipment.trip.toCountry}
                       </span>
                       <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
-                        {shipment.trip.airportArrivalTime ? formatTime(shipment.trip.airportArrivalTime) : formatTime(shipment.trip.flightTime)}, {formatDate(shipment.trip.flightDate)}
+                        {shipment.trip.airportArrivalTime
+                          ? formatTime(shipment.trip.airportArrivalTime)
+                          : formatTime(shipment.trip.flightTime)}
+                        , {formatDate(shipment.trip.flightDate)}
                       </span>
                     </div>
-                    <CountryFlag code={shipment.trip.toCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                    <CountryFlag
+                      code={shipment.trip.toCountry}
+                      className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Capacities Box */}
-              <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-4 space-y-2.5">
+              <div className="bg-slate-50/70 border border-slate-100/50 rounded-lg p-4 space-y-2.5">
                 {isTraveller ? (
                   <>
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-slate-500 font-medium">Total capacity</span>
-                      <span className="font-semibold text-slate-700">{shipment.trip.totalCapacity ?? 0} KG</span>
+                      <span className="font-semibold text-slate-700">
+                        {shipment.trip.totalCapacity ?? 0} KG
+                      </span>
                     </div>
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-slate-500 font-medium">Remaining capacity</span>
@@ -323,9 +335,7 @@ export default function ShipmentDetailsPage() {
 
               {/* Traveler Details Section */}
               <div className="space-y-4 pt-5 border-t border-slate-100">
-                <h3 className="text-base font-bold text-slate-800">
-                  Traveler Details
-                </h3>
+                <h3 className="text-base font-bold text-slate-800">Traveler Details</h3>
 
                 <div className="space-y-3.5 text-xs md:text-sm">
                   {/* Name Row */}
@@ -363,13 +373,17 @@ export default function ShipmentDetailsPage() {
                   {/* Phone Row */}
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-slate-400 font-medium">Phone</span>
-                    <span className="font-semibold text-slate-700">{shipment.trip.user?.phone || 'N/A'}</span>
+                    <span className="font-semibold text-slate-700">
+                      {shipment.trip.user?.phone || 'N/A'}
+                    </span>
                   </div>
 
                   {/* Email Row */}
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-slate-400 font-medium">Email</span>
-                    <span className="font-semibold text-slate-700">{shipment.trip.user?.email || 'N/A'}</span>
+                    <span className="font-semibold text-slate-700">
+                      {shipment.trip.user?.email || 'N/A'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -381,7 +395,8 @@ export default function ShipmentDetailsPage() {
               </div>
               <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
               <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                This shipment is currently awaiting a traveler. Once matched, the traveler's flight details, bag capacity, and contact info will appear here.
+                This shipment is currently awaiting a traveler. Once matched, the traveler's flight
+                details, bag capacity, and contact info will appear here.
               </p>
             </div>
           )}

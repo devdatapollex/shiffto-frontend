@@ -240,7 +240,9 @@ export default function TrackingPage() {
   const [tripSearch, setTripSearch] = useState('');
   const debouncedTripSearch = useDebouncedValue(tripSearch, 300);
 
-  const [tripSortBy, setTripSortBy] = useState<'flightNumber' | 'flightDate' | 'createdAt'>('flightDate');
+  const [tripSortBy, setTripSortBy] = useState<'flightNumber' | 'flightDate' | 'createdAt'>(
+    'flightDate'
+  );
   const [tripSortOrder, setTripSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const [tripPage, setTripPage] = useState(1);
@@ -255,7 +257,7 @@ export default function TrackingPage() {
 
     if (debouncedTripSearch.trim()) {
       const query = debouncedTripSearch.toLowerCase();
-      const cleanQuery = query.replace(/^(tr|sh)-?/, "");
+      const cleanQuery = query.replace(/^(tr|sh)-?/, '');
       result = result.filter((trip) => {
         const fromName = getCountryByCode(trip.fromCountry)?.name.toLowerCase() || '';
         const toName = getCountryByCode(trip.toCountry)?.name.toLowerCase() || '';
@@ -334,7 +336,7 @@ export default function TrackingPage() {
     if (!trackId.trim()) return;
 
     const formattedId = trackId.trim().toUpperCase();
-    const cleanId = formattedId.replace(/^(SH|TR)-?/, "");
+    const cleanId = formattedId.replace(/^(SH|TR)-?/, '');
 
     // Check if the cleanId matches any of the user's trips
     const hasTripMatch = rawTrips.some((trip) => {
@@ -536,7 +538,7 @@ export default function TrackingPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <div className="overflow-x-auto rounded-lg border border-slate-100">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -672,7 +674,7 @@ export default function TrackingPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -690,8 +692,10 @@ export default function TrackingPage() {
                   const displayStatus = TRIP_STATUS_DISPLAY_MAP[item.status] || item.status;
                   const shortId = `TR-${item.id.slice(-6).toUpperCase()}`;
                   const route = `${getCountryByCode(item.fromCountry)?.name ?? item.fromCountry} - ${getCountryByCode(item.toCountry)?.name ?? item.toCountry}`;
-                  const totalCapacity = (item.cabinBagCapacity || 0) + (item.checkInBagCapacity || 0);
-                  const remainingCapacity = (item.remainingCabinCapacity || 0) + (item.remainingCheckInCapacity || 0);
+                  const totalCapacity =
+                    (item.cabinBagCapacity || 0) + (item.checkInBagCapacity || 0);
+                  const remainingCapacity =
+                    (item.remainingCabinCapacity || 0) + (item.remainingCheckInCapacity || 0);
 
                   return (
                     <tr
@@ -865,13 +869,16 @@ export default function TrackingPage() {
             {/* Rows per page */}
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <span>Rows per page:</span>
-              <Select value={String(tripLimit)} onValueChange={(val) => {
-                const num = Number(val);
-                if (!isNaN(num) && num > 0) {
-                  setTripLimit(num);
-                  setTripPage(1);
-                }
-              }}>
+              <Select
+                value={String(tripLimit)}
+                onValueChange={(val) => {
+                  const num = Number(val);
+                  if (!isNaN(num) && num > 0) {
+                    setTripLimit(num);
+                    setTripPage(1);
+                  }
+                }}
+              >
                 <SelectTrigger className="h-8 w-[70px] text-xs">
                   <SelectValue />
                 </SelectTrigger>

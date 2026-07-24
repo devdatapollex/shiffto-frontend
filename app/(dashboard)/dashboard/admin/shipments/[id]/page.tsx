@@ -166,7 +166,8 @@ export default function AdminShipmentDetailsPage() {
           <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
           <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
           <p className="text-sm text-slate-500 mt-2 max-w-md">
-            We couldn't retrieve details for this shipment. It may have been deleted, or you might not have authorization to view it.
+            We couldn't retrieve details for this shipment. It may have been deleted, or you might
+            not have authorization to view it.
           </p>
           <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
             <Link href="/dashboard/admin/shipments">Back to Shipments</Link>
@@ -177,9 +178,7 @@ export default function AdminShipmentDetailsPage() {
   }
 
   const { user } = useRole();
-  const isTraveller = Boolean(
-    user && shipment.trip?.user?.id === user.id
-  );
+  const isTraveller = Boolean(user && shipment.trip?.user?.id === user.id);
   const shortShipmentId = `SH-${shipment.id.slice(-6).toUpperCase()}`;
   const canAdvanceStep = shipment.status === 'ACTIVE';
 
@@ -203,7 +202,10 @@ export default function AdminShipmentDetailsPage() {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-1.5 text-xs md:text-sm text-slate-500 font-medium">
-              <Link href="/dashboard/admin/shipments" className="hover:text-slate-800 transition-colors">
+              <Link
+                href="/dashboard/admin/shipments"
+                className="hover:text-slate-800 transition-colors"
+              >
                 Admin Shipments
               </Link>
               <span>/</span>
@@ -233,8 +235,8 @@ export default function AdminShipmentDetailsPage() {
                     (shipment as any).paymentTransaction.status === 'RELEASED'
                       ? 'bg-emerald-100 text-emerald-800'
                       : (shipment as any).paymentTransaction.status === 'PENDING_RELEASE'
-                      ? 'bg-amber-100 text-amber-800 animate-pulse'
-                      : 'bg-blue-100 text-blue-800'
+                        ? 'bg-amber-100 text-amber-800 animate-pulse'
+                        : 'bg-blue-100 text-blue-800'
                   }`}
                 >
                   {(shipment as any).paymentTransaction.status}
@@ -242,7 +244,7 @@ export default function AdminShipmentDetailsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
                 <p className="text-2xl font-extrabold text-slate-900">
@@ -333,7 +335,7 @@ export default function AdminShipmentDetailsPage() {
               </div>
 
               {/* Shipment Item box */}
-              <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-3 flex items-center justify-between gap-4">
+              <div className="bg-slate-50/70 border border-slate-100/50 rounded-lg p-3 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                     {shipment.itemPhotos?.[0] ? (
@@ -364,9 +366,7 @@ export default function AdminShipmentDetailsPage() {
 
               {/* Receiver Details Section */}
               <div className="space-y-4 pt-5 border-t border-slate-100">
-                <h3 className="text-base font-bold text-slate-800">
-                  Receiver Details
-                </h3>
+                <h3 className="text-base font-bold text-slate-800">Receiver Details</h3>
 
                 <div className="space-y-3.5 text-xs md:text-sm">
                   {/* Name Row */}
@@ -378,7 +378,9 @@ export default function AdminShipmentDetailsPage() {
                   {/* Phone Row */}
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-slate-400 font-medium">Phone</span>
-                    <span className="font-semibold text-slate-700">{shipment.receiverPhone || 'N/A'}</span>
+                    <span className="font-semibold text-slate-700">
+                      {shipment.receiverPhone || 'N/A'}
+                    </span>
                   </div>
 
                   {/* Address Row */}
@@ -417,7 +419,11 @@ export default function AdminShipmentDetailsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        if (shipment.trip && (shipment.trip as any).ticketPhoto && (shipment.trip as any).ticketPhoto !== 'pending') {
+                        if (
+                          shipment.trip &&
+                          (shipment.trip as any).ticketPhoto &&
+                          (shipment.trip as any).ticketPhoto !== 'pending'
+                        ) {
                           setSelectedPhoto({
                             url: (shipment.trip as any).ticketPhoto,
                             title: 'Flight Ticket Scan',
@@ -446,13 +452,18 @@ export default function AdminShipmentDetailsPage() {
                   <div className="flex items-center justify-between gap-4">
                     {/* Departure details */}
                     <div className="flex items-center gap-3 max-w-[42%]">
-                      <CountryFlag code={shipment.trip.fromCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                      <CountryFlag
+                        code={shipment.trip.fromCountry}
+                        className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                      />
                       <div className="flex flex-col min-w-0">
                         <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
-                          {getCountryByCode(shipment.trip.fromCountry)?.name ?? shipment.trip.fromCountry}
+                          {getCountryByCode(shipment.trip.fromCountry)?.name ??
+                            shipment.trip.fromCountry}
                         </span>
                         <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
-                          {formatTime(shipment.trip.flightTime)}, {formatDate(shipment.trip.flightDate)}
+                          {formatTime(shipment.trip.flightTime)},{' '}
+                          {formatDate(shipment.trip.flightDate)}
                         </span>
                       </div>
                     </div>
@@ -470,24 +481,33 @@ export default function AdminShipmentDetailsPage() {
                     <div className="flex items-center gap-3 max-w-[42%] text-right justify-end">
                       <div className="flex flex-col items-end min-w-0">
                         <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
-                          {getCountryByCode(shipment.trip.toCountry)?.name ?? shipment.trip.toCountry}
+                          {getCountryByCode(shipment.trip.toCountry)?.name ??
+                            shipment.trip.toCountry}
                         </span>
                         <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
-                          {shipment.trip.airportArrivalTime ? formatTime(shipment.trip.airportArrivalTime) : formatTime(shipment.trip.flightTime)}, {formatDate(shipment.trip.flightDate)}
+                          {shipment.trip.airportArrivalTime
+                            ? formatTime(shipment.trip.airportArrivalTime)
+                            : formatTime(shipment.trip.flightTime)}
+                          , {formatDate(shipment.trip.flightDate)}
                         </span>
                       </div>
-                      <CountryFlag code={shipment.trip.toCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                      <CountryFlag
+                        code={shipment.trip.toCountry}
+                        className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Capacities Box */}
-                <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-4 space-y-2.5">
+                <div className="bg-slate-50/70 border border-slate-100/50 rounded-lg p-4 space-y-2.5">
                   {isTraveller ? (
                     <>
                       <div className="flex justify-between items-center text-xs md:text-sm">
                         <span className="text-slate-500 font-medium">Total capacity</span>
-                        <span className="font-semibold text-slate-700">{shipment.trip.totalCapacity ?? 0} KG</span>
+                        <span className="font-semibold text-slate-700">
+                          {shipment.trip.totalCapacity ?? 0} KG
+                        </span>
                       </div>
                       <div className="flex justify-between items-center text-xs md:text-sm">
                         <span className="text-slate-500 font-medium">Remaining capacity</span>
@@ -508,9 +528,7 @@ export default function AdminShipmentDetailsPage() {
 
                 {/* Traveler Details Section */}
                 <div className="space-y-4 pt-5 border-t border-slate-100">
-                  <h3 className="text-base font-bold text-slate-800">
-                    Traveler Details
-                  </h3>
+                  <h3 className="text-base font-bold text-slate-800">Traveler Details</h3>
 
                   <div className="space-y-3.5 text-xs md:text-sm">
                     {/* Name Row */}
@@ -548,13 +566,17 @@ export default function AdminShipmentDetailsPage() {
                     {/* Phone Row */}
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-slate-400 font-medium">Phone</span>
-                      <span className="font-semibold text-slate-700">{shipment.trip.user?.phone || 'N/A'}</span>
+                      <span className="font-semibold text-slate-700">
+                        {shipment.trip.user?.phone || 'N/A'}
+                      </span>
                     </div>
 
                     {/* Email Row */}
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-slate-400 font-medium">Email</span>
-                      <span className="font-semibold text-slate-700">{shipment.trip.user?.email || 'N/A'}</span>
+                      <span className="font-semibold text-slate-700">
+                        {shipment.trip.user?.email || 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -566,7 +588,8 @@ export default function AdminShipmentDetailsPage() {
                 </div>
                 <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
                 <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                  This shipment is currently awaiting a traveler. Once matched, the traveler's flight details, bag capacity, and contact info will appear here.
+                  This shipment is currently awaiting a traveler. Once matched, the traveler's
+                  flight details, bag capacity, and contact info will appear here.
                 </p>
               </div>
             )}
@@ -578,7 +601,7 @@ export default function AdminShipmentDetailsPage() {
           <h2 className="text-sm font-bold text-slate-800 px-4 pb-2 border-b border-slate-100 uppercase tracking-wider mb-4">
             Detailed Step Logs & Traveler Proofs
           </h2>
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
             <Table>
               <TableHeader className="bg-slate-50/60">
                 <TableRow>
@@ -682,7 +705,7 @@ export default function AdminShipmentDetailsPage() {
               </DialogTitle>
             </DialogHeader>
             {selectedPhoto && (
-              <div className="relative w-full h-80 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 mt-2">
+              <div className="relative w-full h-80 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 mt-2">
                 <Image
                   src={toRelativeImageUrl(selectedPhoto.url)}
                   alt="Proof photo full view"

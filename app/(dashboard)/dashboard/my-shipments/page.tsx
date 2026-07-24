@@ -22,7 +22,12 @@ import {
 import { toast } from 'sonner';
 import { getShipments, type Shipment } from '@/services/shipment.service';
 import { useRole } from '@/hooks/use-role';
-import { useReceivedOffers, useAcceptOffer, useRejectOffer, useCancelCheckout } from '@/hooks/use-offers';
+import {
+  useReceivedOffers,
+  useAcceptOffer,
+  useRejectOffer,
+  useCancelCheckout,
+} from '@/hooks/use-offers';
 import { OffersReceivedSection } from '@/components/shipments/offers-received-section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -349,7 +354,7 @@ export default function MyShipmentsPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -432,7 +437,11 @@ export default function MyShipmentsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push(`/dashboard/tracking/shipment/${item.id}`)}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  router.push(`/dashboard/tracking/shipment/${item.id}`)
+                                }
+                              >
                                 View details
                               </DropdownMenuItem>
                               {item.status === 'AWAITING_MATCH' && (

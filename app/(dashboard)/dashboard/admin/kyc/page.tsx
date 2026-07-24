@@ -265,7 +265,7 @@ export default function AdminKycPage() {
                         <SelectTrigger className="h-8 w-16 rounded-lg border-[#e2e8f0] bg-white text-xs">
                           <SelectValue placeholder="10" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
+                        <SelectContent className="rounded-lg border-[#e2e8f0] min-w-[4rem] bg-white">
                           {[5, 10, 20, 50].map((size) => (
                             <SelectItem
                               key={size}

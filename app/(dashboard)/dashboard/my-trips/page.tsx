@@ -387,7 +387,7 @@ export default function MyTripsPage() {
                     key={shipment.id}
                     className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-lg overflow-hidden bg-white shadow-xs"
                   >
-                    <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
+                    <CardContent className="px-5 flex flex-col justify-between h-full space-y-4">
                       {/* Time limit badge / Offered badge */}
                       <div className="flex justify-between items-center">
                         {isOffered ? (
@@ -410,7 +410,7 @@ export default function MyTripsPage() {
 
                       <div className="flex gap-4 items-start">
                         {/* Product image placeholder */}
-                        <div className="h-16 w-16 rounded-xl border border-slate-100 bg-slate-50 shrink-0 overflow-hidden flex items-center justify-center">
+                        <div className="h-16 w-16 rounded-lg border border-slate-100 bg-slate-50 shrink-0 overflow-hidden flex items-center justify-center">
                           {shipment.itemPhotos && shipment.itemPhotos.length > 0 ? (
                             <Image
                               src={toRelativeImageUrl(shipment.itemPhotos[0])}
@@ -443,14 +443,14 @@ export default function MyTripsPage() {
                       <div className="grid grid-cols-2 gap-3 pt-2">
                         <Button
                           variant="outline"
-                          className="h-10 font-semibold text-sm text-foreground!"
+                          className=""
                           onClick={() => handleOpenCounterDialog(shipment)}
                           disabled={isOffered}
                         >
-                          Counter
+                          Counter Offer
                         </Button>
                         <Button
-                          className="bg-[#0B3A8E] hover:bg-[#082a66] text-white rounded-xl h-10 font-semibold text-sm transition-colors"
+                          className="bg-foreground text-white transition-colors hover:bg-foreground/90"
                           onClick={() => handleOpenAcceptDialog(shipment)}
                           disabled={isOffered}
                         >
@@ -486,7 +486,7 @@ export default function MyTripsPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
-              <TabsList className="bg-slate-100/80 p-1 rounded-xl flex flex-wrap h-auto gap-1">
+              <TabsList className="bg-slate-100/80 p-1 rounded-lg flex flex-wrap h-auto gap-1">
                 {['all', 'active', 'pending', 'completed', 'canceled', 'rejected'].map((tab) => (
                   <TabsTrigger
                     key={tab}
@@ -507,7 +507,7 @@ export default function MyTripsPage() {
                   placeholder="Search shipment..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 rounded-xl border-[#e2e8f0] focus:border-[#0B3A8E] bg-white h-10 text-sm w-full"
+                  className="pl-9 pr-4 rounded-lg border-[#e2e8f0] focus:border-[#0B3A8E] bg-white h-10 text-sm w-full"
                 />
               </div>
               <Button
@@ -622,14 +622,14 @@ export default function MyTripsPage() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-9 w-9 rounded-xl hover:bg-slate-100 text-slate-500"
+                                  className="h-9 w-9 rounded-lg hover:bg-slate-100 text-slate-500"
                                 >
                                   <MoreVertical className="h-4.5 w-4.5" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
                                 align="end"
-                                className="w-44 rounded-xl border-[#e2e8f0] p-1"
+                                className="w-44 rounded-lg border-[#e2e8f0] p-1"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {trip.status === 'ACTIVE' && (
@@ -685,7 +685,7 @@ export default function MyTripsPage() {
                     <SelectTrigger className="h-8 w-16 rounded-lg border-[#e2e8f0] bg-white text-xs">
                       <SelectValue placeholder="5" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
+                    <SelectContent className="rounded-lg border-[#e2e8f0] min-w-[4rem] bg-white">
                       {[5, 10, 20, 50].map((size) => (
                         <SelectItem
                           key={size}
@@ -811,7 +811,7 @@ export default function MyTripsPage() {
             </div>
           ) : (
             <div className="space-y-4 py-3">
-              <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-2">
+              <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg space-y-2">
                 <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                   Shipment Item
                 </span>
@@ -827,10 +827,10 @@ export default function MyTripsPage() {
                   Select flight trip
                 </label>
                 <Select value={acceptingTripId} onValueChange={setAcceptingTripId}>
-                  <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] h-11 bg-white">
+                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
                     <SelectValue placeholder="Choose a trip" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-[#e2e8f0]">
+                  <SelectContent className="rounded-lg border-[#e2e8f0]">
                     {matchingAcceptTrips.map((t) => {
                       const fromCountry = getCountryByCode(t.fromCountry);
                       const toCountry = getCountryByCode(t.toCountry);
@@ -852,10 +852,10 @@ export default function MyTripsPage() {
                   value={bagType}
                   onValueChange={(val) => setBagType(val as 'cabin' | 'checkIn')}
                 >
-                  <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] h-11 bg-white">
+                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
                     <SelectValue placeholder="Choose bag slot" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-[#e2e8f0]">
+                  <SelectContent className="rounded-lg border-[#e2e8f0]">
                     <SelectItem value="checkIn" className="cursor-pointer">
                       Check-in luggage
                     </SelectItem>
@@ -871,7 +871,7 @@ export default function MyTripsPage() {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
-              className="border-[#e2e8f0] hover:bg-slate-50 font-semibold rounded-xl"
+              className="border-[#e2e8f0] hover:bg-slate-50 font-semibold rounded-lg"
               onClick={() => setSelectedShipment(null)}
             >
               Cancel
@@ -882,7 +882,7 @@ export default function MyTripsPage() {
                 createOfferMutation.isPending ||
                 acceptMatchingLoading
               }
-              className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl"
+              className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-lg"
               onClick={handleAcceptShipmentSubmit}
             >
               {createOfferMutation.isPending ? 'Submitting...' : 'Submit Offer'}
@@ -922,7 +922,7 @@ export default function MyTripsPage() {
             </div>
           ) : (
             <div className="space-y-4 py-3">
-              <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-2">
+              <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg space-y-2">
                 <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">
                   Shipment Item
                 </span>
@@ -957,7 +957,7 @@ export default function MyTripsPage() {
                   <Input
                     type="number"
                     step="0.01"
-                    className="pl-7 rounded-xl border-[#e2e8f0] h-11 bg-white text-slate-800"
+                    className="pl-7 rounded-lg border-[#e2e8f0] h-11 bg-white text-slate-800"
                     placeholder="Enter your price"
                     value={counterPrice}
                     onChange={(e) => setCounterPrice(e.target.value)}
@@ -970,10 +970,10 @@ export default function MyTripsPage() {
                   Select flight trip
                 </label>
                 <Select value={counterTripId} onValueChange={setCounterTripId}>
-                  <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] h-11 bg-white">
+                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
                     <SelectValue placeholder="Choose a trip" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-[#e2e8f0]">
+                  <SelectContent className="rounded-lg border-[#e2e8f0]">
                     {matchingCounterTrips.map((t) => {
                       const fromCountry = getCountryByCode(t.fromCountry);
                       const toCountry = getCountryByCode(t.toCountry);
@@ -995,10 +995,10 @@ export default function MyTripsPage() {
                   value={counterBagType}
                   onValueChange={(val) => setCounterBagType(val as 'cabin' | 'checkIn')}
                 >
-                  <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] h-11 bg-white">
+                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
                     <SelectValue placeholder="Choose bag slot" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-[#e2e8f0]">
+                  <SelectContent className="rounded-lg border-[#e2e8f0]">
                     <SelectItem value="checkIn" className="cursor-pointer">
                       Check-in luggage
                     </SelectItem>
@@ -1014,7 +1014,7 @@ export default function MyTripsPage() {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
-              className="border-[#e2e8f0] hover:bg-slate-50 font-semibold rounded-xl"
+              className="border-[#e2e8f0] hover:bg-slate-50 font-semibold rounded-lg"
               onClick={() => setSelectedCounterShipment(null)}
             >
               Cancel
@@ -1025,7 +1025,7 @@ export default function MyTripsPage() {
                 createOfferMutation.isPending ||
                 counterMatchingLoading
               }
-              className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-xl"
+              className="bg-[#0B3A8E] hover:bg-[#082a66] text-white font-semibold rounded-lg"
               onClick={handleCounterOfferSubmit}
             >
               {createOfferMutation.isPending ? 'Submitting...' : 'Submit Counter-Offer'}

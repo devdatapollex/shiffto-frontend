@@ -63,8 +63,6 @@ export default function AdminTripsPage() {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
 
-
-
   // Debounce search term
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -93,8 +91,6 @@ export default function AdminTripsPage() {
   const startIdx = (page - 1) * limit;
   const endIdx = Math.min(startIdx + limit, total);
   const totalPages = Math.ceil(total / limit) || 1;
-
-
 
   const renderStatusBadge = (status: string) => {
     switch (status) {
@@ -205,7 +201,7 @@ export default function AdminTripsPage() {
               placeholder="Search by ID, User, Flight..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10 bg-white border-slate-200 focus-visible:ring-[#0B3A8E] focus-visible:border-[#0B3A8E] rounded-xl"
+              className="pl-10 h-10 bg-white border-slate-200 focus-visible:ring-[#0B3A8E] focus-visible:border-[#0B3A8E] rounded-lg"
             />
           </div>
         </div>
@@ -285,7 +281,11 @@ export default function AdminTripsPage() {
                           </TableCell>
                           <TableCell>{renderStatusBadge(trip.status)}</TableCell>
                           <TableCell className="text-right">
-                            <Link href={`/dashboard/admin/trips/${trip.id}`} passHref legacyBehavior>
+                            <Link
+                              href={`/dashboard/admin/trips/${trip.id}`}
+                              passHref
+                              legacyBehavior
+                            >
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -323,7 +323,7 @@ export default function AdminTripsPage() {
                       <SelectTrigger className="h-8 w-16 rounded-lg border-[#e2e8f0] bg-white text-xs">
                         <SelectValue placeholder="10" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
+                      <SelectContent className="rounded-lg border-[#e2e8f0] min-w-[4rem] bg-white">
                         {[5, 10, 20, 50].map((size) => (
                           <SelectItem
                             key={size}

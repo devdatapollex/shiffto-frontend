@@ -4,7 +4,15 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useTripDetails } from '@/hooks/use-trips';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
-import { ChevronLeft, ChevronRight, Package, Plane, Eye, FileText, ExternalLink } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  Plane,
+  Eye,
+  FileText,
+  ExternalLink,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import Link from 'next/link';
@@ -88,7 +96,8 @@ export default function TripDetailsPage() {
         <Plane className="h-16 w-16 text-slate-300 mb-4 animate-bounce rotate-45" />
         <h2 className="text-xl font-bold text-slate-800">Trip Not Found</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-md">
-          We couldn't retrieve details for this trip. It may have been deleted, or you might not have authorization to view it.
+          We couldn't retrieve details for this trip. It may have been deleted, or you might not
+          have authorization to view it.
         </p>
         <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
           <Link href="/dashboard/tracking">Back to Tracking</Link>
@@ -131,9 +140,7 @@ export default function TripDetailsPage() {
           <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <span className="text-base font-bold text-slate-800">
-                Trip : #{shortTripId}
-              </span>
+              <span className="text-base font-bold text-slate-800">Trip : #{shortTripId}</span>
               {trip.ticketPhoto && trip.ticketPhoto !== 'pending' && (
                 <Button
                   variant="outline"
@@ -159,7 +166,10 @@ export default function TripDetailsPage() {
               <div className="flex items-center justify-between gap-4">
                 {/* Departure details */}
                 <div className="flex items-center gap-3 max-w-[42%]">
-                  <CountryFlag code={trip.fromCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                  <CountryFlag
+                    code={trip.fromCountry}
+                    className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                  />
                   <div className="flex flex-col min-w-0">
                     <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
                       {getCountryByCode(trip.fromCountry)?.name ?? trip.fromCountry}
@@ -186,16 +196,22 @@ export default function TripDetailsPage() {
                       {getCountryByCode(trip.toCountry)?.name ?? trip.toCountry}
                     </span>
                     <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
-                      {trip.airportArrivalTime ? formatTime(trip.airportArrivalTime) : formatTime(trip.flightTime)}, {formatDate(trip.flightDate)}
+                      {trip.airportArrivalTime
+                        ? formatTime(trip.airportArrivalTime)
+                        : formatTime(trip.flightTime)}
+                      , {formatDate(trip.flightDate)}
                     </span>
                   </div>
-                  <CountryFlag code={trip.toCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                  <CountryFlag
+                    code={trip.toCountry}
+                    className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                  />
                 </div>
               </div>
             </div>
 
             {/* Capacities Box */}
-            <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-4 space-y-2.5">
+            <div className="bg-slate-50/70 border border-slate-100/50 rounded-lg p-4 space-y-2.5">
               <div className="flex justify-between items-center text-xs md:text-sm">
                 <span className="text-slate-500 font-medium">Total capacity</span>
                 <span className="font-semibold text-slate-700">{totalCap} KG</span>
@@ -210,9 +226,7 @@ export default function TripDetailsPage() {
 
             {/* Traveler Details Section */}
             <div className="space-y-4 pt-5 border-t border-slate-100">
-              <h3 className="text-base font-bold text-slate-800">
-                Traveler Details
-              </h3>
+              <h3 className="text-base font-bold text-slate-800">Traveler Details</h3>
 
               <div className="space-y-3.5 text-xs md:text-sm">
                 {/* Name Row */}
@@ -277,7 +291,7 @@ export default function TripDetailsPage() {
 
             {trip.ticketPhoto && trip.ticketPhoto !== 'pending' ? (
               <div
-                className="relative group overflow-hidden border border-slate-200 rounded-xl bg-slate-900 flex items-center justify-center flex-1 min-h-[240px] w-full cursor-zoom-in"
+                className="relative group overflow-hidden border border-slate-200 rounded-lg bg-slate-900 flex items-center justify-center flex-1 min-h-[240px] w-full cursor-zoom-in"
                 onClick={() => setPreviewPhotoUrl(trip.ticketPhoto)}
               >
                 <Image
@@ -292,7 +306,7 @@ export default function TripDetailsPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm min-h-[240px]">
+              <div className="flex-1 flex flex-col items-center justify-center border border-dashed rounded-lg bg-slate-50 text-slate-400 text-sm min-h-[240px]">
                 <FileText className="h-8 w-8 mb-2" />
                 No flight ticket file uploaded
               </div>
@@ -310,13 +324,15 @@ export default function TripDetailsPage() {
         {!trip.shipments || trip.shipments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Package className="h-12 w-12 text-slate-200 mb-3" />
-            <p className="text-sm font-medium text-slate-500">No shipments matched to this trip yet</p>
+            <p className="text-sm font-medium text-slate-500">
+              No shipments matched to this trip yet
+            </p>
             <p className="text-xs text-slate-400 mt-1 max-w-sm">
               Any shipments carrying under this trip will be listed here.
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -378,9 +394,7 @@ export default function TripDetailsPage() {
                         <span className="text-slate-500 font-light">{route}</span>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="font-semibold text-slate-700">
-                          ${amount.toFixed(2)}
-                        </span>
+                        <span className="font-semibold text-slate-700">${amount.toFixed(2)}</span>
                       </td>
                       <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-1">
