@@ -193,7 +193,7 @@ export function RecentTripsSection({ trips, isLoading }: RecentTripsSectionProps
                   </div>
 
                   {/* Details Box: Total & Remaining Capacity + Shipments Count */}
-                  <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3.5 space-y-2">
+                  <div className="bg-slate-50/80 border border-slate-100 rounded-lg p-3.5 space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-500 font-medium">Shipments</span>
                       <span className="font-semibold text-slate-700">

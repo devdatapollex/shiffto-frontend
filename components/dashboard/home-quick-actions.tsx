@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
 
 type QuickTab = 'shipment' | 'trip';
 
@@ -117,7 +118,7 @@ export function HomeQuickActions() {
               From <span className="text-red-500">*</span>
             </label>
             <Select value={shipmentFrom} onValueChange={setShipmentFrom}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {shipmentFrom ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={shipmentFrom} className="h-4 w-6 shrink-0" />
@@ -158,7 +159,7 @@ export function HomeQuickActions() {
               To <span className="text-red-500">*</span>
             </label>
             <Select value={shipmentTo} onValueChange={setShipmentTo}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {shipmentTo ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={shipmentTo} className="h-4 w-6 shrink-0" />
@@ -187,7 +188,7 @@ export function HomeQuickActions() {
               Category
             </label>
             <Select value={shipmentCategory} onValueChange={setShipmentCategory}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent position="popper" className="max-h-[280px]">
@@ -202,14 +203,14 @@ export function HomeQuickActions() {
 
           {/* Action Button */}
           <div className="shrink-0 lg:self-end">
-            <button
-              type="button"
+            <Button
+              variant="default"
               onClick={handleContinueShipment}
-              className="w-full lg:w-auto h-11 px-6 rounded-xl bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+              className="w-full lg:w-auto h-11 px-6 bg-foreground hover:bg-foreground/90 font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors"
             >
               <span>Continue</span>
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -220,7 +221,7 @@ export function HomeQuickActions() {
               From <span className="text-red-500">*</span>
             </label>
             <Select value={tripFrom} onValueChange={setTripFrom}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {tripFrom ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={tripFrom} className="h-4 w-6 shrink-0" />
@@ -261,7 +262,7 @@ export function HomeQuickActions() {
               To <span className="text-red-500">*</span>
             </label>
             <Select value={tripTo} onValueChange={setTripTo}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {tripTo ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={tripTo} className="h-4 w-6 shrink-0" />
@@ -301,7 +302,7 @@ export function HomeQuickActions() {
             <button
               type="button"
               onClick={handleContinueTrip}
-              className="w-full lg:w-auto h-11 px-6 rounded-xl bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+              className="w-full lg:w-auto h-11 px-6 rounded-lg bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="h-4 w-4" />

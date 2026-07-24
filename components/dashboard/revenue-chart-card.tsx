@@ -51,12 +51,8 @@ export function RevenueChartCard({
     setIsMounted(true);
   }, []);
 
-  const startDateStr = dateRange?.from
-    ? dateRange.from.toISOString().split('T')[0]
-    : undefined;
-  const endDateStr = dateRange?.to
-    ? dateRange.to.toISOString().split('T')[0]
-    : startDateStr;
+  const startDateStr = dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined;
+  const endDateStr = dateRange?.to ? dateRange.to.toISOString().split('T')[0] : startDateStr;
 
   const { data: apiData } = useQuery({
     queryKey: ['revenue-chart', startDateStr, endDateStr],
@@ -76,7 +72,10 @@ export function RevenueChartCard({
       }`
     : 'Select date range';
 
-  const dateRangeText = overrideDateRange || (apiData?.dateRangeText && dateRange?.from ? formattedDateRangeText : apiData?.dateRangeText) || formattedDateRangeText;
+  const dateRangeText =
+    overrideDateRange ||
+    (apiData?.dateRangeText && dateRange?.from ? formattedDateRangeText : apiData?.dateRangeText) ||
+    formattedDateRangeText;
   const chartData = overrideData || apiData?.chartData || [];
 
   // Dynamic Y Axis formatter
@@ -135,7 +134,10 @@ export function RevenueChartCard({
                 <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
               </button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-auto p-0 rounded-lg border border-slate-200 shadow-xl bg-white">
+            <PopoverContent
+              align="end"
+              className="w-auto p-0 rounded-lg border border-slate-200 shadow-xl bg-white"
+            >
               <Calendar
                 mode="range"
                 defaultMonth={dateRange?.from}
@@ -213,7 +215,10 @@ export function RevenueChartCard({
                 domain={[0, 'auto']}
               />
 
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5 }} />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5 }}
+              />
 
               {/* Total Earned Area (Dark Navy/Blue) */}
               <Area
@@ -237,7 +242,7 @@ export function RevenueChartCard({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" />
+          <div className="h-full w-full bg-slate-50 animate-pulse rounded-lg" />
         )}
       </div>
     </div>

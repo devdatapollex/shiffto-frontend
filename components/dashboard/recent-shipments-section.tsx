@@ -195,7 +195,7 @@ export function RecentShipmentsSection({ shipments, isLoading }: RecentShipments
                   </div>
 
                   {/* Item Details Box */}
-                  <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center justify-between gap-3">
+                  <div className="bg-slate-50/80 border border-slate-100 rounded-lg p-3 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-lg bg-white border border-slate-200/80 overflow-hidden flex items-center justify-center shrink-0">
                         {s.itemPhotos?.[0] ? (

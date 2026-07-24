@@ -51,11 +51,7 @@ const STAGE_DISPLAY_MAP: Record<string, string> = {
   DELIVERED: 'Delivered',
 };
 
-export function ShipmentStepsModal({
-  shipmentId,
-  open,
-  onOpenChange,
-}: ShipmentStepsModalProps) {
+export function ShipmentStepsModal({ shipmentId, open, onOpenChange }: ShipmentStepsModalProps) {
   const { data: shipment, isLoading } = useShipmentDetails(shipmentId, open);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; title: string } | null>(null);
   const [showAdvancement, setShowAdvancement] = useState(false);
@@ -106,7 +102,7 @@ export function ShipmentStepsModal({
                   variant="outline"
                   size="sm"
                   onClick={() => setShowAdvancement((prev) => !prev)}
-                  className="border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold text-xs rounded-xl h-9"
+                  className="border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold text-xs rounded-lg h-9"
                 >
                   {showAdvancement ? 'Hide Admin Override' : 'Admin Step Override'}
                 </Button>
@@ -120,13 +116,11 @@ export function ShipmentStepsModal({
               <p className="text-sm font-medium text-slate-500">Loading step logs...</p>
             </div>
           ) : !shipment ? (
-            <div className="py-12 text-center text-slate-400">
-              Shipment details unavailable.
-            </div>
+            <div className="py-12 text-center text-slate-400">Shipment details unavailable.</div>
           ) : (
             <div className="space-y-6">
               {/* Header Overview Card */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 border border-slate-100 rounded-xl p-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 border border-slate-100 rounded-lg p-4 text-xs">
                 <div>
                   <span className="text-slate-400 font-semibold uppercase block">Route</span>
                   <span className="font-bold text-slate-700 mt-0.5 block">
@@ -181,7 +175,7 @@ export function ShipmentStepsModal({
                   Detailed Step Informations & Traveller Uploads
                 </h4>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-100">
+                <div className="overflow-x-auto rounded-lg border border-slate-100">
                   <Table>
                     <TableHeader className="bg-slate-50/60">
                       <TableRow>
@@ -283,7 +277,7 @@ export function ShipmentStepsModal({
             </DialogTitle>
           </DialogHeader>
           {selectedPhoto && (
-            <div className="relative w-full h-80 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 mt-2">
+            <div className="relative w-full h-80 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 mt-2">
               <Image
                 src={toRelativeImageUrl(selectedPhoto.url)}
                 alt="Proof photo full view"
