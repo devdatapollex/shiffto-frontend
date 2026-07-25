@@ -38,12 +38,14 @@ export function getOfferExpirationStatus(createdAtStr?: string, status?: string)
     return { label: 'Expired', class: 'bg-slate-100 text-slate-500', isExpired: true };
   }
   if (!createdAtStr) {
-    return { label: '30:00 left', class: 'bg-[#FFECEC] text-[#FF5D5D]', isExpired: false };
+    return { label: '30:00 left', class: 'bg-[#DCFCE7] text-[#16A34A]', isExpired: false };
   }
 
   const createdAt = new Date(createdAtStr).getTime();
-  const expiresAt = createdAt + 30 * 60 * 1000;
-  const diffMs = expiresAt - Date.now();
+  const totalDurationMs = 30 * 60 * 1000;
+  const expiresAt = createdAt + totalDurationMs;
+  const now = Date.now();
+  const diffMs = expiresAt - now;
 
   if (diffMs <= 0) {
     return { label: 'Expired', class: 'bg-slate-100 text-slate-500', isExpired: true };
@@ -53,10 +55,22 @@ export function getOfferExpirationStatus(createdAtStr?: string, status?: string)
   const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
   const label = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} left`;
 
-  if (minutes < 5) {
-    return { label, class: 'bg-[#FFECEC] text-[#FF5D5D] animate-pulse', isExpired: false };
+  const timePassedMs = now - createdAt;
+  const timePassedRatio = timePassedMs / totalDurationMs;
+
+  let colorClass = '';
+  if (timePassedRatio < 1 / 3) {
+    colorClass = 'bg-[#DCFCE7] text-[#16A34A]';
+  } else if (timePassedRatio < 2 / 3) {
+    colorClass = 'bg-[#FEF3C7] text-[#D97706]';
+  } else {
+    colorClass = 'bg-[#FEE2E2] text-[#DC2626]';
+    if (minutes < 5) {
+      colorClass += ' animate-pulse';
+    }
   }
-  return { label, class: 'bg-[#FFECEC] text-[#FF5D5D]', isExpired: false };
+
+  return { label, class: colorClass, isExpired: false };
 }
 
 export function OffersReceivedSection({
