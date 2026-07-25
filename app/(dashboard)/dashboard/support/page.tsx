@@ -18,7 +18,7 @@ import {
   User,
   ArrowRight,
   RefreshCw,
-  FolderOpen
+  FolderOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { io, Socket } from 'socket.io-client';
@@ -68,7 +68,8 @@ const STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-primary text-white border-primary font-bold shadow-xs',
   IN_PROGRESS: 'bg-primary text-white border-primary font-bold shadow-xs',
   RESOLVED: 'bg-primary text-white border-primary font-bold shadow-xs',
-  CLOSED: 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
+  CLOSED:
+    'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -91,7 +92,8 @@ export default function UserSupportPage() {
 
   const getSocketUrl = () => {
     if (typeof window !== 'undefined') {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isLocalhost =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isLocalhost) {
         return 'http://localhost:5000';
       }
@@ -209,7 +211,8 @@ export default function UserSupportPage() {
         // Strict privacy check for real-time socket comments
         const isCommentFromAdmin = newComment.user?.role === 'admin';
         if (isCommentFromAdmin) {
-          const isTraveler = oldData.travelerId === currentUserId && oldData.senderId !== currentUserId;
+          const isTraveler =
+            oldData.travelerId === currentUserId && oldData.senderId !== currentUserId;
           const myRoleTag = isTraveler ? 'TRAVELER' : 'SENDER';
           if (newComment.visibleTo !== 'ALL' && newComment.visibleTo !== myRoleTag) {
             return oldData;
@@ -287,12 +290,18 @@ export default function UserSupportPage() {
       return;
     }
 
-    if (newCategory === 'Order' && (newRelationId === 'NONE' || !newRelationId.startsWith('shipment:'))) {
+    if (
+      newCategory === 'Order' &&
+      (newRelationId === 'NONE' || !newRelationId.startsWith('shipment:'))
+    ) {
       toast.error('Please select a related order/shipment');
       return;
     }
 
-    if (newCategory === 'Trip' && (newRelationId === 'NONE' || !newRelationId.startsWith('trip:'))) {
+    if (
+      newCategory === 'Trip' &&
+      (newRelationId === 'NONE' || !newRelationId.startsWith('trip:'))
+    ) {
       toast.error('Please select a related trip');
       return;
     }
@@ -374,7 +383,7 @@ export default function UserSupportPage() {
 
       {/* Tabs / Filters */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-primary/5 pb-4">
-        <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-xl border border-primary/5">
+        <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-lg border border-primary/5">
           {['ALL', 'OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'].map((status) => (
             <button
               key={status}
@@ -414,7 +423,7 @@ export default function UserSupportPage() {
             <p>Loading tickets...</p>
           </div>
         ) : !ticketsData?.tickets || ticketsData.tickets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4 border border-dashed rounded-2xl bg-card">
+          <div className="flex flex-col items-center justify-center py-20 gap-4 border border-dashed rounded-lg bg-card">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <FolderOpen className="h-6 w-6" />
             </div>
@@ -445,7 +454,7 @@ export default function UserSupportPage() {
                 <AccordionItem
                   key={ticket.id}
                   value={ticket.id}
-                  className="bg-card border border-primary/5 rounded-2xl overflow-hidden px-0"
+                  className="bg-card border border-primary/5 rounded-lg overflow-hidden px-0"
                 >
                   <AccordionTrigger className="hover:no-underline px-6 py-5 flex items-center justify-between text-left group">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-5 w-full mr-4">
@@ -483,10 +492,14 @@ export default function UserSupportPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0 self-start sm:self-center mt-2 sm:mt-0">
-                        <Badge className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${STATUS_COLORS[ticket.status]}`}>
+                        <Badge
+                          className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${STATUS_COLORS[ticket.status]}`}
+                        >
                           {ticket.status.replace('_', ' ')}
                         </Badge>
-                        <Badge className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${PRIORITY_COLORS[ticket.priority]}`}>
+                        <Badge
+                          className={`border uppercase text-[10px] font-bold py-0.5 px-2 ${PRIORITY_COLORS[ticket.priority]}`}
+                        >
                           {ticket.priority}
                         </Badge>
                       </div>
@@ -504,7 +517,7 @@ export default function UserSupportPage() {
                     ) : (
                       <div className="space-y-6">
                         {/* Description & Attachments */}
-                        <div className="space-y-3 bg-white p-5 rounded-xl border border-primary/5">
+                        <div className="space-y-3 bg-white p-5 rounded-lg border border-primary/5">
                           <div>
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                               Description
@@ -556,12 +569,16 @@ export default function UserSupportPage() {
                                   <div
                                     key={comment.id}
                                     className={`flex gap-3 max-w-[85%] ${
-                                      isAdmin ? 'mr-auto text-left' : 'ml-auto flex-row-reverse text-right'
+                                      isAdmin
+                                        ? 'mr-auto text-left'
+                                        : 'ml-auto flex-row-reverse text-right'
                                     }`}
                                   >
                                     <div
                                       className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                                        isAdmin ? 'bg-primary text-white' : 'bg-slate-200 text-slate-700'
+                                        isAdmin
+                                          ? 'bg-primary text-white'
+                                          : 'bg-slate-200 text-slate-700'
                                       }`}
                                     >
                                       {isAdmin ? 'A' : 'U'}
@@ -580,7 +597,7 @@ export default function UserSupportPage() {
                                         </span>
                                       </div>
                                       <div
-                                        className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm whitespace-pre-line ${
+                                        className={`rounded-lg px-4 py-2.5 text-sm shadow-sm whitespace-pre-line ${
                                           isAdmin
                                             ? 'bg-muted text-foreground rounded-tl-none'
                                             : 'bg-primary text-white rounded-tr-none'
@@ -599,7 +616,9 @@ export default function UserSupportPage() {
                                               className="flex items-center gap-1.5 p-1 px-2 border rounded bg-card hover:bg-primary/5 text-[10px] max-w-[150px] truncate"
                                             >
                                               <Paperclip className="h-3 w-3 shrink-0" />
-                                              <span className="truncate">Admin File {fIdx + 1}</span>
+                                              <span className="truncate">
+                                                Admin File {fIdx + 1}
+                                              </span>
                                             </a>
                                           ))}
                                         </div>
@@ -615,10 +634,12 @@ export default function UserSupportPage() {
 
                         {/* Reply Form / Ticket Actions */}
                         <div className="border-t border-primary/5 pt-4 flex flex-col gap-4">
-                          {expandedTicket.status === 'CLOSED' || expandedTicket.status === 'RESOLVED' ? (
-                            <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-xs">
+                          {expandedTicket.status === 'CLOSED' ||
+                          expandedTicket.status === 'RESOLVED' ? (
+                            <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-xs">
                               <AlertCircle className="h-4 w-4 text-slate-500" />
-                              This ticket is marked as {expandedTicket.status.toLowerCase()}. You cannot post replies. Please create a new ticket if needed.
+                              This ticket is marked as {expandedTicket.status.toLowerCase()}. You
+                              cannot post replies. Please create a new ticket if needed.
                             </div>
                           ) : (
                             <form onSubmit={handleAddComment} className="flex gap-2">
@@ -643,21 +664,22 @@ export default function UserSupportPage() {
                             </form>
                           )}
 
-                          {expandedTicket.status !== 'CLOSED' && expandedTicket.status !== 'RESOLVED' && (
-                            <div className="flex justify-end border-t border-primary/5 pt-3 mt-1">
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleCloseTicket(expandedTicket.id)}
-                                disabled={closeTicketMutation.isPending}
-                                className="text-xs font-semibold gap-1.5"
-                              >
-                                <X className="h-4 w-4" />
-                                Close Ticket
-                              </Button>
-                            </div>
-                          )}
+                          {expandedTicket.status !== 'CLOSED' &&
+                            expandedTicket.status !== 'RESOLVED' && (
+                              <div className="flex justify-end border-t border-primary/5 pt-3 mt-1">
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleCloseTicket(expandedTicket.id)}
+                                  disabled={closeTicketMutation.isPending}
+                                  className="text-xs font-semibold gap-1.5"
+                                >
+                                  <X className="h-4 w-4" />
+                                  Close Ticket
+                                </Button>
+                              </div>
+                            )}
                         </div>
                       </div>
                     )}
@@ -682,29 +704,36 @@ export default function UserSupportPage() {
                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                       />
                     </PaginationItem>
-                    {Array.from({ length: ticketsData.meta.totalPages }, (_, i) => i + 1).map((p) => (
-                      <PaginationItem key={p}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPage(p);
-                          }}
-                          isActive={currentPage === p}
-                        >
-                          {p}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                    {Array.from({ length: ticketsData.meta.totalPages }, (_, i) => i + 1).map(
+                      (p) => (
+                        <PaginationItem key={p}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(p);
+                            }}
+                            isActive={currentPage === p}
+                          >
+                            {p}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
                     <PaginationItem>
                       <PaginationNext
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          if (currentPage < ticketsData.meta.totalPages) setCurrentPage((c) => c + 1);
+                          if (currentPage < ticketsData.meta.totalPages)
+                            setCurrentPage((c) => c + 1);
                         }}
                         aria-disabled={currentPage === ticketsData.meta.totalPages}
-                        className={currentPage === ticketsData.meta.totalPages ? 'pointer-events-none opacity-50' : ''}
+                        className={
+                          currentPage === ticketsData.meta.totalPages
+                            ? 'pointer-events-none opacity-50'
+                            : ''
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -717,7 +746,7 @@ export default function UserSupportPage() {
 
       {/* Create Ticket Modal */}
       <Dialog open={isCreateOpen} onOpenChange={(open) => setIsCreateOpen(open)}>
-        <DialogContent className="sm:max-w-[550px] rounded-2xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="sm:max-w-[550px] rounded-lg overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2 text-primary">
               <LifeBuoy className="h-6 w-6" />
@@ -841,9 +870,11 @@ export default function UserSupportPage() {
             <div className="space-y-2">
               <Label className="text-sm font-semibold flex items-center justify-between">
                 <span>Attachments (JPG/PNG/PDF, max 3MB each)</span>
-                <span className="text-xs text-muted-foreground">{selectedFiles.length}/5 files</span>
+                <span className="text-xs text-muted-foreground">
+                  {selectedFiles.length}/5 files
+                </span>
               </Label>
-              <div className="border-2 border-dashed border-primary/10 rounded-xl p-4 text-center hover:bg-primary/[0.01] transition-all relative">
+              <div className="border-2 border-dashed border-primary/10 rounded-lg p-4 text-center hover:bg-primary/[0.01] transition-all relative">
                 <input
                   type="file"
                   multiple

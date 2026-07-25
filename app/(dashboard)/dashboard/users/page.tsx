@@ -64,7 +64,8 @@ const KYC_COLORS: Record<string, string> = {
   APPROVED: 'bg-primary text-white border-primary font-bold shadow-xs',
   PENDING: 'bg-primary text-white border-primary font-bold shadow-xs',
   REJECTED: 'bg-primary text-white border-primary font-bold shadow-xs',
-  NOT_SUBMITTED: 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
+  NOT_SUBMITTED:
+    'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 font-semibold',
 };
 
 export default function AdminUsersPage() {
@@ -156,7 +157,9 @@ export default function AdminUsersPage() {
   };
 
   const isAllSelected =
-    usersData?.data && usersData.data.length > 0 && selectedUserIds.length === usersData.data.length;
+    usersData?.data &&
+    usersData.data.length > 0 &&
+    selectedUserIds.length === usersData.data.length;
 
   return (
     <div className="space-y-6">
@@ -185,7 +188,7 @@ export default function AdminUsersPage() {
 
       {/* Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-primary/5 pb-4">
-        <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-xl border border-primary/5">
+        <div className="flex items-center gap-1 bg-primary/[0.03] p-1 rounded-lg border border-primary/5">
           {[
             { id: 'ALL', label: 'All Users' },
             { id: 'ACTIVE', label: 'Active' },
@@ -226,7 +229,7 @@ export default function AdminUsersPage() {
 
       {/* Bulk Actions Header */}
       {selectedUserIds.length > 0 && (
-        <div className="flex items-center gap-3 p-3 px-4 bg-primary/5 border border-primary/10 rounded-xl animate-in fade-in slide-in-from-top-1">
+        <div className="flex items-center gap-3 p-3 px-4 bg-primary/5 border border-primary/10 rounded-lg animate-in fade-in slide-in-from-top-1">
           <span className="text-xs font-semibold text-primary">
             {selectedUserIds.length} users selected
           </span>
@@ -270,7 +273,7 @@ export default function AdminUsersPage() {
           <p className="text-sm text-muted-foreground">Loading users...</p>
         </div>
       ) : !usersData?.data || usersData.data.length === 0 ? (
-        <div className="text-center py-16 bg-card border border-primary/5 rounded-2xl">
+        <div className="text-center py-16 bg-card border border-primary/5 rounded-lg">
           <Users className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
           <h3 className="font-semibold text-foreground">No users found</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -296,7 +299,7 @@ export default function AdminUsersPage() {
                 <motion.div
                   key={user.id}
                   layout
-                  className={`relative flex flex-col p-5 border rounded-2xl bg-card transition-all duration-300 ${
+                  className={`relative flex flex-col p-5 border rounded-lg bg-card transition-all duration-300 ${
                     isSelected
                       ? 'border-primary/30 ring-1 ring-primary/10 shadow-sm'
                       : 'border-primary/5 hover:border-primary/20 hover:shadow-md'
@@ -316,7 +319,11 @@ export default function AdminUsersPage() {
                       {/* Avatar */}
                       <div className="h-11 w-11 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground bg-primary shrink-0 overflow-hidden shadow-inner">
                         {user.image ? (
-                          <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+                          <img
+                            src={user.image}
+                            alt={user.name}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           user.name.charAt(0).toUpperCase()
                         )}
@@ -335,13 +342,15 @@ export default function AdminUsersPage() {
                     </div>
 
                     {/* Status Badge */}
-                    <Badge className={`border uppercase text-[9px] font-bold py-0.5 px-2 ${STATUS_COLORS[user.status]}`}>
+                    <Badge
+                      className={`border uppercase text-[9px] font-bold py-0.5 px-2 ${STATUS_COLORS[user.status]}`}
+                    >
                       {user.status.replace('_', ' ')}
                     </Badge>
                   </div>
 
                   {/* Card Content stats */}
-                  <div className="grid grid-cols-3 gap-2 border-y border-primary/5 my-4 py-3 bg-primary/[0.01] rounded-xl px-2">
+                  <div className="grid grid-cols-3 gap-2 border-y border-primary/5 my-4 py-3 bg-primary/[0.01] rounded-lg px-2">
                     <div className="text-center">
                       <span className="text-[10px] text-muted-foreground block">Shipments</span>
                       <span className="text-sm font-bold text-foreground flex items-center justify-center gap-1 mt-0.5">
@@ -369,11 +378,21 @@ export default function AdminUsersPage() {
                   <div className="grid grid-cols-2 gap-y-2 text-xs text-muted-foreground pb-2">
                     <div className="flex items-center gap-1.5">
                       <Award className="h-3.5 w-3.5 text-amber-500" />
-                      <span>Trust Score: <strong className="text-foreground">{user.trustScore}</strong></span>
+                      <span>
+                        Trust Score: <strong className="text-foreground">{user.trustScore}</strong>
+                      </span>
                     </div>
                     <div className="flex items-center gap-1.5 justify-end">
                       <ShieldAlert className="h-3.5 w-3.5 text-muted-foreground/60" />
-                      <span>KYC: <Badge variant="outline" className={`py-0 px-1.5 text-[9px] font-bold ${KYC_COLORS[user.kycStatus]}`}>{user.kycStatus.replace('_', ' ')}</Badge></span>
+                      <span>
+                        KYC:{' '}
+                        <Badge
+                          variant="outline"
+                          className={`py-0 px-1.5 text-[9px] font-bold ${KYC_COLORS[user.kycStatus]}`}
+                        >
+                          {user.kycStatus.replace('_', ' ')}
+                        </Badge>
+                      </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
@@ -387,9 +406,15 @@ export default function AdminUsersPage() {
                   {/* View details footer button */}
                   <div className="border-t border-primary/5 pt-3 mt-2 flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">
-                      Commission: <strong className="text-foreground">{user.commissionRate}%</strong>
+                      Commission:{' '}
+                      <strong className="text-foreground">{user.commissionRate}%</strong>
                     </span>
-                    <Button asChild size="sm" variant="ghost" className="text-primary hover:text-primary-foreground hover:bg-primary text-xs flex items-center gap-1 rounded-xl">
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="ghost"
+                      className="text-primary hover:text-primary-foreground hover:bg-primary text-xs flex items-center gap-1 rounded-lg"
+                    >
                       <Link href={`/dashboard/users/${user.id}`}>
                         View Profile
                         <ChevronRight className="h-3.5 w-3.5" />
@@ -442,17 +467,19 @@ export default function AdminUsersPage() {
                       <PaginationPrevious className="h-4 w-4" />
                     </Button>
                   </PaginationItem>
-                  {Array.from({ length: Math.ceil(usersData.meta.total / limitPerPage) }).map((_, idx) => (
-                    <PaginationItem key={idx}>
-                      <PaginationLink
-                        isActive={currentPage === idx + 1}
-                        onClick={() => setCurrentPage(idx + 1)}
-                        className="h-8 w-8 text-xs cursor-pointer"
-                      >
-                        {idx + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
+                  {Array.from({ length: Math.ceil(usersData.meta.total / limitPerPage) }).map(
+                    (_, idx) => (
+                      <PaginationItem key={idx}>
+                        <PaginationLink
+                          isActive={currentPage === idx + 1}
+                          onClick={() => setCurrentPage(idx + 1)}
+                          className="h-8 w-8 text-xs cursor-pointer"
+                        >
+                          {idx + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
                   <PaginationItem>
                     <Button
                       variant="ghost"

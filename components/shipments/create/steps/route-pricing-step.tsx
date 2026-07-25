@@ -160,7 +160,7 @@ export function RoutePricingStep() {
         />
       </div>
 
-      <div className="border border-[#e2e8f0] rounded-xl p-5 bg-white space-y-6">
+      <div className="border border-[#e2e8f0] rounded-lg p-5 bg-white space-y-6">
         <h3 className="text-[#8292a1] text-lg font-medium">Pricing details</h3>
 
         <div className="flex items-start gap-4">

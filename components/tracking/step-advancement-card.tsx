@@ -162,7 +162,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
 
   if (stage === 'PAYMENT_CONFIRMED') {
     return (
-      <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-5 shadow-xs flex items-center gap-4">
+      <div className="bg-amber-50/70 border border-amber-200/80 rounded-lg p-5 shadow-xs flex items-center gap-4">
         <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
           <AlertCircle className="h-5 w-5" />
         </div>
@@ -178,10 +178,10 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
   }
 
   return (
-    <div className="bg-accent-foreground/10 border border-accent-foreground/20 rounded-2xl p-6 shadow-sm space-y-5">
+    <div className="bg-accent-foreground/10 border border-accent-foreground/20 rounded-lg p-6 shadow-sm space-y-5">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-accent-foreground/15 border border-accent-foreground/30 flex items-center justify-center text-foreground shrink-0">
+          <div className="h-11 w-11 rounded-lg bg-accent-foreground/15 border border-accent-foreground/30 flex items-center justify-center text-foreground shrink-0">
             <PackageCheck className="h-6 w-6" />
           </div>
           <div>
@@ -206,7 +206,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
             </Label>
 
             {photoUrl ? (
-              <div className="relative w-36 h-28 rounded-xl overflow-hidden border-2 border-accent-foreground/50 group shadow-sm">
+              <div className="relative w-36 h-28 rounded-lg overflow-hidden border-2 border-accent-foreground/50 group shadow-sm">
                 <Image
                   src={toRelativeImageUrl(photoUrl)}
                   alt="Proof photo"
@@ -222,7 +222,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-accent-foreground/30 hover:border-accent-foreground/60 rounded-xl cursor-pointer bg-accent-foreground/5 hover:bg-accent-foreground/10 transition-all">
+              <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-accent-foreground/30 hover:border-accent-foreground/60 rounded-lg cursor-pointer bg-accent-foreground/5 hover:bg-accent-foreground/10 transition-all">
                 {isUploading ? (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Loader2 className="h-5 w-5 animate-spin text-foreground" />
@@ -264,7 +264,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
-            className="bg-background/80 border-accent-foreground/20 text-foreground placeholder:text-muted-foreground text-xs rounded-xl focus:border-primary focus:ring-primary"
+            className="bg-background/80 border-accent-foreground/20 text-foreground placeholder:text-muted-foreground text-xs rounded-lg focus:border-primary focus:ring-primary"
           />
         </div>
 
@@ -273,7 +273,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
           <Button
             onClick={handleAdvancement}
             disabled={isPendingMutation || isUploading}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-lg shadow-md transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
           >
             {isPendingMutation ? (
               <>

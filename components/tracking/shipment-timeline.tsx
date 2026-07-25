@@ -224,7 +224,7 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
 
       {/* Image Preview Modal */}
       <Dialog open={previewPhoto !== null} onOpenChange={(open) => !open && setPreviewPhoto(null)}>
-        <DialogContent className="max-w-md rounded-2xl p-6 bg-white">
+        <DialogContent className="max-w-md rounded-lg p-6 bg-white">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
               <ImageIcon className="h-5 w-5 text-emerald-600" />
@@ -232,7 +232,7 @@ export function ShipmentTimeline({ steps }: ShipmentTimelineProps) {
             </DialogTitle>
           </DialogHeader>
           {previewPhoto && (
-            <div className="relative w-full h-72 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 mt-2">
+            <div className="relative w-full h-72 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 mt-2">
               <Image
                 src={toRelativeImageUrl(previewPhoto.url)}
                 alt="Step proof photo"

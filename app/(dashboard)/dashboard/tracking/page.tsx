@@ -240,7 +240,9 @@ export default function TrackingPage() {
   const [tripSearch, setTripSearch] = useState('');
   const debouncedTripSearch = useDebouncedValue(tripSearch, 300);
 
-  const [tripSortBy, setTripSortBy] = useState<'flightNumber' | 'flightDate' | 'createdAt'>('flightDate');
+  const [tripSortBy, setTripSortBy] = useState<'flightNumber' | 'flightDate' | 'createdAt'>(
+    'flightDate'
+  );
   const [tripSortOrder, setTripSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const [tripPage, setTripPage] = useState(1);
@@ -255,7 +257,7 @@ export default function TrackingPage() {
 
     if (debouncedTripSearch.trim()) {
       const query = debouncedTripSearch.toLowerCase();
-      const cleanQuery = query.replace(/^(tr|sh)-?/, "");
+      const cleanQuery = query.replace(/^(tr|sh)-?/, '');
       result = result.filter((trip) => {
         const fromName = getCountryByCode(trip.fromCountry)?.name.toLowerCase() || '';
         const toName = getCountryByCode(trip.toCountry)?.name.toLowerCase() || '';
@@ -334,7 +336,7 @@ export default function TrackingPage() {
     if (!trackId.trim()) return;
 
     const formattedId = trackId.trim().toUpperCase();
-    const cleanId = formattedId.replace(/^(SH|TR)-?/, "");
+    const cleanId = formattedId.replace(/^(SH|TR)-?/, '');
 
     // Check if the cleanId matches any of the user's trips
     const hasTripMatch = rawTrips.some((trip) => {
@@ -357,7 +359,7 @@ export default function TrackingPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       {/* Track your consignment header */}
-      <div className="relative rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm p-6 sm:p-8">
+      <div className="relative rounded-lg border border-slate-200/60 bg-white/60 backdrop-blur-sm p-6 sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0D307A]/10 text-[#0D307A]">
@@ -400,7 +402,7 @@ export default function TrackingPage() {
       </div>
 
       {/* Consignment History */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+      <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
         {/* Title and Controls Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
           <h3 className="text-xl text-muted-foreground tracking-tight">Consignment History</h3>
@@ -442,7 +444,7 @@ export default function TrackingPage() {
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+              className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
             >
               <Crosshair className="h-4 w-4" />
             </Button>
@@ -453,7 +455,7 @@ export default function TrackingPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+                  className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
@@ -536,7 +538,7 @@ export default function TrackingPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <div className="overflow-x-auto rounded-lg border border-slate-100">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -672,7 +674,7 @@ export default function TrackingPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -690,8 +692,10 @@ export default function TrackingPage() {
                   const displayStatus = TRIP_STATUS_DISPLAY_MAP[item.status] || item.status;
                   const shortId = `TR-${item.id.slice(-6).toUpperCase()}`;
                   const route = `${getCountryByCode(item.fromCountry)?.name ?? item.fromCountry} - ${getCountryByCode(item.toCountry)?.name ?? item.toCountry}`;
-                  const totalCapacity = (item.cabinBagCapacity || 0) + (item.checkInBagCapacity || 0);
-                  const remainingCapacity = (item.remainingCabinCapacity || 0) + (item.remainingCheckInCapacity || 0);
+                  const totalCapacity =
+                    (item.cabinBagCapacity || 0) + (item.checkInBagCapacity || 0);
+                  const remainingCapacity =
+                    (item.remainingCabinCapacity || 0) + (item.remainingCheckInCapacity || 0);
 
                   return (
                     <tr
@@ -865,13 +869,16 @@ export default function TrackingPage() {
             {/* Rows per page */}
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <span>Rows per page:</span>
-              <Select value={String(tripLimit)} onValueChange={(val) => {
-                const num = Number(val);
-                if (!isNaN(num) && num > 0) {
-                  setTripLimit(num);
-                  setTripPage(1);
-                }
-              }}>
+              <Select
+                value={String(tripLimit)}
+                onValueChange={(val) => {
+                  const num = Number(val);
+                  if (!isNaN(num) && num > 0) {
+                    setTripLimit(num);
+                    setTripPage(1);
+                  }
+                }}
+              >
                 <SelectTrigger className="h-8 w-[70px] text-xs">
                   <SelectValue />
                 </SelectTrigger>

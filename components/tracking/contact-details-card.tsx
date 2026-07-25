@@ -24,7 +24,7 @@ export function ContactDetailsCard({
   className,
 }: ContactDetailsCardProps) {
   return (
-    <div className={cn('bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm space-y-4', className)}>
+    <div className={cn('bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-4', className)}>
       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3">
         {title}
       </h3>

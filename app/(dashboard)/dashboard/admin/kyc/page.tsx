@@ -265,7 +265,7 @@ export default function AdminKycPage() {
                         <SelectTrigger className="h-8 w-16 rounded-lg border-[#e2e8f0] bg-white text-xs">
                           <SelectValue placeholder="10" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-[#e2e8f0] min-w-[4rem] bg-white">
+                        <SelectContent className="rounded-lg border-[#e2e8f0] min-w-[4rem] bg-white">
                           {[5, 10, 20, 50].map((size) => (
                             <SelectItem
                               key={size}
@@ -297,7 +297,7 @@ export default function AdminKycPage() {
                       size="sm"
                       onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                       disabled={page === 1}
-                      className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                      className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-foreground! px-3 cursor-pointer text-xs"
                     >
                       Previous
                     </Button>
@@ -336,7 +336,7 @@ export default function AdminKycPage() {
                           className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer ${
                             page === pageNum
                               ? 'bg-[#FF6F3F] hover:bg-[#e05626] text-white border-transparent'
-                              : 'border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600'
+                              : 'border-[#e2e8f0] bg-white hover:bg-slate-50 text-foreground!'
                           }`}
                         >
                           {pageNum}
@@ -349,7 +349,7 @@ export default function AdminKycPage() {
                       size="sm"
                       onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
                       disabled={page === totalPages}
-                      className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-slate-600 px-3 cursor-pointer text-xs"
+                      className="h-8 rounded-lg border-[#e2e8f0] bg-white hover:bg-slate-50 text-foreground! px-3 cursor-pointer text-xs"
                     >
                       Next
                     </Button>

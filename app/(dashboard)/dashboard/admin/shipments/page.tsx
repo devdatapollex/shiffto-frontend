@@ -303,7 +303,7 @@ function ShipmentsTab() {
   const showingTo = Math.min(meta.page * meta.limit, meta.total);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       {/* Controls Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
         <h3 className="text-xl text-muted-foreground tracking-tight">All Shipments</h3>
@@ -333,7 +333,7 @@ function ShipmentsTab() {
               <Button
                 variant="outline"
                 size="icon"
-                className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+                className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
               >
                 <ArrowUpDown className="h-4 w-4" />
               </Button>
@@ -394,7 +394,7 @@ function ShipmentsTab() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
+        <div className="overflow-x-auto rounded-lg border border-slate-100">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -710,7 +710,7 @@ function CategoriesTab() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       <div className="flex items-center justify-between border-b border-slate-100 pb-5">
         <h3 className="text-xl text-muted-foreground tracking-tight">Shipment Categories</h3>
         <Button
@@ -737,7 +737,7 @@ function CategoriesTab() {
           <p className="text-xs text-slate-400 mt-1">Create your first shipment category.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
+        <div className="overflow-x-auto rounded-lg border border-slate-100">
           <Table>
             <TableHeader>
               <TableRow>
@@ -1105,7 +1105,7 @@ function StepDefinitionsTab() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       <div className="border-b border-slate-100 pb-5">
         <h3 className="text-xl text-muted-foreground tracking-tight">Step Definitions</h3>
         <p className="text-sm text-slate-400 mt-1">
@@ -1127,7 +1127,7 @@ function StepDefinitionsTab() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
+        <div className="overflow-x-auto rounded-lg border border-slate-100">
           <Table>
             <TableHeader>
               <TableRow>

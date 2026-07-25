@@ -4,15 +4,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, ChevronDown, TrendingUp } from 'lucide-react';
 import { getShipmentChart } from '@/services/profile.service';
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,7 +50,10 @@ export function ShipmentChartCard({
   const chartData = overrideData || apiData?.data || [];
 
   const defaultYears = Array.from({ length: 4 }, (_, i) => (currentYearNum - i).toString());
-  const yearsList = apiData?.availableYears && apiData.availableYears.length > 0 ? apiData.availableYears : defaultYears;
+  const yearsList =
+    apiData?.availableYears && apiData.availableYears.length > 0
+      ? apiData.availableYears
+      : defaultYears;
 
   // Dynamic Y Axis formatter
   const formatYAxis = (val: number) => {
@@ -78,7 +73,7 @@ export function ShipmentChartCard({
       const formatVal = (num: number) => (num >= 1000 ? `${(num / 1000).toFixed(1)}k` : `${num}`);
 
       return (
-        <div className="bg-slate-900 text-white rounded-xl p-2.5 shadow-xl text-xs font-semibold space-y-1 z-50 pointer-events-none min-w-[120px]">
+        <div className="bg-slate-900 text-white rounded-lg p-2.5 shadow-xl text-xs font-semibold space-y-1 z-50 pointer-events-none min-w-[120px]">
           <div className="text-[11px] text-slate-400 font-bold border-b border-slate-700/60 pb-1 mb-1">
             {label}
           </div>
@@ -103,7 +98,7 @@ export function ShipmentChartCard({
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-6 flex flex-col justify-between">
+    <div className="w-full bg-white rounded-lg border border-slate-200/80 shadow-xs p-6 space-y-6 flex flex-col justify-between">
       {/* Top Header & Legend */}
       <div className="space-y-4">
         {/* Row 1: Title & Year Selector Dropdown */}
@@ -115,14 +110,17 @@ export function ShipmentChartCard({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer outline-hidden shadow-2xs"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer outline-hidden shadow-2xs"
               >
                 <Calendar className="h-3.5 w-3.5 text-slate-400" />
                 <span>{year}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 rounded-xl bg-white border border-slate-200 p-1.5 shadow-md z-50">
+            <DropdownMenuContent
+              align="end"
+              className="w-32 rounded-lg bg-white border border-slate-200 p-1.5 shadow-md z-50"
+            >
               {yearsList.map((yr) => (
                 <DropdownMenuItem
                   key={yr}
@@ -170,7 +168,11 @@ export function ShipmentChartCard({
       <div className="h-[220px] w-full pt-2">
         {isMounted ? (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }} barGap={3}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
+              barGap={3}
+            >
               <CartesianGrid vertical={false} stroke="#f1f5f9" strokeDasharray="0" />
 
               <XAxis
@@ -191,24 +193,14 @@ export function ShipmentChartCard({
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.4)' }} />
 
               {/* Canceled Deliveries Bar (Light Grey/Striped look) */}
-              <Bar
-                dataKey="canceled"
-                fill="#E2E8F0"
-                radius={[4, 4, 0, 0]}
-                barSize={9}
-              />
+              <Bar dataKey="canceled" fill="#E2E8F0" radius={[4, 4, 0, 0]} barSize={9} />
 
               {/* Completed Deliveries Bar (Peach / Orange) */}
-              <Bar
-                dataKey="completed"
-                fill="#FF9E79"
-                radius={[4, 4, 0, 0]}
-                barSize={9}
-              />
+              <Bar dataKey="completed" fill="#FF9E79" radius={[4, 4, 0, 0]} barSize={9} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" />
+          <div className="h-full w-full bg-slate-50 animate-pulse rounded-lg" />
         )}
       </div>
     </div>

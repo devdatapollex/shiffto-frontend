@@ -1,9 +1,14 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, Plane, Scale, Boxes, Tag, Calendar, Package } from 'lucide-react';
+import { Clock, PlaneTakeoff, Luggage, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { useReceivedOffers, useAcceptOffer, useRejectOffer, useCancelCheckout } from '@/hooks/use-offers';
+import {
+  useReceivedOffers,
+  useAcceptOffer,
+  useRejectOffer,
+  useCancelCheckout,
+} from '@/hooks/use-offers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getCountryByCode } from '@/lib/constants/countries';
@@ -15,21 +20,37 @@ interface OffersReceivedSectionProps {
   titleClassName?: string;
 }
 
+export function formatFlightDate(dateStr?: string) {
+  if (!dateStr) return 'N/A';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = d.getDate();
+    const month = d.toLocaleString('en-US', { month: 'long' });
+    const year = d.getFullYear();
+    return `${day} ${month}, ${year}`;
+  } catch {
+    return dateStr;
+  }
+}
+
 export function getFlightTimeStatus(flightDateStr?: string) {
-  if (!flightDateStr) return { label: 'Upcoming', class: 'bg-emerald-50 text-emerald-600 border-emerald-100' };
+  if (!flightDateStr) return { label: '08:45', class: 'bg-[#FFECEC] text-[#FF5D5D]' };
   const flightDate = new Date(flightDateStr);
   const now = new Date();
   const diffMs = flightDate.getTime() - now.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
 
   if (diffHours < 0) {
-    return { label: 'Passed', class: 'bg-slate-50 text-slate-500 border-slate-200' };
+    return { label: 'Passed', class: 'bg-slate-100 text-slate-500' };
   } else if (diffHours < 24) {
-    return { label: `${Math.round(diffHours)}h left`, class: 'bg-red-50 text-red-600 border-red-100' };
-  } else if (diffHours < 72) {
-    return { label: `${Math.round(diffHours / 24)}d left`, class: 'bg-amber-50 text-amber-600 border-amber-100' };
+    const hours = Math.max(0, Math.floor(diffHours));
+    const mins = Math.max(0, Math.floor((diffHours - hours) * 60));
+    const timeStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+    return { label: timeStr, class: 'bg-[#FFECEC] text-[#FF5D5D]' };
   } else {
-    return { label: `${Math.round(diffHours / 24)}d left`, class: 'bg-emerald-50 text-emerald-600 border-emerald-100' };
+    const days = Math.round(diffHours / 24);
+    return { label: `${days}d left`, class: 'bg-[#FFECEC] text-[#FF5D5D]' };
   }
 }
 
@@ -47,23 +68,26 @@ export function OffersReceivedSection({
   const handleAcceptOffer = async (offerId: string, travellerName: string) => {
     try {
       const res = await acceptOfferMutation.mutateAsync(offerId);
-      toast.success(
-        `Offer from ${travellerName} selected! Redirecting to payment checkout...`
-      );
+      toast.success(`Offer from ${travellerName} selected! Redirecting to payment checkout...`);
       if (res?.checkoutUrl) {
         window.location.href = res.checkoutUrl;
       }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to accept offer');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(
+        errorObj?.response?.data?.message || errorObj?.message || 'Failed to accept offer'
+      );
     }
   };
 
-  const handleRejectOffer = async (offerId: string, travellerName: string) => {
+  const handleCounterOffer = async (offerId: string, travellerName: string) => {
+    const counterAmount = window.prompt(`Enter your counter offer price for ${travellerName}:`);
+    if (!counterAmount) return;
+    toast.info(`Counter offer of $${counterAmount} submitted for ${travellerName}.`);
     try {
       await rejectOfferMutation.mutateAsync(offerId);
-      toast.success(`Offer from ${travellerName} declined.`);
-    } catch (err: any) {
-      toast.error(err?.message || 'Failed to decline offer');
+    } catch {
+      // Toast notification is handled above
     }
   };
 
@@ -71,15 +95,18 @@ export function OffersReceivedSection({
     try {
       await cancelCheckoutMutation.mutateAsync(offerId);
       toast.success(`Checkout for ${travellerName}'s offer canceled.`);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to cancel checkout');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(
+        errorObj?.response?.data?.message || errorObj?.message || 'Failed to cancel checkout'
+      );
     }
   };
 
   const isHorizontal = layoutMode === 'horizontal-scroll';
 
   return (
-    <div className="space-y-4 bg-background p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs">
+    <div className="space-y-4 bg-background p-4 sm:p-6 rounded-lg border border-slate-200/80 shadow-xs">
       {/* Header */}
       <div className="flex items-center gap-2.5">
         <h2 className={titleClassName}>Offers received</h2>
@@ -102,8 +129,8 @@ export function OffersReceivedSection({
                 key={i}
                 className={
                   isHorizontal
-                    ? 'w-[320px] sm:w-[350px] shrink-0 animate-pulse flex flex-col justify-between overflow-hidden rounded-xl border border-slate-100 bg-white p-5 shadow-sm h-64'
-                    : 'animate-pulse flex flex-col justify-between overflow-hidden rounded-xl border border-slate-100 bg-white p-5 shadow-sm h-64'
+                    ? 'w-[320px] sm:w-[350px] shrink-0 animate-pulse flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 shadow-sm h-64'
+                    : 'animate-pulse flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 shadow-sm h-64'
                 }
               >
                 <div className="space-y-4">
@@ -112,14 +139,14 @@ export function OffersReceivedSection({
                     <div className="h-6 w-12 bg-slate-100 rounded"></div>
                   </div>
                   <div className="flex gap-4">
-                    <div className="h-14 w-14 bg-slate-100 rounded-xl"></div>
+                    <div className="h-14 w-14 bg-slate-100 rounded-lg"></div>
                     <div className="space-y-2 flex-1">
                       <div className="h-4 w-3/4 bg-slate-100 rounded"></div>
                       <div className="h-3 w-1/2 bg-slate-100 rounded"></div>
                     </div>
                   </div>
                 </div>
-                <div className="h-10 bg-slate-100 rounded-xl"></div>
+                <div className="h-10 bg-slate-100 rounded-lg"></div>
               </div>
             ))}
           </div>
@@ -128,7 +155,7 @@ export function OffersReceivedSection({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center justify-center py-10 px-4 rounded-2xl border border-slate-100 bg-white shadow-xs text-center"
+            className="flex flex-col items-center justify-center py-10 px-4 rounded-lg border border-slate-100 bg-white shadow-xs text-center"
           >
             <Package className="h-10 w-10 text-slate-300 mb-3" />
             <p className="text-slate-500 font-medium">All caught up!</p>
@@ -147,8 +174,8 @@ export function OffersReceivedSection({
             <div
               className={
                 isHorizontal
-                  ? 'flex items-stretch gap-4 sm:gap-6 flex-nowrap min-w-max'
-                  : 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
+                  ? 'flex items-stretch gap-2 sm:gap-4 flex-nowrap min-w-max'
+                  : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'
               }
             >
               {offers.map((offer) => {
@@ -165,28 +192,24 @@ export function OffersReceivedSection({
                     exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                     className={
                       isHorizontal
-                        ? 'w-[330px] sm:w-[360px] shrink-0 relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200'
-                        : 'relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md duration-200'
+                        ? 'w-[340px] sm:w-[370px] shrink-0 relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200'
+                        : 'relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200'
                     }
                   >
                     <div>
-                      {/* Time status & Price */}
+                      {/* Time status badge */}
                       <div className="flex items-center justify-between mb-4">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold ${timeStatus.class}`}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${timeStatus.class}`}
                         >
                           <Clock className="h-3.5 w-3.5 stroke-[2.5]" />
                           {timeStatus.label}
                         </span>
-                        <div className="flex flex-col items-end">
-                          <span className="text-lg font-bold text-[#0B3A8E]">${offer.senderPrice}</span>
-                          <span className="text-[9px] text-slate-400 font-medium uppercase">Original Price</span>
-                        </div>
                       </div>
 
                       {/* Shipment Item */}
-                      <div className="flex gap-4 items-start mb-4">
-                        <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="flex gap-3.5 items-start mb-4">
+                        <div className="w-14 h-14 bg-slate-200/80 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
                           {offer.shipment?.itemPhotos?.[0] ? (
                             <Image
                               src={toRelativeImageUrl(offer.shipment.itemPhotos[0])}
@@ -200,105 +223,108 @@ export function OffersReceivedSection({
                           )}
                         </div>
                         <div className="space-y-1 min-w-0 flex-1">
-                          <h3 className="text-sm font-bold text-slate-800 truncate">
-                            {offer.shipment?.itemName || 'Unknown Item'}
-                          </h3>
-                          <p className="text-xs text-slate-500 flex items-center gap-1 truncate">
-                            <Plane className="h-3.5 w-3.5 text-slate-400 rotate-45 shrink-0" />
+                          <div className="flex items-center justify-between gap-2">
+                            <h3 className="text-base font-bold text-[#0B3A8E] truncate">
+                              {offer.shipment?.itemName || 'Unknown Item'}
+                            </h3>
+                            <span className="text-xl font-bold text-[#94A3B8] shrink-0">
+                              ${offer.senderPrice}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 flex items-center gap-1.5 truncate">
+                            <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             {offer.shipment ? (
                               <span className="truncate">
-                                {getCountryByCode(offer.shipment.fromCountry)?.name ?? offer.shipment.fromCountry} -{' '}
-                                {getCountryByCode(offer.shipment.toCountry)?.name ?? offer.shipment.toCountry}
+                                {getCountryByCode(offer.shipment.fromCountry)?.name ??
+                                  offer.shipment.fromCountry}{' '}
+                                -{' '}
+                                {getCountryByCode(offer.shipment.toCountry)?.name ??
+                                  offer.shipment.toCountry}
                               </span>
                             ) : (
                               'Unknown Route'
                             )}
                           </p>
-                          <div className="flex items-center gap-3 text-slate-400 text-[11px] font-medium pt-0.5">
-                            <span className="flex items-center gap-1">
-                              <Scale className="h-3 w-3 shrink-0" />
-                              {offer.shipment?.weight || 0} Kg
+                          <p className="text-xs text-slate-500 flex items-center gap-1.5 truncate">
+                            <Luggage className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <span>
+                              {offer.shipment?.weight || 0} Kg • {offer.shipment?.quantity || 1}pcs
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Boxes className="h-3 w-3 shrink-0" />
-                              {offer.shipment?.quantity || 0}pcs
-                            </span>
-                          </div>
+                          </p>
                         </div>
                       </div>
 
                       {/* Traveler info & offered price */}
-                      <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 mb-5 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-slate-200 border border-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+                      <div className="bg-[#F4F6F9] rounded-lg p-3.5 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-slate-300 flex items-center justify-center font-bold text-xs text-slate-700 shrink-0 overflow-hidden">
                             {offer.traveller?.image ? (
                               <Image
                                 src={toRelativeImageUrl(offer.traveller.image)}
                                 alt={travelerName}
                                 className="object-cover w-full h-full"
-                                width={56}
-                                height={56}
+                                width={36}
+                                height={36}
                               />
                             ) : (
                               <span>{travelerName.charAt(0)}</span>
                             )}
                           </div>
                           <div className="min-w-0 space-y-0.5">
-                            <h4 className="text-xs font-bold text-slate-800 truncate">
+                            <h4 className="text-sm font-normal text-[#0B3A8E] truncate">
                               {travelerName}
                             </h4>
-                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium truncate">
-                              <span className="flex items-center gap-1 shrink-0">
-                                <Tag className="h-2.5 w-2.5 shrink-0" />
-                                {offer.trip?.flightNumber || 'N/A'}
-                              </span>
-                              <span className="flex items-center gap-1 truncate">
-                                <Calendar className="h-2.5 w-2.5 shrink-0" />
-                                {offer.trip?.flightDate ? new Date(offer.trip.flightDate).toLocaleDateString() : 'N/A'}
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 truncate">
+                              <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                              <span className="truncate">
+                                {offer.trip?.flightNumber || 'N/A'} •{' '}
+                                {formatFlightDate(offer.trip?.flightDate)}
                               </span>
                             </div>
                           </div>
                         </div>
                         <div className="text-right pl-2 shrink-0">
-                          <span
-                            className={`text-sm font-bold block ${
-                              offer.isCounterOffer ? 'text-amber-600 scale-105 font-extrabold' : 'text-[#0D307A]'
-                            }`}
-                          >
+                          <span className="text-xl font-bold text-[#0B3A8E] block">
                             ${offeredPrice}
                           </span>
-                          <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider block">
+                          <span className="text-xs text-slate-400 font-normal block">
                             {offer.isCounterOffer ? 'Counter Offer' : 'Offered price'}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {offer.status === 'PAYMENT_CANCELED' && (
-                      <div className="text-rose-600 bg-rose-50/50 border border-rose-100/80 rounded-xl p-2.5 text-xs font-bold text-center mb-4 flex items-center justify-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-                        Previous payment canceled
+                    {offer.status === 'PAYMENT_CANCELED' ? (
+                      <div className="text-xs text-red-500 font-semibold flex items-center justify-start gap-1 my-1 animate-in fade-in duration-200">
+                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                        <span>Previous payment canceled</span>
                       </div>
+                    ) : (
+                      <hr className="border-slate-200/80 my-3" />
                     )}
 
                     {/* Action buttons */}
-                    <div className="flex gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       {offer.status === 'PAYMENT_PENDING' ? (
                         <>
                           <Button
                             variant="outline"
                             size="sm"
-                            disabled={cancelCheckoutMutation.isPending || acceptOfferMutation.isPending}
+                            disabled={
+                              cancelCheckoutMutation.isPending || acceptOfferMutation.isPending
+                            }
                             onClick={() => handleCancelCheckout(offer.id, travelerName)}
-                            className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
+                            className="border-foreground text-foreground hover:bg-foreground/10"
                           >
                             {cancelCheckoutMutation.isPending ? 'Canceling...' : 'Cancel Checkout'}
                           </Button>
                           <Button
                             size="sm"
-                            disabled={cancelCheckoutMutation.isPending || acceptOfferMutation.isPending}
+                            disabled={
+                              cancelCheckoutMutation.isPending || acceptOfferMutation.isPending
+                            }
                             onClick={() => handleAcceptOffer(offer.id, travelerName)}
-                            className="flex-1 bg-[#0B3A8E] hover:bg-[#092E72] text-white font-semibold shadow-sm"
+                            className="bg-foreground hover:bg-foreground/90 text-white shadow-xs"
                           >
                             {acceptOfferMutation.isPending ? 'Redirecting...' : 'Pay Now'}
                           </Button>
@@ -308,17 +334,21 @@ export function OffersReceivedSection({
                           <Button
                             variant="outline"
                             size="sm"
-                            disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
-                            onClick={() => handleRejectOffer(offer.id, travelerName)}
-                            className="flex-1 bg-background border-slate-200 text-foreground hover:bg-slate-50 font-semibold"
+                            disabled={
+                              rejectOfferMutation.isPending || acceptOfferMutation.isPending
+                            }
+                            onClick={() => handleCounterOffer(offer.id, travelerName)}
+                            className="border-foreground text-foreground hover:bg-foreground/10"
                           >
-                            {rejectOfferMutation.isPending ? 'Declining...' : 'Reject'}
+                            {rejectOfferMutation.isPending ? 'Processing...' : 'Counter offer'}
                           </Button>
                           <Button
                             size="sm"
-                            disabled={rejectOfferMutation.isPending || acceptOfferMutation.isPending}
+                            disabled={
+                              rejectOfferMutation.isPending || acceptOfferMutation.isPending
+                            }
                             onClick={() => handleAcceptOffer(offer.id, travelerName)}
-                            className="flex-1 bg-[#0B3A8E] hover:bg-[#092E72] text-white font-semibold shadow-sm"
+                            className="bg-foreground hover:bg-foreground/90 text-white shadow-xs"
                           >
                             {acceptOfferMutation.isPending ? 'Accepting...' : 'Accept'}
                           </Button>

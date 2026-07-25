@@ -51,12 +51,8 @@ export function RevenueChartCard({
     setIsMounted(true);
   }, []);
 
-  const startDateStr = dateRange?.from
-    ? dateRange.from.toISOString().split('T')[0]
-    : undefined;
-  const endDateStr = dateRange?.to
-    ? dateRange.to.toISOString().split('T')[0]
-    : startDateStr;
+  const startDateStr = dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined;
+  const endDateStr = dateRange?.to ? dateRange.to.toISOString().split('T')[0] : startDateStr;
 
   const { data: apiData } = useQuery({
     queryKey: ['revenue-chart', startDateStr, endDateStr],
@@ -76,7 +72,10 @@ export function RevenueChartCard({
       }`
     : 'Select date range';
 
-  const dateRangeText = overrideDateRange || (apiData?.dateRangeText && dateRange?.from ? formattedDateRangeText : apiData?.dateRangeText) || formattedDateRangeText;
+  const dateRangeText =
+    overrideDateRange ||
+    (apiData?.dateRangeText && dateRange?.from ? formattedDateRangeText : apiData?.dateRangeText) ||
+    formattedDateRangeText;
   const chartData = overrideData || apiData?.chartData || [];
 
   // Dynamic Y Axis formatter
@@ -116,7 +115,7 @@ export function RevenueChartCard({
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-6 flex flex-col justify-between">
+    <div className="w-full bg-white rounded-lg border border-slate-200/80 shadow-xs p-6 space-y-6 flex flex-col justify-between">
       {/* Top Header & Legend */}
       <div className="space-y-4">
         {/* Row 1: Title & Date Range Selection Popover */}
@@ -128,21 +127,24 @@ export function RevenueChartCard({
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer outline-hidden shadow-2xs"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer outline-hidden shadow-2xs"
               >
                 <CalendarIcon className="h-3.5 w-3.5 text-slate-400" />
                 <span>{dateRangeText}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
               </button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-auto p-0 rounded-2xl border border-slate-200 shadow-xl bg-white">
+            <PopoverContent
+              align="end"
+              className="w-auto p-0 rounded-lg border border-slate-200 shadow-xl bg-white"
+            >
               <Calendar
                 mode="range"
                 defaultMonth={dateRange?.from}
                 selected={dateRange}
                 onSelect={setDateRange}
                 numberOfMonths={2}
-                className="rounded-2xl"
+                className="rounded-lg"
               />
             </PopoverContent>
           </Popover>
@@ -213,7 +215,10 @@ export function RevenueChartCard({
                 domain={[0, 'auto']}
               />
 
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5 }} />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5 }}
+              />
 
               {/* Total Earned Area (Dark Navy/Blue) */}
               <Area
@@ -237,7 +242,7 @@ export function RevenueChartCard({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" />
+          <div className="h-full w-full bg-slate-50 animate-pulse rounded-lg" />
         )}
       </div>
     </div>
