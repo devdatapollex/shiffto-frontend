@@ -6,14 +6,12 @@ import {
   Package,
   Truck,
   CheckCircle2,
-  CircleAlert,
   PlaneTakeoff,
   TowerControl,
   DollarSign,
   ShieldCheck,
   LifeBuoy,
   Banknote,
-  RefreshCw,
   XCircle,
   ArrowUpRight,
   TrendingUp,
@@ -34,12 +32,7 @@ import { reviewKyc } from '@/services/profile.service';
 export default function AdminDashboardPage() {
   const queryClient = useQueryClient();
 
-  const {
-    data: analytics,
-    isLoading,
-    isRefetching,
-    refetch,
-  } = useQuery({
+  const { data: analytics, isLoading } = useQuery({
     queryKey: ['admin-analytics'],
     queryFn: getAdminAnalytics,
     refetchOnWindowFocus: true,
@@ -124,77 +117,10 @@ export default function AdminDashboardPage() {
     },
   ];
 
-  const financialItems = [
-    {
-      id: 'gross-volume',
-      label: 'Gross Volume',
-      value: `$${(stats?.totalVolume || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      icon: DollarSign,
-      iconBg: 'bg-[#eefcf4]',
-      iconColor: 'text-[#10b981]',
-    },
-    {
-      id: 'commission',
-      label: 'Platform Commission',
-      value: `$${(stats?.totalCommission || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      icon: Percent,
-      iconBg: 'bg-[#f0f5ff]',
-      iconColor: 'text-[#0B3A8E]',
-    },
-    {
-      id: 'pending-kyc',
-      label: 'Pending KYC',
-      value: formatValue(stats?.pendingKycCount),
-      icon: ShieldAlert,
-      iconBg: 'bg-[#fff5f0]',
-      iconColor: 'text-[#FF6F3F]',
-    },
-    {
-      id: 'open-tickets',
-      label: 'Open Tickets',
-      value: formatValue(stats?.openTicketsCount),
-      icon: LifeBuoy,
-      iconBg: 'bg-[#eef4ff]',
-      iconColor: 'text-[#3b82f6]',
-    },
-  ];
-
   return (
     <RoleGuard roles={['admin']}>
       <div className="space-y-6 sm:space-y-8 max-w-[1144px] mx-auto pb-12">
-        {/* Top Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-lg border border-slate-200/80 p-5 sm:p-7 shadow-xs">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#f0f5ff] text-[#0B3A8E] border border-[#dbeafe] text-xs font-extrabold uppercase tracking-wider">
-                Admin Panel
-              </span>
-              <span className="inline-flex items-center gap-1 text-xs text-slate-400 font-medium">
-                <span className="h-2 w-2 rounded-full bg-[#22c55e] animate-pulse" />
-                Live System Metrics
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0B3A8E]">
-              Admin Home Overview
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-400 font-medium mt-1">
-              Monitor overall platform volume, pending user verifications, support activity, and
-              operational statistics.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isLoading || isRefetching}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200/90 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer shadow-xs self-start sm:self-center shrink-0"
-          >
-            <RefreshCw className={`h-4 w-4 text-slate-400 ${isRefetching ? 'animate-spin' : ''}`} />
-            <span>Sync Data</span>
-          </button>
-        </div>
-
-        {/* Action Required Banner Section - 4 Typical Card Shapes */}
+        {/* Action Required Section - 4 Card Shapes */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-[#0B3A8E] tracking-tight">
@@ -374,29 +300,55 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Financial Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {financialItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={item.id}
-                className="bg-white border border-slate-200/80 rounded-lg p-5 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all"
-              >
-                <div className="space-y-1">
-                  <div className="text-xs sm:text-sm font-medium text-slate-400">{item.label}</div>
-                  <div className="text-xl sm:text-2xl font-extrabold text-[#0B3A8E] tracking-tight">
-                    {isLoading ? '...' : item.value}
-                  </div>
-                </div>
-                <div
-                  className={`h-11 w-11 rounded-lg ${item.iconBg} ${item.iconColor} flex items-center justify-center shrink-0`}
-                >
-                  <Icon className="h-5.5 w-5.5 stroke-[1.75]" />
-                </div>
+        {/* Financial Summary Cards - 2 Large & Wide Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          {/* Gross Volume Card */}
+          <div className="bg-white border border-slate-200/80 rounded-lg p-6 sm:p-7 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+            <div className="space-y-1">
+              <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+                Gross Transaction Volume
               </div>
-            );
-          })}
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#0B3A8E] tracking-tight">
+                {isLoading
+                  ? '...'
+                  : `$${(stats?.totalVolume || 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`}
+              </div>
+              <div className="text-xs font-medium text-[#10b981] flex items-center gap-1 pt-1">
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span>Total platform volume processed</span>
+              </div>
+            </div>
+            <div className="h-14 w-14 rounded-xl bg-[#eefcf4] text-[#10b981] border border-[#c6f6d5] flex items-center justify-center shrink-0">
+              <DollarSign className="h-7 w-7 stroke-[2]" />
+            </div>
+          </div>
+
+          {/* Platform Commission Card */}
+          <div className="bg-white border border-slate-200/80 rounded-lg p-6 sm:p-7 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+            <div className="space-y-1">
+              <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+                Platform Commission
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#0B3A8E] tracking-tight">
+                {isLoading
+                  ? '...'
+                  : `$${(stats?.totalCommission || 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`}
+              </div>
+              <div className="text-xs font-medium text-[#0B3A8E] flex items-center gap-1 pt-1">
+                <Percent className="h-3.5 w-3.5" />
+                <span>Total earnings collected from completed payouts</span>
+              </div>
+            </div>
+            <div className="h-14 w-14 rounded-xl bg-[#f0f5ff] text-[#0B3A8E] border border-[#dbeafe] flex items-center justify-center shrink-0">
+              <Percent className="h-7 w-7 stroke-[2]" />
+            </div>
+          </div>
         </div>
 
         {/* Platform Monthly Activity & Revenue Chart (Styled like RevenueChartCard) */}
