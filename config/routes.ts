@@ -28,6 +28,7 @@ export const ROUTES = {
   NOTIFICATIONS: '/dashboard/notifications',
 
   // Admin-only Routes
+  ADMIN_DASHBOARD: '/dashboard/admin',
   ADMIN_SHIPMENTS: '/dashboard/admin/shipments',
   SETTLEMENTS: '/dashboard/settlements',
   WITHDRAWALS: '/dashboard/withdrawals',
