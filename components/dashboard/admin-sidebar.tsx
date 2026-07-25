@@ -144,7 +144,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         {/* Logo Section */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-border-layout bg-primary/[0.02]">
           {!isCollapsed ? (
-            <Link href={ROUTES.DASHBOARD} className="flex items-center gap-2">
+            <Link href={ROUTES.ADMIN_DASHBOARD} className="flex items-center gap-2">
               <img src="/shiffto-icon.svg" alt="SHIFFTO Icon" className="h-9 w-auto shrink-0" />
               <img src="/shiffto-name.svg" alt="SHIFFTO Name" className="h-2 w-auto shrink-0" />
               <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary uppercase font-bold">
@@ -152,7 +152,10 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
               </span>
             </Link>
           ) : (
-            <Link href={ROUTES.DASHBOARD} className="mx-auto flex items-center justify-center">
+            <Link
+              href={ROUTES.ADMIN_DASHBOARD}
+              className="mx-auto flex items-center justify-center"
+            >
               <img src="/shiffto-icon.svg" alt="SHIFFTO Icon" className="h-9 w-auto" />
             </Link>
           )}

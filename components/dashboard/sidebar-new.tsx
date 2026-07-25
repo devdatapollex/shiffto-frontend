@@ -186,7 +186,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           {role === 'admin' && (
             <div className="pt-4 border-t border-border-layout">
               <Link
-                href={ROUTES.ADMIN_KYC}
+                href={ROUTES.ADMIN_DASHBOARD}
                 className={cn(
                   'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                   'text-muted-foreground hover:bg-primary/5 hover:text-primary'

@@ -33,7 +33,7 @@ import { Input } from '@/components/ui/input';
 export default function AdminLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || ROUTES.DASHBOARD;
+  const callbackUrl = searchParams.get('callbackUrl') || ROUTES.ADMIN_DASHBOARD;
 
   const [showPassword, setShowPassword] = useState(false);
 
