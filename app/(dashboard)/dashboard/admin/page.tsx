@@ -20,6 +20,7 @@ import {
   Percent,
   Check,
   ShieldAlert,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -193,8 +194,8 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        {/* Action Required Banner Section (Styled like HomeQuickActions) */}
-        <div className="w-full bg-white rounded-lg border border-slate-200/80 shadow-xs p-5 sm:p-7 space-y-4">
+        {/* Action Required Banner Section - 4 Typical Card Shapes */}
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-[#0B3A8E] tracking-tight">
               Action Required
@@ -202,72 +203,132 @@ export default function AdminDashboardPage() {
             <span className="text-xs font-medium text-slate-400">High priority tasks</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-            {/* Pending KYC Action Card */}
-            <div className="bg-[#fff8f0] border border-[#ffedd5] rounded-lg p-4 flex items-center justify-between shadow-2xs">
-              <div className="flex items-center gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {/* Pending KYC Card */}
+            <Link
+              href={ROUTES.ADMIN_KYC}
+              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#FF6F3F]/40 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
                 <div className="h-10 w-10 rounded-lg bg-[#fff5f0] text-[#FF6F3F] flex items-center justify-center shrink-0 border border-[#ffedd5]">
                   <ShieldAlert className="h-5 w-5 stroke-[1.75]" />
                 </div>
-                <div>
-                  <div className="text-xs font-medium text-slate-500">Pending KYC</div>
-                  <div className="text-xl font-extrabold text-[#0B3A8E]">
-                    {isLoading ? '...' : formatValue(stats?.pendingKycCount)}
-                  </div>
+                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff5f0] group-hover:text-[#FF6F3F] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
-              <Link
-                href={ROUTES.ADMIN_KYC}
-                className="px-3.5 py-2 rounded-lg bg-[#FF6F3F] hover:bg-[#e05b2e] text-white text-xs font-semibold flex items-center gap-1 transition-colors shadow-xs"
-              >
-                <span>Review</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
 
-            {/* Open Tickets Action Card */}
-            <div className="bg-[#f0f5ff] border border-[#dbeafe] rounded-lg p-4 flex items-center justify-between shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-white text-[#0B3A8E] flex items-center justify-center shrink-0 border border-[#dbeafe]">
+              <div className="space-y-1">
+                {isLoading ? (
+                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
+                    {formatValue(stats?.pendingKycCount)}
+                  </div>
+                )}
+                <div className="text-xs sm:text-sm font-semibold text-slate-700">Pending KYC</div>
+              </div>
+
+              <div className="text-xs font-semibold text-[#FF6F3F] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+                <span>Review Submissions</span>
+                <ArrowUpRight className="h-3 w-3" />
+              </div>
+            </Link>
+
+            {/* Pending Trip Card */}
+            <Link
+              href={ROUTES.ADMIN_TRIPS}
+              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#FF8552]/40 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-10 w-10 rounded-lg bg-[#fff8f0] text-[#FF8552] flex items-center justify-center shrink-0 border border-[#ffe8dc]">
+                  <PlaneTakeoff className="h-5 w-5 stroke-[1.75]" />
+                </div>
+                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff8f0] group-hover:text-[#FF8552] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                {isLoading ? (
+                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
+                    {formatValue(stats?.pendingTripsCount)}
+                  </div>
+                )}
+                <div className="text-xs sm:text-sm font-semibold text-slate-700">Pending Trips</div>
+              </div>
+
+              <div className="text-xs font-semibold text-[#FF8552] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+                <span>Review Trips</span>
+                <ArrowUpRight className="h-3 w-3" />
+              </div>
+            </Link>
+
+            {/* Open Tickets Card */}
+            <Link
+              href={ROUTES.ADMIN_TICKETS}
+              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#0B3A8E]/40 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-10 w-10 rounded-lg bg-[#f0f5ff] text-[#0B3A8E] flex items-center justify-center shrink-0 border border-[#dbeafe]">
                   <LifeBuoy className="h-5 w-5 stroke-[1.75]" />
                 </div>
-                <div>
-                  <div className="text-xs font-medium text-slate-500">Open Tickets</div>
-                  <div className="text-xl font-extrabold text-[#0B3A8E]">
-                    {isLoading ? '...' : formatValue(stats?.openTicketsCount)}
-                  </div>
+                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#f0f5ff] group-hover:text-[#0B3A8E] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
-              <Link
-                href={ROUTES.ADMIN_TICKETS}
-                className="px-3.5 py-2 rounded-lg bg-[#0B3A8E] hover:bg-[#082a69] text-white text-xs font-semibold flex items-center gap-1 transition-colors shadow-xs"
-              >
-                <span>Manage</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
 
-            {/* Pending Withdrawals Action Card */}
-            <div className="bg-[#eefcf4] border border-[#c6f6d5] rounded-lg p-4 flex items-center justify-between shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-white text-[#10b981] flex items-center justify-center shrink-0 border border-[#c6f6d5]">
+              <div className="space-y-1">
+                {isLoading ? (
+                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
+                    {formatValue(stats?.openTicketsCount)}
+                  </div>
+                )}
+                <div className="text-xs sm:text-sm font-semibold text-slate-700">Open Tickets</div>
+              </div>
+
+              <div className="text-xs font-semibold text-[#0B3A8E] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+                <span>Manage Support</span>
+                <ArrowUpRight className="h-3 w-3" />
+              </div>
+            </Link>
+
+            {/* Pending Withdrawal Card */}
+            <Link
+              href={ROUTES.WITHDRAWALS}
+              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#10b981]/40 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-10 w-10 rounded-lg bg-[#eefcf4] text-[#10b981] flex items-center justify-center shrink-0 border border-[#c6f6d5]">
                   <Banknote className="h-5 w-5 stroke-[1.75]" />
                 </div>
-                <div>
-                  <div className="text-xs font-medium text-slate-500">Pending Withdrawals</div>
-                  <div className="text-xl font-extrabold text-[#0B3A8E]">
-                    {isLoading ? '...' : formatValue(stats?.pendingWithdrawalsCount)}
-                  </div>
+                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#eefcf4] group-hover:text-[#10b981] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
-              <Link
-                href={ROUTES.WITHDRAWALS}
-                className="px-3.5 py-2 rounded-lg bg-[#10b981] hover:bg-[#0d9668] text-white text-xs font-semibold flex items-center gap-1 transition-colors shadow-xs"
-              >
-                <span>Process</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
+
+              <div className="space-y-1">
+                {isLoading ? (
+                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
+                    {formatValue(stats?.pendingWithdrawalsCount)}
+                  </div>
+                )}
+                <div className="text-xs sm:text-sm font-semibold text-slate-700">
+                  Pending Withdrawals
+                </div>
+              </div>
+
+              <div className="text-xs font-semibold text-[#10b981] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+                <span>Process Payouts</span>
+                <ArrowUpRight className="h-3 w-3" />
+              </div>
+            </Link>
           </div>
         </div>
 

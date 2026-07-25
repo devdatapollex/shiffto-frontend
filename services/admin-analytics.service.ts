@@ -10,6 +10,7 @@ export interface AdminStats {
   activeTrips: number;
   completedTrips: number;
   pendingKycCount: number;
+  pendingTripsCount: number;
   openTicketsCount: number;
   pendingWithdrawalsCount: number;
   totalVolume: number;
