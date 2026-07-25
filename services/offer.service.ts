@@ -10,7 +10,7 @@ export interface Offer {
   senderPrice: number;
   offeredPrice: number;
   bagType: 'cabin' | 'checkIn';
-  status: 'PENDING' | 'PAYMENT_PENDING' | 'ACCEPTED' | 'REJECTED' | 'PAYMENT_CANCELED';
+  status: 'PENDING' | 'PAYMENT_PENDING' | 'ACCEPTED' | 'REJECTED' | 'PAYMENT_CANCELED' | 'EXPIRED';
   isCounterOffer: boolean;
   createdAt: string;
   traveller?: { id: string; name: string; email: string; image: string | null };

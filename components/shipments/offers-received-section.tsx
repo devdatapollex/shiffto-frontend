@@ -1,5 +1,4 @@
-'use client';
-
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock, PlaneTakeoff, Luggage, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -34,24 +33,44 @@ export function formatFlightDate(dateStr?: string) {
   }
 }
 
-export function getFlightTimeStatus(flightDateStr?: string) {
-  if (!flightDateStr) return { label: '08:45', class: 'bg-[#FFECEC] text-[#FF5D5D]' };
-  const flightDate = new Date(flightDateStr);
-  const now = new Date();
-  const diffMs = flightDate.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
-
-  if (diffHours < 0) {
-    return { label: 'Passed', class: 'bg-slate-100 text-slate-500' };
-  } else if (diffHours < 24) {
-    const hours = Math.max(0, Math.floor(diffHours));
-    const mins = Math.max(0, Math.floor((diffHours - hours) * 60));
-    const timeStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-    return { label: timeStr, class: 'bg-[#FFECEC] text-[#FF5D5D]' };
-  } else {
-    const days = Math.round(diffHours / 24);
-    return { label: `${days}d left`, class: 'bg-[#FFECEC] text-[#FF5D5D]' };
+export function getOfferExpirationStatus(createdAtStr?: string, status?: string) {
+  if (status === 'EXPIRED') {
+    return { label: 'Expired', class: 'bg-slate-100 text-slate-500', isExpired: true };
   }
+  if (!createdAtStr) {
+    return { label: '30:00 left', class: 'bg-[#DCFCE7] text-[#16A34A]', isExpired: false };
+  }
+
+  const createdAt = new Date(createdAtStr).getTime();
+  const totalDurationMs = 30 * 60 * 1000;
+  const expiresAt = createdAt + totalDurationMs;
+  const now = Date.now();
+  const diffMs = expiresAt - now;
+
+  if (diffMs <= 0) {
+    return { label: 'Expired', class: 'bg-slate-100 text-slate-500', isExpired: true };
+  }
+
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+  const label = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} left`;
+
+  const timePassedMs = now - createdAt;
+  const timePassedRatio = timePassedMs / totalDurationMs;
+
+  let colorClass = '';
+  if (timePassedRatio < 1 / 3) {
+    colorClass = 'bg-[#DCFCE7] text-[#16A34A]';
+  } else if (timePassedRatio < 2 / 3) {
+    colorClass = 'bg-[#FEF3C7] text-[#D97706]';
+  } else {
+    colorClass = 'bg-[#FEE2E2] text-[#DC2626]';
+    if (minutes < 5) {
+      colorClass += ' animate-pulse';
+    }
+  }
+
+  return { label, class: colorClass, isExpired: false };
 }
 
 export function OffersReceivedSection({
@@ -60,6 +79,13 @@ export function OffersReceivedSection({
 }: OffersReceivedSectionProps) {
   const { data: offersData, isLoading: offersLoading } = useReceivedOffers();
   const offers = offersData || [];
+
+  const [, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const acceptOfferMutation = useAcceptOffer();
   const rejectOfferMutation = useRejectOffer();
@@ -179,7 +205,8 @@ export function OffersReceivedSection({
               }
             >
               {offers.map((offer) => {
-                const timeStatus = getFlightTimeStatus(offer.trip?.flightDate);
+                const timeStatus = getOfferExpirationStatus(offer.createdAt, offer.status);
+                const isExpired = timeStatus.isExpired || offer.status === 'EXPIRED';
                 const travelerName = offer.traveller?.name || 'Unknown Traveler';
                 const offeredPrice = offer.offeredPrice;
 
@@ -274,9 +301,9 @@ export function OffersReceivedSection({
                             <h4 className="text-sm font-normal text-[#0B3A8E] truncate">
                               {travelerName}
                             </h4>
-                            <div className="flex items-center gap-1.5 text-xs text-slate-500 truncate">
-                              <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                              <span className="truncate">
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 text-nowrap">
+                              <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400" />
+                              <span>
                                 {offer.trip?.flightNumber || 'N/A'} •{' '}
                                 {formatFlightDate(offer.trip?.flightDate)}
                               </span>
@@ -287,8 +314,20 @@ export function OffersReceivedSection({
                           <span className="text-xl font-bold text-[#0B3A8E] block">
                             ${offeredPrice}
                           </span>
-                          <span className="text-xs text-slate-400 font-normal block">
-                            {offer.isCounterOffer ? 'Counter Offer' : 'Offered price'}
+                          <span className="text-xs text-slate-400 font-normal block leading-tight">
+                            {offer.isCounterOffer ? (
+                              <>
+                                Counter
+                                <br />
+                                Offer
+                              </>
+                            ) : (
+                              <>
+                                Offered
+                                <br />
+                                Price
+                              </>
+                            )}
                           </span>
                         </div>
                       </div>
@@ -305,7 +344,16 @@ export function OffersReceivedSection({
 
                     {/* Action buttons */}
                     <div className="grid grid-cols-2 gap-3">
-                      {offer.status === 'PAYMENT_PENDING' ? (
+                      {isExpired ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled
+                          className="col-span-2 bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                        >
+                          Offer Expired
+                        </Button>
+                      ) : offer.status === 'PAYMENT_PENDING' ? (
                         <>
                           <Button
                             variant="outline"
