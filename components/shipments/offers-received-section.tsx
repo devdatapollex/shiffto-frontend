@@ -274,9 +274,9 @@ export function OffersReceivedSection({
                             <h4 className="text-sm font-normal text-[#0B3A8E] truncate">
                               {travelerName}
                             </h4>
-                            <div className="flex items-center gap-1.5 text-xs text-slate-500 truncate">
-                              <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                              <span className="truncate">
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 text-nowrap">
+                              <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400" />
+                              <span>
                                 {offer.trip?.flightNumber || 'N/A'} •{' '}
                                 {formatFlightDate(offer.trip?.flightDate)}
                               </span>
@@ -288,7 +288,7 @@ export function OffersReceivedSection({
                             ${offeredPrice}
                           </span>
                           <span className="text-xs text-slate-400 font-normal block">
-                            {offer.isCounterOffer ? 'Counter Offer' : 'Offered price'}
+                            {offer.isCounterOffer ? 'Counter Offer' : 'Offered Price'}
                           </span>
                         </div>
                       </div>
