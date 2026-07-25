@@ -1,5 +1,4 @@
-'use client';
-
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock, PlaneTakeoff, Luggage, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -34,24 +33,30 @@ export function formatFlightDate(dateStr?: string) {
   }
 }
 
-export function getFlightTimeStatus(flightDateStr?: string) {
-  if (!flightDateStr) return { label: '08:45', class: 'bg-[#FFECEC] text-[#FF5D5D]' };
-  const flightDate = new Date(flightDateStr);
-  const now = new Date();
-  const diffMs = flightDate.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
-
-  if (diffHours < 0) {
-    return { label: 'Passed', class: 'bg-slate-100 text-slate-500' };
-  } else if (diffHours < 24) {
-    const hours = Math.max(0, Math.floor(diffHours));
-    const mins = Math.max(0, Math.floor((diffHours - hours) * 60));
-    const timeStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-    return { label: timeStr, class: 'bg-[#FFECEC] text-[#FF5D5D]' };
-  } else {
-    const days = Math.round(diffHours / 24);
-    return { label: `${days}d left`, class: 'bg-[#FFECEC] text-[#FF5D5D]' };
+export function getOfferExpirationStatus(createdAtStr?: string, status?: string) {
+  if (status === 'EXPIRED') {
+    return { label: 'Expired', class: 'bg-slate-100 text-slate-500', isExpired: true };
   }
+  if (!createdAtStr) {
+    return { label: '30:00 left', class: 'bg-[#FFECEC] text-[#FF5D5D]', isExpired: false };
+  }
+
+  const createdAt = new Date(createdAtStr).getTime();
+  const expiresAt = createdAt + 30 * 60 * 1000;
+  const diffMs = expiresAt - Date.now();
+
+  if (diffMs <= 0) {
+    return { label: 'Expired', class: 'bg-slate-100 text-slate-500', isExpired: true };
+  }
+
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+  const label = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} left`;
+
+  if (minutes < 5) {
+    return { label, class: 'bg-[#FFECEC] text-[#FF5D5D] animate-pulse', isExpired: false };
+  }
+  return { label, class: 'bg-[#FFECEC] text-[#FF5D5D]', isExpired: false };
 }
 
 export function OffersReceivedSection({
@@ -60,6 +65,13 @@ export function OffersReceivedSection({
 }: OffersReceivedSectionProps) {
   const { data: offersData, isLoading: offersLoading } = useReceivedOffers();
   const offers = offersData || [];
+
+  const [, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const acceptOfferMutation = useAcceptOffer();
   const rejectOfferMutation = useRejectOffer();
@@ -179,7 +191,8 @@ export function OffersReceivedSection({
               }
             >
               {offers.map((offer) => {
-                const timeStatus = getFlightTimeStatus(offer.trip?.flightDate);
+                const timeStatus = getOfferExpirationStatus(offer.createdAt, offer.status);
+                const isExpired = timeStatus.isExpired || offer.status === 'EXPIRED';
                 const travelerName = offer.traveller?.name || 'Unknown Traveler';
                 const offeredPrice = offer.offeredPrice;
 
@@ -317,7 +330,16 @@ export function OffersReceivedSection({
 
                     {/* Action buttons */}
                     <div className="grid grid-cols-2 gap-3">
-                      {offer.status === 'PAYMENT_PENDING' ? (
+                      {isExpired ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled
+                          className="col-span-2 bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                        >
+                          Offer Expired
+                        </Button>
+                      ) : offer.status === 'PAYMENT_PENDING' ? (
                         <>
                           <Button
                             variant="outline"
