@@ -2,7 +2,8 @@ import apiClient from '@/lib/api-client';
 import type { WithdrawalHistoryItem } from './payment.service';
 
 export interface RequestWithdrawalPayload {
-  grossAmount: number;
+  amount?: number;
+  grossAmount?: number;
   paymentMethodId: string;
 }
 

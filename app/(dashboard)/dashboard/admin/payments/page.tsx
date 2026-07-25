@@ -266,7 +266,7 @@ export default function AdminPaymentsPage() {
                 <h3 className="text-xl font-bold text-purple-600 mt-1">
                   ${data?.stats.estimatedCommission.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h3>
-                <p className="text-[11px] text-muted-foreground mt-1">Based on 30% commission</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Total commission collected</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
                 <TrendingUp className="h-5 w-5" />

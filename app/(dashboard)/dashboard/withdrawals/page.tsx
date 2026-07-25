@@ -195,12 +195,9 @@ export default function AdminWithdrawalsPage() {
       let aValue: number | string;
       let bValue: number | string;
 
-      if (sortBy === 'grossAmount') {
-        aValue = a.grossAmount;
-        bValue = b.grossAmount;
-      } else if (sortBy === 'netAmount') {
-        aValue = a.netAmount;
-        bValue = b.netAmount;
+      if (sortBy === 'amount') {
+        aValue = a.amount;
+        bValue = b.amount;
       } else if (sortBy === 'withdrawalNo') {
         aValue = a.withdrawalNo;
         bValue = b.withdrawalNo;
@@ -333,11 +330,8 @@ export default function AdminWithdrawalsPage() {
                 <DropdownMenuItem onClick={() => handleSort('withdrawalNo')}>
                   Sort by ID{sortIndicator('withdrawalNo')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort('grossAmount')}>
-                  Sort by Gross{sortIndicator('grossAmount')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort('netAmount')}>
-                  Sort by Net{sortIndicator('netAmount')}
+                <DropdownMenuItem onClick={() => handleSort('amount')}>
+                  Sort by Amount{sortIndicator('amount')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -392,9 +386,7 @@ export default function AdminWithdrawalsPage() {
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                   <th className="px-5 py-4 font-semibold">Withdrawal #</th>
                   <th className="px-5 py-4 font-semibold">Traveler</th>
-                  <th className="px-5 py-4 font-semibold">Gross Amount</th>
-                  <th className="px-5 py-4 font-semibold">Commission Cut</th>
-                  <th className="px-5 py-4 font-semibold">Net Payout</th>
+                  <th className="px-5 py-4 font-semibold">Amount</th>
                   <th className="px-5 py-4 font-semibold">Payout Method</th>
                   <th className="px-5 py-4 font-semibold">Status</th>
                   <th className="px-5 py-4 font-semibold text-right">Actions</th>
@@ -417,15 +409,8 @@ export default function AdminWithdrawalsPage() {
                         </p>
                         <p className="text-xs text-slate-400">{wdr.user?.email}</p>
                       </td>
-                      <td className="px-5 py-4 font-semibold text-slate-700">
-                        ${wdr.grossAmount.toFixed(2)}
-                      </td>
-                      <td className="px-5 py-4 text-slate-500">
-                        -${wdr.commissionAmount.toFixed(2)} ({Math.round(wdr.commissionRate * 100)}
-                        %)
-                      </td>
                       <td className="px-5 py-4 font-bold text-emerald-600">
-                        ${wdr.netAmount.toFixed(2)}
+                        ${wdr.amount.toFixed(2)}
                       </td>
                       <td className="px-5 py-4 text-xs space-y-0.5">
                         <p className="font-semibold text-slate-800">
@@ -622,9 +607,9 @@ export default function AdminWithdrawalsPage() {
                 </span>
               </p>
               <p>
-                <span className="text-slate-500">Net Payout:</span>{' '}
+                <span className="text-slate-500">Payout Amount:</span>{' '}
                 <span className="font-bold text-emerald-600">
-                  ${selectedWithdrawal?.netAmount.toFixed(2)}
+                  ${selectedWithdrawal?.amount.toFixed(2)}
                 </span>
               </p>
               <p>

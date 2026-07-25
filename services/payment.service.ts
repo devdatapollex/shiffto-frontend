@@ -8,6 +8,9 @@ export interface PaymentTransaction {
   senderId: string;
   travellerId: string;
   grossAmount: number;
+  commissionRate: number;
+  commissionAmount: number;
+  netAmount: number;
   currency: string;
   paymentGateway: string;
   gatewayTxnId: string | null;
@@ -32,21 +35,15 @@ export interface SenderSummaryResponse {
   transactions: PaymentTransaction[];
 }
 
-export interface TravelerEarningsTransaction extends PaymentTransaction {
-  commissionAmount: number;
-  netAmount: number;
-}
+export type TravelerEarningsTransaction = PaymentTransaction;
 
 export interface WithdrawalHistoryItem {
   id: string;
   withdrawalNo: string;
   userId: string;
-  grossAmount: number;
-  commissionRate: number;
-  commissionAmount: number;
-  netAmount: number;
+  amount: number;
   paymentMethodId: string | null;
-  paymentMethodDetails: Record<string, any> | null;
+  paymentMethodDetails: Record<string, unknown> | null;
   payoutTxnId: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   rejectionReason: string | null;
@@ -57,12 +54,11 @@ export interface WithdrawalHistoryItem {
 export interface TravelerSummaryResponse {
   stats: {
     totalEarnings: number;
+    escrowedEarnings: number;
     pendingReleaseEarnings: number;
     awaitingPayout: number;
     disputeAmount: number;
     availableForWithdrawal: number;
-    commissionRate: number;
-    commissionPercentage: number;
   };
   earningsHistory: TravelerEarningsTransaction[];
   withdrawalHistory: WithdrawalHistoryItem[];
