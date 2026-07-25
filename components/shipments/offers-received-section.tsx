@@ -287,8 +287,20 @@ export function OffersReceivedSection({
                           <span className="text-xl font-bold text-[#0B3A8E] block">
                             ${offeredPrice}
                           </span>
-                          <span className="text-xs text-slate-400 font-normal block">
-                            {offer.isCounterOffer ? 'Counter Offer' : 'Offered Price'}
+                          <span className="text-xs text-slate-400 font-normal block leading-tight">
+                            {offer.isCounterOffer ? (
+                              <>
+                                Counter
+                                <br />
+                                Offer
+                              </>
+                            ) : (
+                              <>
+                                Offered
+                                <br />
+                                Price
+                              </>
+                            )}
                           </span>
                         </div>
                       </div>
