@@ -20,7 +20,7 @@ import {
   Bell,
   Percent,
   DollarSign,
-  LayoutDashboard,
+  Home,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
@@ -58,9 +58,9 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
 
   const adminMenuItems = [
     {
-      label: 'Overview',
+      label: 'Home',
       href: ROUTES.ADMIN_DASHBOARD,
-      icon: LayoutDashboard,
+      icon: Home,
     },
     {
       label: 'KYC Verifications',
