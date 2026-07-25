@@ -151,7 +151,7 @@ export default function AdminPaymentsPage() {
   const totalPages = data?.meta ? Math.ceil(data.meta.total / limit) : 1;
 
   return (
-    <RoleGuard allowedRoles={['admin']}>
+    <RoleGuard roles={['admin']}>
       <div className="space-y-6 p-6 max-w-7xl mx-auto">
         {/* Header */}
         <div>
