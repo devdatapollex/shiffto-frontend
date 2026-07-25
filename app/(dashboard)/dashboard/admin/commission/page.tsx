@@ -307,7 +307,7 @@ export default function CommissionSettingsPage() {
 
                 {/* Calculation Cards */}
                 <div className="space-y-3 pt-2">
-                  <div className="p-4 rounded-xl bg-card border border-border flex items-center justify-between">
+                  <div className="p-4 rounded-lg bg-card border border-border flex items-center justify-between">
                     <div>
                       <span className="text-xs text-muted-foreground font-medium block">
                         Gross Shipment Payment
@@ -319,7 +319,7 @@ export default function CommissionSettingsPage() {
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-between">
                     <div>
                       <span className="text-xs text-primary font-semibold block">
                         Platform Commission ({currentFormRateNum}%)
@@ -333,7 +333,7 @@ export default function CommissionSettingsPage() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
+                  <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
                     <div>
                       <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold block">
                         Traveler Net Payout ({Math.max(0, 100 - currentFormRateNum)}%)

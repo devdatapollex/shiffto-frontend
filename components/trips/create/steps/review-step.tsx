@@ -50,7 +50,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
   return (
     <div className="space-y-6">
       {/* Flight Details Card */}
-      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[#8292a1] text-lg font-medium">Flight details</h3>
           <button
@@ -137,7 +137,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
       </div>
 
       {/* Flight Ticket Card */}
-      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[#8292a1] text-lg font-medium">Flight ticket</h3>
           <button
@@ -151,7 +151,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
 
         {values.ticketPhoto ? (
           <div className="flex gap-6 items-start">
-            <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
+            <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-[#E2E8F0]/40 flex items-center justify-center">
               {isPdf ? (
                 <FileText className="h-10 w-10 text-red-500 shrink-0" />
               ) : (
@@ -176,7 +176,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
           </div>
         ) : (
           <div className="flex gap-6 items-start">
-            <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center">
+            <div className="h-[120px] w-[120px] shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 flex items-center justify-center">
               <FileText className="h-10 w-10 text-slate-300 shrink-0" />
             </div>
             <div className="flex-1 min-w-0 self-center">
@@ -193,7 +193,7 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
       </div>
 
       {/* Luggage Capacity Card */}
-      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-2xl p-6">
+      <div className="relative bg-[#F8FAFC] border border-[#e2e8f0] rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[#8292a1] text-lg font-medium">Luggage capacity</h3>
           <button
@@ -206,11 +206,11 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between">
+          <div className="bg-white border border-[#e2e8f0] rounded-lg py-3 px-5 flex items-center justify-between">
             <span className="text-[#8292a1] text-sm font-medium">Cabin Bag Capacity</span>
             <strong className="text-[#0B3A8E] text-base">{values.cabinBagCapacity || 0} KG</strong>
           </div>
-          <div className="bg-white border border-[#e2e8f0] rounded-xl py-3 px-5 flex items-center justify-between">
+          <div className="bg-white border border-[#e2e8f0] rounded-lg py-3 px-5 flex items-center justify-between">
             <span className="text-[#8292a1] text-sm font-medium">Check-In Bag Capacity</span>
             <strong className="text-[#0B3A8E] text-base">
               {values.checkInBagCapacity || 0} KG

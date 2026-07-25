@@ -35,7 +35,7 @@ export function KycGuard({ children }: { children: ReactNode }) {
   // Otherwise, render a premium block screen in place of the page content
   return (
     <div className="mx-auto max-w-[600px] py-12 px-4">
-      <div className="relative overflow-hidden rounded-2xl border border-primary/10 bg-card p-8 shadow-xl transition-all duration-300 hover:shadow-2xl">
+      <div className="relative overflow-hidden rounded-lg border border-primary/10 bg-card p-8 shadow-xl transition-all duration-300 hover:shadow-2xl">
         <div className="flex flex-col items-center text-center">
           {/* Icon Container matching modal */}
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600 border border-amber-100 mb-6">

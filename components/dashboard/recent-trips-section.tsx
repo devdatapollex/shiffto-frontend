@@ -89,12 +89,12 @@ export function RecentTripsSection({ trips, isLoading }: RecentTripsSectionProps
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-[320px] sm:w-[360px] shrink-0 h-64 rounded-2xl bg-slate-50 border border-slate-100 animate-pulse"
+              className="w-[320px] sm:w-[360px] shrink-0 h-64 rounded-lg bg-slate-50 border border-slate-100 animate-pulse"
             />
           ))}
         </div>
       ) : !trips || trips.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-xs">
+        <div className="bg-white rounded-lg border border-slate-100 p-8 text-center text-slate-400 text-xs">
           <Plane className="h-8 w-8 mx-auto mb-2 opacity-30 text-emerald-600 rotate-45" />
           No recent trips available.
         </div>
@@ -127,7 +127,7 @@ export function RecentTripsSection({ trips, isLoading }: RecentTripsSectionProps
               return (
                 <div
                   key={t.id}
-                  className="w-[320px] sm:w-[360px] shrink-0 bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                  className="w-[320px] sm:w-[360px] shrink-0 bg-white border border-slate-200/70 rounded-lg p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                 >
                   {/* Header: Trip ID + Status Badge */}
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -193,7 +193,7 @@ export function RecentTripsSection({ trips, isLoading }: RecentTripsSectionProps
                   </div>
 
                   {/* Details Box: Total & Remaining Capacity + Shipments Count */}
-                  <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3.5 space-y-2">
+                  <div className="bg-slate-50/80 border border-slate-100 rounded-lg p-3.5 space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-500 font-medium">Shipments</span>
                       <span className="font-semibold text-slate-700">

@@ -45,13 +45,8 @@ import {
   type SenderSummaryResponse,
   type TravelerSummaryResponse,
 } from '@/services/payment.service';
-import {
-  getMyPaymentMethods,
-  type PaymentMethod,
-} from '@/services/wallet.service';
-import {
-  requestWithdrawal,
-} from '@/services/withdrawal.service';
+import { getMyPaymentMethods, type PaymentMethod } from '@/services/wallet.service';
+import { requestWithdrawal } from '@/services/withdrawal.service';
 
 export default function PaymentEarningsPage() {
   const searchParams = useSearchParams();
@@ -139,16 +134,18 @@ export default function PaymentEarningsPage() {
   const calculatedNetPayout = Math.max(0, parsedWithdrawAmount - calculatedCommissionCut);
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-[1144px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Earnings & Payments</h1>
-          <p className="text-sm text-slate-500">Track your earnings, manage withdrawals, and view transaction history</p>
+          <p className="text-sm text-slate-500">
+            Track your earnings, manage withdrawals, and view transaction history
+          </p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-100 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-100 p-1 rounded-lg">
           <TabsTrigger value="earnings" className="rounded-lg font-medium">
             Earnings (Traveler)
           </TabsTrigger>
@@ -164,12 +161,14 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Earnings</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Total Earnings
+                  </p>
                   <p className="text-3xl font-extrabold text-slate-900">
                     ${travelerData?.stats.totalEarnings.toFixed(2) || '0.00'}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl">
+                <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl">
                   $
                 </div>
               </CardContent>
@@ -178,12 +177,14 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Awaiting Payout</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Awaiting Payout
+                  </p>
                   <p className="text-3xl font-extrabold text-amber-600">
                     ${travelerData?.stats.awaitingPayout.toFixed(2) || '0.00'}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                   <Clock className="w-6 h-6" />
                 </div>
               </CardContent>
@@ -192,13 +193,15 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Pending Release</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Pending Release
+                  </p>
                   <p className="text-3xl font-extrabold text-sky-600">
                     ${travelerData?.stats.pendingReleaseEarnings.toFixed(2) || '0.00'}
                   </p>
                   <p className="text-xs text-slate-400">Delivered, awaiting admin release</p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
                   <Info className="w-6 h-6" />
                 </div>
               </CardContent>
@@ -214,14 +217,15 @@ export default function PaymentEarningsPage() {
                   ${travelerData?.stats.availableForWithdrawal.toFixed(2) || '0.00'}
                 </p>
                 <p className="text-xs text-slate-500">
-                  Total Earnings minus withdrawn amounts. Current commission rate: <span className="font-semibold">{currentCommissionPercentage}%</span>
+                  Total Earnings minus withdrawn amounts. Current commission rate:{' '}
+                  <span className="font-semibold">{currentCommissionPercentage}%</span>
                 </p>
               </div>
 
               <Button
                 onClick={() => setIsWithdrawModalOpen(true)}
                 disabled={!travelerData || travelerData.stats.availableForWithdrawal <= 0}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-6 rounded-xl text-base shadow-md transition-all"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-6 rounded-lg text-base shadow-md transition-all"
               >
                 Request Withdrawal
               </Button>
@@ -241,26 +245,30 @@ export default function PaymentEarningsPage() {
                   <Card key={item.id} className="border-slate-200 shadow-sm bg-white">
                     <CardContent className="p-5 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-blue-600 text-sm">#{item.transactionId}</span>
+                        <span className="font-bold text-blue-600 text-sm">
+                          #{item.transactionId}
+                        </span>
                         <Badge
                           variant="secondary"
                           className={
                             item.status === 'RELEASED'
                               ? 'bg-emerald-100 text-emerald-700 font-semibold'
                               : item.status === 'PENDING_RELEASE'
-                              ? 'bg-amber-100 text-amber-700 font-semibold'
-                              : 'bg-slate-100 text-slate-700'
+                                ? 'bg-amber-100 text-amber-700 font-semibold'
+                                : 'bg-slate-100 text-slate-700'
                           }
                         >
                           {item.status === 'RELEASED'
                             ? 'Received'
                             : item.status === 'PENDING_RELEASE'
-                            ? 'Awaiting Payout'
-                            : item.status}
+                              ? 'Awaiting Payout'
+                              : item.status}
                         </Badge>
                       </div>
 
-                      <h3 className="font-semibold text-slate-900 text-base">{item.shipment?.itemName || 'Shipment Item'}</h3>
+                      <h3 className="font-semibold text-slate-900 text-base">
+                        {item.shipment?.itemName || 'Shipment Item'}
+                      </h3>
 
                       <div className="text-xs space-y-1 text-slate-600 border-t pt-2 border-slate-100">
                         <div className="flex justify-between">
@@ -311,19 +319,29 @@ export default function PaymentEarningsPage() {
                             wdr.status === 'APPROVED'
                               ? 'bg-emerald-100 text-emerald-700 font-semibold'
                               : wdr.status === 'PENDING'
-                              ? 'bg-amber-100 text-amber-700 font-semibold'
-                              : 'bg-rose-100 text-rose-700 font-semibold'
+                                ? 'bg-amber-100 text-amber-700 font-semibold'
+                                : 'bg-rose-100 text-rose-700 font-semibold'
                           }
                         >
-                          {wdr.status === 'APPROVED' ? 'Approved' : wdr.status === 'PENDING' ? 'Pending' : 'Rejected'}
+                          {wdr.status === 'APPROVED'
+                            ? 'Approved'
+                            : wdr.status === 'PENDING'
+                              ? 'Pending'
+                              : 'Rejected'}
                         </Badge>
                       </div>
 
                       <div className="space-y-1">
                         <p className="text-xs text-slate-500">Amount:</p>
-                        <p className="text-xl font-extrabold text-slate-900">${wdr.netAmount.toFixed(2)}</p>
+                        <p className="text-xl font-extrabold text-slate-900">
+                          ${wdr.netAmount.toFixed(2)}
+                        </p>
                         <p className="text-xs text-slate-400">
-                          Method: <span className="font-medium text-slate-700">{wdr.paymentMethodDetails?.type || 'Saved Method'} | {wdr.paymentMethodDetails?.accountNumber}</span>
+                          Method:{' '}
+                          <span className="font-medium text-slate-700">
+                            {wdr.paymentMethodDetails?.type || 'Saved Method'} |{' '}
+                            {wdr.paymentMethodDetails?.accountNumber}
+                          </span>
                         </p>
                       </div>
 
@@ -331,12 +349,20 @@ export default function PaymentEarningsPage() {
                         <div className="space-y-1">
                           {wdr.processedAt && (
                             <p className="text-[11px] text-emerald-600 font-medium">
-                              Paid on: {new Date(wdr.processedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              Paid on:{' '}
+                              {new Date(wdr.processedAt).toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
                             </p>
                           )}
                           {wdr.payoutTxnId && (
                             <p className="text-xs text-slate-500 font-mono">
-                              Txn ID: <span className="font-semibold text-slate-700">{wdr.payoutTxnId}</span>
+                              Txn ID:{' '}
+                              <span className="font-semibold text-slate-700">
+                                {wdr.payoutTxnId}
+                              </span>
                             </p>
                           )}
                         </div>
@@ -344,7 +370,9 @@ export default function PaymentEarningsPage() {
 
                       {wdr.status === 'REJECTED' && (
                         <div className="space-y-2 pt-1 border-t border-rose-100">
-                          <p className="text-xs text-rose-600 font-medium">{wdr.rejectionReason || 'Insufficient verification'}</p>
+                          <p className="text-xs text-rose-600 font-medium">
+                            {wdr.rejectionReason || 'Insufficient verification'}
+                          </p>
                           <Button
                             size="sm"
                             onClick={() => setIsWithdrawModalOpen(true)}
@@ -356,7 +384,12 @@ export default function PaymentEarningsPage() {
                       )}
 
                       <p className="text-[11px] text-slate-400">
-                        Requested: {new Date(wdr.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        Requested:{' '}
+                        {new Date(wdr.createdAt).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
                       </p>
                     </CardContent>
                   </Card>
@@ -373,12 +406,14 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Spent</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Total Spent
+                  </p>
                   <p className="text-2xl font-extrabold text-slate-900">
                     ${senderData?.stats.totalSpent.toFixed(2) || '0.00'}
                   </p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                   <WalletIcon className="w-5 h-5" />
                 </div>
               </CardContent>
@@ -387,13 +422,15 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Pending Amount</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Pending Amount
+                  </p>
                   <p className="text-2xl font-extrabold text-amber-600">
                     ${senderData?.stats.pendingAmount.toFixed(2) || '0.00'}
                   </p>
                   <p className="text-[11px] text-slate-400">Held in escrow</p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                   <Clock className="w-5 h-5" />
                 </div>
               </CardContent>
@@ -402,12 +439,14 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Refunded Amount</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Refunded Amount
+                  </p>
                   <p className="text-2xl font-extrabold text-emerald-600">
                     ${senderData?.stats.refundedAmount.toFixed(2) || '0.00'}
                   </p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                   <RotateCcw className="w-5 h-5" />
                 </div>
               </CardContent>
@@ -416,12 +455,14 @@ export default function PaymentEarningsPage() {
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Dispute Money</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Dispute Money
+                  </p>
                   <p className="text-2xl font-extrabold text-rose-600">
                     ${senderData?.stats.disputeMoney.toFixed(2) || '0.00'}
                   </p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
                   <AlertTriangle className="w-5 h-5" />
                 </div>
               </CardContent>
@@ -442,43 +483,60 @@ export default function PaymentEarningsPage() {
                     <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-blue-600 text-sm">#{tx.transactionId}</span>
+                          <span className="font-bold text-blue-600 text-sm">
+                            #{tx.transactionId}
+                          </span>
                           <Badge
                             variant="secondary"
                             className={
                               tx.status === 'RELEASED' || tx.status === 'ESCROWED'
                                 ? 'bg-emerald-100 text-emerald-700 font-semibold'
                                 : tx.status === 'PENDING_RELEASE'
-                                ? 'bg-amber-100 text-amber-700 font-semibold'
-                                : tx.status === 'FAILED'
-                                ? 'bg-rose-100 text-rose-700 font-semibold'
-                                : 'bg-slate-100 text-slate-700'
+                                  ? 'bg-amber-100 text-amber-700 font-semibold'
+                                  : tx.status === 'FAILED'
+                                    ? 'bg-rose-100 text-rose-700 font-semibold'
+                                    : 'bg-slate-100 text-slate-700'
                             }
                           >
                             {tx.status === 'ESCROWED' || tx.status === 'RELEASED'
                               ? 'Completed'
                               : tx.status === 'PENDING_RELEASE'
-                              ? 'Pending Release'
-                              : tx.status === 'FAILED'
-                              ? 'Failed'
-                              : tx.status}
+                                ? 'Pending Release'
+                                : tx.status === 'FAILED'
+                                  ? 'Failed'
+                                  : tx.status}
                           </Badge>
                         </div>
-                        <h3 className="font-semibold text-slate-900 text-base">{tx.shipment?.itemName || 'Shipment Package'}</h3>
+                        <h3 className="font-semibold text-slate-900 text-base">
+                          {tx.shipment?.itemName || 'Shipment Package'}
+                        </h3>
                         <p className="text-xs text-slate-500">
-                          Payment Method: <span className="font-medium">{tx.paymentGateway || 'Stripe / SSLCommerz'}</span> •{' '}
-                          {new Date(tx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          Payment Method:{' '}
+                          <span className="font-medium">
+                            {tx.paymentGateway || 'Stripe / SSLCommerz'}
+                          </span>{' '}
+                          •{' '}
+                          {new Date(tx.createdAt).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <span className="text-2xl font-extrabold text-slate-900">${tx.grossAmount.toFixed(2)}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">
+                          ${tx.grossAmount.toFixed(2)}
+                        </span>
                         {tx.status === 'FAILED' ? (
-                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs">
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs"
+                          >
                             Retry Payment
                           </Button>
                         ) : (
-                          <Button size="sm" variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 text-xs gap-1.5">
+                          <Button size="sm" variant="outline" className="text-xs gap-1.5">
                             <Download className="w-3.5 h-3.5" />
                             Download Invoice
                           </Button>
@@ -492,7 +550,7 @@ export default function PaymentEarningsPage() {
           </div>
 
           {/* Info Banner */}
-          <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-xs text-blue-800 space-y-1">
+          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-4 text-xs text-blue-800 space-y-1">
             <p className="font-semibold flex items-center gap-1.5">
               <Info className="w-4 h-4 text-blue-600" /> Payment Terms & Information
             </p>
@@ -511,7 +569,8 @@ export default function PaymentEarningsPage() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Request Withdrawal</DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              Submit a withdrawal request to transfer your available earnings to your saved payment method.
+              Submit a withdrawal request to transfer your available earnings to your saved payment
+              method.
             </DialogDescription>
           </DialogHeader>
 
@@ -529,14 +588,19 @@ export default function PaymentEarningsPage() {
                 className="font-bold text-lg"
               />
               <p className="text-[11px] text-slate-500">
-                Available: <span className="font-bold text-emerald-600">${travelerData?.stats.availableForWithdrawal.toFixed(2)}</span>
+                Available:{' '}
+                <span className="font-bold text-emerald-600">
+                  ${travelerData?.stats.availableForWithdrawal.toFixed(2)}
+                </span>
               </p>
             </div>
 
             <div className="space-y-2">
               <Label className="text-xs font-semibold text-slate-700">Select Payment Method</Label>
               {paymentMethods.length === 0 ? (
-                <p className="text-xs text-rose-600">No payment methods found in Wallet. Please add a payment method first.</p>
+                <p className="text-xs text-rose-600">
+                  No payment methods found in Wallet. Please add a payment method first.
+                </p>
               ) : (
                 <Select value={selectedMethodId} onValueChange={setSelectedMethodId}>
                   <SelectTrigger className="w-full">
@@ -555,7 +619,7 @@ export default function PaymentEarningsPage() {
 
             {/* Breakdown */}
             {parsedWithdrawAmount > 0 && (
-              <div className="rounded-xl bg-slate-50 p-3 text-xs space-y-1 border border-slate-100">
+              <div className="rounded-lg bg-slate-50 p-3 text-xs space-y-1 border border-slate-100">
                 <div className="flex justify-between text-slate-600">
                   <span>Gross Withdrawal:</span>
                   <span className="font-semibold">${parsedWithdrawAmount.toFixed(2)}</span>
@@ -572,13 +636,18 @@ export default function PaymentEarningsPage() {
             )}
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsWithdrawModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="text-foreground!"
+                onClick={() => setIsWithdrawModalOpen(false)}
+              >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmittingWithdraw || paymentMethods.length === 0}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                className="bg-primary! hover:bg-primary/90! text-white! font-semibold"
               >
                 {isSubmittingWithdraw ? 'Submitting...' : 'Submit Request'}
               </Button>

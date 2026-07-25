@@ -84,10 +84,10 @@ export function HomeStatsOverview({ stats, isLoading }: HomeStatsOverviewProps) 
         return (
           <div
             key={item.id}
-            className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-slate-300 transition-all"
+            className="bg-white border border-slate-200/80 rounded-lg p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-slate-300 transition-all"
           >
             {/* Top Icon */}
-            <div className="h-10 w-10 rounded-xl bg-[#f0f5ff] text-[#0B3A8E] flex items-center justify-center shrink-0">
+            <div className="h-10 w-10 rounded-lg bg-[#f0f5ff] text-[#0B3A8E] flex items-center justify-center shrink-0">
               <Icon className="h-5 w-5 stroke-[1.75]" />
             </div>
 

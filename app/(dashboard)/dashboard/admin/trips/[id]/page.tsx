@@ -17,7 +17,14 @@ import {
   Eye,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -132,12 +139,12 @@ export default function AdminTripDetailsPage() {
 
           {/* Content Columns Skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
-            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
+            <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
           </div>
 
           {/* Shipments List Skeleton */}
-          <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-2xl animate-pulse" />
+          <div className="h-64 w-full bg-slate-50 border border-slate-200/50 rounded-lg animate-pulse" />
         </div>
       </RoleGuard>
     );
@@ -155,7 +162,8 @@ export default function AdminTripDetailsPage() {
           <Plane className="h-16 w-16 text-slate-300 mb-4 animate-bounce rotate-45" />
           <h2 className="text-xl font-bold text-slate-800">Trip Not Found</h2>
           <p className="text-sm text-slate-500 mt-2 max-w-md">
-            We couldn't retrieve details for this trip. It may have been deleted, or you might not have authorization to view it.
+            We couldn't retrieve details for this trip. It may have been deleted, or you might not
+            have authorization to view it.
           </p>
           <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
             <Link href="/dashboard/admin/trips">Back to Trips</Link>
@@ -192,7 +200,10 @@ export default function AdminTripDetailsPage() {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-1.5 text-xs md:text-sm text-slate-500 font-medium">
-              <Link href="/dashboard/admin/trips" className="hover:text-slate-800 transition-colors">
+              <Link
+                href="/dashboard/admin/trips"
+                className="hover:text-slate-800 transition-colors"
+              >
                 Admin Trips
               </Link>
               <span>/</span>
@@ -211,13 +222,14 @@ export default function AdminTripDetailsPage() {
 
         {/* Verification action panel for Admin */}
         {trip.status === 'PENDING' && (
-          <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="bg-amber-50/50 border border-amber-200 rounded-lg p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-amber-800 uppercase tracking-wider">
                 Verification Actions
               </h3>
               <p className="text-xs text-amber-700">
-                Review the traveler's ticket scans and details to verify the legitimacy of this trip.
+                Review the traveler's ticket scans and details to verify the legitimacy of this
+                trip.
               </p>
             </div>
             <div className="flex items-center gap-3 sm:shrink-0 w-full sm:w-auto">
@@ -225,14 +237,14 @@ export default function AdminTripDetailsPage() {
                 variant="destructive"
                 onClick={() => setShowRejectDialog(true)}
                 disabled={verifyTripMutation.isPending}
-                className="flex-1 sm:flex-none sm:px-6 rounded-xl h-11 font-semibold"
+                className="flex-1 sm:flex-none sm:px-6 rounded-lg h-11 font-semibold"
               >
                 <X className="mr-1.5 h-4 w-4" /> Reject
               </Button>
               <Button
                 onClick={handleApprove}
                 disabled={verifyTripMutation.isPending}
-                className="flex-1 sm:flex-none sm:px-6 bg-green-600 hover:bg-green-700 text-white rounded-xl h-11 font-semibold"
+                className="flex-1 sm:flex-none sm:px-6 bg-green-600 hover:bg-green-700 text-white rounded-lg h-11 font-semibold"
               >
                 {verifyTripMutation.isPending ? (
                   <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
@@ -249,12 +261,10 @@ export default function AdminTripDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <div className="flex flex-col gap-6">
             {/* Combined Card: Trip details & Traveler details */}
-            <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
+            <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm flex flex-col flex-1 overflow-hidden p-6 space-y-6">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <span className="text-base font-bold text-slate-800">
-                  Trip : #{shortTripId}
-                </span>
+                <span className="text-base font-bold text-slate-800">Trip : #{shortTripId}</span>
                 {trip.ticketPhoto && trip.ticketPhoto !== 'pending' && (
                   <Button
                     variant="outline"
@@ -280,7 +290,10 @@ export default function AdminTripDetailsPage() {
                 <div className="flex items-center justify-between gap-4">
                   {/* Departure details */}
                   <div className="flex items-center gap-3 max-w-[42%]">
-                    <CountryFlag code={trip.fromCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                    <CountryFlag
+                      code={trip.fromCountry}
+                      className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                    />
                     <div className="flex flex-col min-w-0">
                       <span className="font-bold text-[#0D307A] text-[15px] md:text-[17px] leading-tight truncate">
                         {getCountryByCode(trip.fromCountry)?.name ?? trip.fromCountry}
@@ -307,16 +320,22 @@ export default function AdminTripDetailsPage() {
                         {getCountryByCode(trip.toCountry)?.name ?? trip.toCountry}
                       </span>
                       <span className="text-[11px] text-slate-400 font-normal leading-normal mt-0.5 whitespace-nowrap">
-                        {trip.airportArrivalTime ? formatTime(trip.airportArrivalTime) : formatTime(trip.flightTime)}, {formatDate(trip.flightDate)}
+                        {trip.airportArrivalTime
+                          ? formatTime(trip.airportArrivalTime)
+                          : formatTime(trip.flightTime)}
+                        , {formatDate(trip.flightDate)}
                       </span>
                     </div>
-                    <CountryFlag code={trip.toCountry} className="w-8 h-6 rounded shadow-sm shrink-0 object-cover" />
+                    <CountryFlag
+                      code={trip.toCountry}
+                      className="w-8 h-6 rounded shadow-sm shrink-0 object-cover"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Capacities Box */}
-              <div className="bg-slate-50/70 border border-slate-100/50 rounded-xl p-4 space-y-2.5">
+              <div className="bg-slate-50/70 border border-slate-100/50 rounded-lg p-4 space-y-2.5">
                 <div className="flex justify-between items-center text-xs md:text-sm">
                   <span className="text-slate-500 font-medium">Total capacity</span>
                   <span className="font-semibold text-slate-700">{totalCap} KG</span>
@@ -331,9 +350,7 @@ export default function AdminTripDetailsPage() {
 
               {/* Traveler Details Section */}
               <div className="space-y-4 pt-5 border-t border-slate-100">
-                <h3 className="text-base font-bold text-slate-800">
-                  Traveler Details
-                </h3>
+                <h3 className="text-base font-bold text-slate-800">Traveler Details</h3>
 
                 <div className="space-y-3.5 text-xs md:text-sm">
                   {/* Name Row */}
@@ -364,13 +381,17 @@ export default function AdminTripDetailsPage() {
                   {/* Phone Row */}
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-slate-400 font-medium">Phone</span>
-                    <span className="font-semibold text-slate-700">{trip.user?.phone || 'N/A'}</span>
+                    <span className="font-semibold text-slate-700">
+                      {trip.user?.phone || 'N/A'}
+                    </span>
                   </div>
 
                   {/* Email Row */}
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-slate-400 font-medium">Email</span>
-                    <span className="font-semibold text-slate-700">{trip.user?.email || 'N/A'}</span>
+                    <span className="font-semibold text-slate-700">
+                      {trip.user?.email || 'N/A'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -378,13 +399,11 @@ export default function AdminTripDetailsPage() {
 
             {/* Rejection Banner */}
             {trip.status === 'REJECTED' && trip.rejectionReason && (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm flex gap-3 items-start shrink-0">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-5 shadow-sm flex gap-3 items-start shrink-0">
                 <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-red-800 text-sm">Trip Rejected</h4>
-                  <p className="text-red-700 text-xs mt-1 font-medium">
-                    {trip.rejectionReason}
-                  </p>
+                  <p className="text-red-700 text-xs mt-1 font-medium">{trip.rejectionReason}</p>
                 </div>
               </div>
             )}
@@ -392,7 +411,7 @@ export default function AdminTripDetailsPage() {
 
           <div className="flex flex-col gap-6">
             {/* Ticket scan preview card inline */}
-            <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex flex-col flex-1 space-y-4">
+            <div className="bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm flex flex-col flex-1 space-y-4">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
                   Ticket Document Scan
@@ -411,7 +430,7 @@ export default function AdminTripDetailsPage() {
 
               {trip.ticketPhoto && trip.ticketPhoto !== 'pending' ? (
                 <div
-                  className="relative group overflow-hidden border border-slate-200 rounded-xl bg-slate-900 flex items-center justify-center flex-1 min-h-[240px] w-full cursor-zoom-in"
+                  className="relative group overflow-hidden border border-slate-200 rounded-lg bg-slate-900 flex items-center justify-center flex-1 min-h-[240px] w-full cursor-zoom-in"
                   onClick={() => setPreviewPhotoUrl(trip.ticketPhoto)}
                 >
                   <Image
@@ -426,7 +445,7 @@ export default function AdminTripDetailsPage() {
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center border border-dashed rounded-xl bg-slate-50 text-slate-400 text-sm min-h-[240px]">
+                <div className="flex-1 flex flex-col items-center justify-center border border-dashed rounded-lg bg-slate-50 text-slate-400 text-sm min-h-[240px]">
                   <FileText className="h-8 w-8 mb-2" />
                   No flight ticket file uploaded
                 </div>
@@ -436,7 +455,7 @@ export default function AdminTripDetailsPage() {
         </div>
 
         {/* Accepted Shipments Section */}
-        <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm space-y-4">
+        <div className="bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-4">
           <h3 className="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 uppercase tracking-wider text-xs">
             Shipments matched under this trip
           </h3>
@@ -444,10 +463,12 @@ export default function AdminTripDetailsPage() {
           {!trip.shipments || trip.shipments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Package className="h-12 w-12 text-slate-200 mb-3" />
-              <p className="text-sm font-medium text-slate-500">No shipments matched to this trip yet</p>
+              <p className="text-sm font-medium text-slate-500">
+                No shipments matched to this trip yet
+              </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <div className="overflow-x-auto rounded-lg border border-slate-100">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -496,9 +517,7 @@ export default function AdminTripDetailsPage() {
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <span
-                            className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-slate-50 text-slate-500 border-slate-200"
-                          >
+                          <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-slate-50 text-slate-500 border-slate-200">
                             {item.status}
                           </span>
                         </td>
@@ -506,9 +525,7 @@ export default function AdminTripDetailsPage() {
                           <span className="text-slate-500 font-light">{route}</span>
                         </td>
                         <td className="px-5 py-4">
-                          <span className="font-semibold text-slate-700">
-                            ${amount.toFixed(2)}
-                          </span>
+                          <span className="font-semibold text-slate-700">${amount.toFixed(2)}</span>
                         </td>
                         <td className="px-5 py-4 text-right">
                           <Button
@@ -534,7 +551,8 @@ export default function AdminTripDetailsPage() {
             <DialogHeader>
               <DialogTitle className="text-destructive">Reject Flight Trip</DialogTitle>
               <DialogDescription>
-                Provide an explanation of why this flight trip is rejected. The user will see this notification.
+                Provide an explanation of why this flight trip is rejected. The user will see this
+                notification.
               </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-2">

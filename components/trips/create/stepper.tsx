@@ -12,7 +12,7 @@ export function Stepper({ currentStep, completedSteps }: StepperProps) {
   const stepsToShow = TRIP_WIZARD_STEPS.filter((step) => !step.inactive);
 
   return (
-    <div className="bg-[#0B3A8E] rounded-xl p-4 md:p-6 flex items-center justify-between gap-4 w-full">
+    <div className="bg-[#0B3A8E] rounded-lg p-4 md:p-6 flex items-center justify-between gap-4 w-full">
       {stepsToShow.map((step) => {
         const isCompleted = completedSteps.includes(step.id);
         const isCurrent = step.id === currentStep;

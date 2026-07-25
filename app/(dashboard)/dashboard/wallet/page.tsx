@@ -179,14 +179,14 @@ export default function WalletPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-[1144px] mx-auto">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Wallet</h1>
         <p className="text-sm text-slate-500">Manage your payment methods</p>
       </div>
 
       {/* Security Banner */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-4 flex items-center gap-3 text-sm text-blue-900">
+      <div className="rounded-lg border border-blue-100 bg-blue-50/70 p-4 flex items-center gap-3 text-sm text-blue-900">
         <Lock className="w-4 h-4 text-blue-600 flex-shrink-0" />
         <p className="font-medium">Your payment details are used for withdrawal purposes only</p>
       </div>
@@ -197,7 +197,7 @@ export default function WalletPage() {
           <h2 className="text-lg font-bold text-slate-900">My Payment Methods</h2>
           <Button
             onClick={handleOpenAddModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm gap-2"
+            className="bg-primary! hover:bg-primary/90! text-white! font-medium shadow-sm gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Payment Method
@@ -211,17 +211,22 @@ export default function WalletPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {methods.map((method) => (
-              <Card key={method.id} className="border-slate-200 shadow-sm bg-white hover:shadow-md transition-all">
+              <Card
+                key={method.id}
+                className="border-slate-200 shadow-sm bg-white hover:shadow-md transition-all"
+              >
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
                         {getMethodIcon(method.type)}
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 text-base">{method.type}</h3>
                         <p className="text-xs text-slate-500 font-mono">
-                          {method.cryptoAddress ? maskAccountNumber(method.cryptoAddress) : maskAccountNumber(method.accountNumber)}
+                          {method.cryptoAddress
+                            ? maskAccountNumber(method.cryptoAddress)
+                            : maskAccountNumber(method.accountNumber)}
                         </p>
                       </div>
                     </div>
@@ -246,7 +251,7 @@ export default function WalletPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleSetPrimary(method.id)}
-                        className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50"
+                        className="text-xs border-slate-300! text-foreground! hover:bg-slate-50!"
                       >
                         Set as Primary
                       </Button>
@@ -255,7 +260,7 @@ export default function WalletPage() {
                       size="sm"
                       variant="outline"
                       onClick={() => handleOpenEditModal(method)}
-                      className="text-xs border-slate-200 text-slate-700 hover:bg-slate-50 gap-1"
+                      className="text-xs border-slate-300! text-foreground! hover:bg-slate-50! gap-1"
                     >
                       <Edit2 className="w-3.5 h-3.5" /> Edit
                     </Button>
@@ -375,18 +380,32 @@ export default function WalletPage() {
               <Checkbox
                 id="isPrimary"
                 checked={formData.isPrimary}
-                onCheckedChange={(checked) => setFormData({ ...formData, isPrimary: Boolean(checked) })}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isPrimary: Boolean(checked) })
+                }
               />
-              <Label htmlFor="isPrimary" className="text-xs font-medium text-slate-700 cursor-pointer">
+              <Label
+                htmlFor="isPrimary"
+                className="text-xs font-medium text-slate-700 cursor-pointer"
+              >
                 Set as Primary Payment Method
               </Label>
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="text-foreground!"
+                onClick={() => setIsModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-primary! hover:bg-primary/90! text-white! font-semibold"
+              >
                 {isSubmitting ? 'Saving...' : 'Save Method'}
               </Button>
             </DialogFooter>

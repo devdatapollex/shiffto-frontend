@@ -22,7 +22,12 @@ import {
 import { toast } from 'sonner';
 import { getShipments, type Shipment } from '@/services/shipment.service';
 import { useRole } from '@/hooks/use-role';
-import { useReceivedOffers, useAcceptOffer, useRejectOffer, useCancelCheckout } from '@/hooks/use-offers';
+import {
+  useReceivedOffers,
+  useAcceptOffer,
+  useRejectOffer,
+  useCancelCheckout,
+} from '@/hooks/use-offers';
 import { OffersReceivedSection } from '@/components/shipments/offers-received-section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -255,7 +260,7 @@ export default function MyShipmentsPage() {
       <OffersReceivedSection layoutMode="grid" />
 
       {/* 2. SHIPMENT HISTORY SECTION */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6">
+      <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
         {/* Title and Controls Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
           <h3 className="text-xl text-muted-foreground tracking-tight">Shipment History</h3>
@@ -287,7 +292,7 @@ export default function MyShipmentsPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:text-slate-700 bg-white"
+                  className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
@@ -349,7 +354,7 @@ export default function MyShipmentsPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -432,7 +437,11 @@ export default function MyShipmentsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push(`/dashboard/tracking/shipment/${item.id}`)}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  router.push(`/dashboard/tracking/shipment/${item.id}`)
+                                }
+                              >
                                 View details
                               </DropdownMenuItem>
                               {item.status === 'AWAITING_MATCH' && (

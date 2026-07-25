@@ -10,7 +10,7 @@ export function SuccessStep() {
   const router = useRouter();
 
   return (
-    <Card className="border border-[#e2e8f0] rounded-2xl bg-white shadow-xs max-w-lg mx-auto">
+    <Card className="border border-[#e2e8f0] rounded-lg bg-white shadow-xs max-w-lg mx-auto">
       <CardContent className="flex flex-col items-center justify-center text-center p-8 md:p-10 space-y-6">
         <div className="rounded-full bg-emerald-50 p-5 text-emerald-500 animate-in fade-in zoom-in duration-300">
           <CheckCircle2 className="h-16 w-16 stroke-[1.5]" />
@@ -29,7 +29,7 @@ export function SuccessStep() {
           <Button
             type="button"
             onClick={() => router.push(ROUTES.MY_TRIPS)}
-            className="flex-1 bg-[#F16522] hover:bg-[#d9541b] text-white font-semibold rounded-xl h-11 transition-colors"
+            className="flex-1 bg-[#F16522] hover:bg-[#d9541b] text-white font-semibold rounded-lg h-11 transition-colors"
           >
             View My Trips
           </Button>
@@ -37,7 +37,7 @@ export function SuccessStep() {
             type="button"
             variant="outline"
             onClick={() => router.push(ROUTES.DASHBOARD)}
-            className="flex-1 border-[#e2e8f0] text-slate-700 hover:bg-slate-50 font-semibold rounded-xl h-11 transition-colors"
+            className="flex-1 rounded-lg h-11 transition-colors"
           >
             Go to Dashboard
           </Button>

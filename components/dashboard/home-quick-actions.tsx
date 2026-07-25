@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
 
 type QuickTab = 'shipment' | 'trip';
 
@@ -76,14 +77,14 @@ export function HomeQuickActions() {
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-5 sm:p-7 space-y-6">
+    <div className="w-full bg-white rounded-lg border border-slate-200/80 shadow-xs p-5 sm:p-7 space-y-6">
       {/* Navigation Tabs */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => setActiveTab('shipment')}
           className={cn(
-            'flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer',
+            'flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer',
             activeTab === 'shipment'
               ? 'bg-[#eef4ff] text-[#0B3A8E]'
               : 'text-slate-600 hover:text-[#0B3A8E] hover:bg-slate-50'
@@ -97,7 +98,7 @@ export function HomeQuickActions() {
           type="button"
           onClick={() => setActiveTab('trip')}
           className={cn(
-            'flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer',
+            'flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer',
             activeTab === 'trip'
               ? 'bg-[#eef4ff] text-[#0B3A8E]'
               : 'text-slate-600 hover:text-[#0B3A8E] hover:bg-slate-50'
@@ -117,7 +118,7 @@ export function HomeQuickActions() {
               From <span className="text-red-500">*</span>
             </label>
             <Select value={shipmentFrom} onValueChange={setShipmentFrom}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {shipmentFrom ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={shipmentFrom} className="h-4 w-6 shrink-0" />
@@ -127,7 +128,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of departure" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === shipmentTo}>
                     <div className="flex items-center gap-2">
@@ -158,7 +162,7 @@ export function HomeQuickActions() {
               To <span className="text-red-500">*</span>
             </label>
             <Select value={shipmentTo} onValueChange={setShipmentTo}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {shipmentTo ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={shipmentTo} className="h-4 w-6 shrink-0" />
@@ -168,7 +172,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of arrival" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === shipmentFrom}>
                     <div className="flex items-center gap-2">
@@ -187,10 +194,13 @@ export function HomeQuickActions() {
               Category
             </label>
             <Select value={shipmentCategory} onValueChange={setShipmentCategory}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {categories?.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>
                     {cat.name}
@@ -202,14 +212,14 @@ export function HomeQuickActions() {
 
           {/* Action Button */}
           <div className="shrink-0 lg:self-end">
-            <button
-              type="button"
+            <Button
+              variant="default"
               onClick={handleContinueShipment}
-              className="w-full lg:w-auto h-11 px-6 rounded-xl bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+              className="w-full lg:w-auto h-11 px-6 bg-foreground hover:bg-foreground/90 font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors"
             >
               <span>Continue</span>
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -220,7 +230,7 @@ export function HomeQuickActions() {
               From <span className="text-red-500">*</span>
             </label>
             <Select value={tripFrom} onValueChange={setTripFrom}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {tripFrom ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={tripFrom} className="h-4 w-6 shrink-0" />
@@ -230,7 +240,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of departure" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === tripTo}>
                     <div className="flex items-center gap-2">
@@ -261,7 +274,7 @@ export function HomeQuickActions() {
               To <span className="text-red-500">*</span>
             </label>
             <Select value={tripTo} onValueChange={setTripTo}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-xl">
+              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 {tripTo ? (
                   <span className="flex items-center gap-2 truncate">
                     <CountryFlag code={tripTo} className="h-4 w-6 shrink-0" />
@@ -271,7 +284,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of arrival" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === tripFrom}>
                     <div className="flex items-center gap-2">
@@ -301,7 +317,7 @@ export function HomeQuickActions() {
             <button
               type="button"
               onClick={handleContinueTrip}
-              className="w-full lg:w-auto h-11 px-6 rounded-xl bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+              className="w-full lg:w-auto h-11 px-6 rounded-lg bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="h-4 w-4" />

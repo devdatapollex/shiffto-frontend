@@ -33,7 +33,7 @@ import { OtpVerificationStep } from '@/components/shipments/create/steps/otp-ver
 function WizardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="bg-[#0B3A8E] rounded-xl p-4 md:p-6 flex justify-between gap-4 w-full animate-pulse">
+      <div className="bg-[#0B3A8E] rounded-lg p-4 md:p-6 flex justify-between gap-4 w-full animate-pulse">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-2">
             <div className="h-3 w-20 bg-white/20 rounded animate-pulse" />
@@ -42,7 +42,7 @@ function WizardSkeleton() {
           </div>
         ))}
       </div>
-      <div className="rounded-xl border bg-card p-6 shadow-sm space-y-6">
+      <div className="rounded-lg border bg-card p-6 shadow-sm space-y-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
             <div className="h-10 w-10 rounded-lg bg-muted animate-pulse" />
@@ -265,7 +265,7 @@ export function CreateShipmentWizard() {
   }
 
   return (
-    <div className="mx-auto max-w-[850px]">
+    <div className="mx-auto max-w-[700px]">
       <FormProvider {...form}>
         <form onSubmit={handleSubmit}>
           <WizardCard

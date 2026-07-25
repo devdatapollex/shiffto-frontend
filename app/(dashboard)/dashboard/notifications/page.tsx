@@ -41,7 +41,11 @@ export default function NotificationsPage() {
     if (combined.includes('ticket') || combined.includes('support') || combined.includes('reply')) {
       return <LifeBuoy className="h-5 w-5 text-primary" />;
     }
-    if (combined.includes('shipment') || combined.includes('order') || combined.includes('package')) {
+    if (
+      combined.includes('shipment') ||
+      combined.includes('order') ||
+      combined.includes('package')
+    ) {
       return <Package className="h-5 w-5 text-sky-600" />;
     }
     if (combined.includes('trip') || combined.includes('flight')) {
@@ -56,10 +60,10 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card p-6 border border-primary/5 rounded-2xl shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card p-6 border border-primary/5 rounded-lg shadow-xs">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
               <Bell className="h-5 w-5" />
             </div>
             Notifications
@@ -90,7 +94,7 @@ export default function NotificationsPage() {
       {/* Filter Tabs */}
       <div className="flex items-center justify-between">
         <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as any)}>
-          <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsList className="bg-muted/50 p-1 rounded-lg">
             <TabsTrigger value="ALL" className="text-xs px-4 rounded-lg font-medium">
               All ({notifications.length})
             </TabsTrigger>
@@ -103,12 +107,12 @@ export default function NotificationsPage() {
 
       {/* Notifications List */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 bg-card border border-primary/5 rounded-2xl">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 bg-card border border-primary/5 rounded-lg">
           <Clock className="h-7 w-7 text-primary animate-spin" />
           <p className="text-sm text-muted-foreground">Loading your notifications...</p>
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="text-center py-16 bg-card border border-primary/5 rounded-2xl">
+        <div className="text-center py-16 bg-card border border-primary/5 rounded-lg">
           <Bell className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
           <h3 className="font-semibold text-foreground">No notifications found</h3>
           <p className="text-sm text-muted-foreground mt-1">
@@ -132,7 +136,7 @@ export default function NotificationsPage() {
                     markAsRead(n.id);
                   }
                 }}
-                className={`flex items-start gap-4 p-4 border rounded-2xl transition-all duration-200 cursor-pointer ${
+                className={`flex items-start gap-4 p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
                   !n.read
                     ? 'bg-card border-primary/20 shadow-xs ring-1 ring-primary/5'
                     : 'bg-card/60 border-primary/5 hover:border-primary/15'
@@ -140,7 +144,7 @@ export default function NotificationsPage() {
               >
                 {/* Notification Icon */}
                 <div
-                  className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
                     !n.read ? 'bg-primary/10' : 'bg-muted/80'
                   }`}
                 >
@@ -162,9 +166,7 @@ export default function NotificationsPage() {
                     )}
                   </div>
 
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {n.message}
-                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{n.message}</p>
 
                   <div className="flex items-center gap-1.5 pt-1 text-[11px] text-muted-foreground/70 font-medium">
                     <Clock className="h-3 w-3" />

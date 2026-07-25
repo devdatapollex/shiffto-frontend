@@ -121,7 +121,7 @@ export default function AdminWithdrawalsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-[1144px] mx-auto">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Withdrawals & Payouts</h1>
         <p className="text-sm text-slate-500">Process traveler withdrawal requests and enter transfer references</p>
@@ -246,7 +246,7 @@ export default function AdminWithdrawalsPage() {
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsApproveModalOpen(false)}>
+              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsApproveModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmittingApprove} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
@@ -279,7 +279,7 @@ export default function AdminWithdrawalsPage() {
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsRejectModalOpen(false)}>
+              <Button type="button" variant="outline" className="text-foreground!" onClick={() => setIsRejectModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmittingReject} className="bg-rose-600 hover:bg-rose-700 text-white font-semibold">
