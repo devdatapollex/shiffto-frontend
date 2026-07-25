@@ -1,14 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Banknote,
-  Search,
-  ArrowUpDown,
-  X,
-  ChevronsLeft,
-  ChevronsRight,
-} from 'lucide-react';
+import { Banknote, Search, ArrowUpDown, X, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -50,6 +43,13 @@ import {
 } from '@/services/withdrawal.service';
 import type { WithdrawalHistoryItem } from '@/services/payment.service';
 
+export interface AdminWithdrawalItem extends WithdrawalHistoryItem {
+  user?: {
+    name?: string;
+    email?: string;
+  };
+}
+
 const STATUS_TABS = [
   { label: 'All', value: undefined },
   { label: 'Pending', value: 'PENDING' },
@@ -81,7 +81,7 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 }
 
 export default function AdminWithdrawalsPage() {
-  const [withdrawals, setWithdrawals] = useState<WithdrawalHistoryItem[]>([]);
+  const [withdrawals, setWithdrawals] = useState<AdminWithdrawalItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters, sorting, and pagination
@@ -94,7 +94,7 @@ export default function AdminWithdrawalsPage() {
   const [customRowsInput, setCustomRowsInput] = useState('');
 
   // Approve Modal State
-  const [selectedWithdrawal, setSelectedWithdrawal] = useState<WithdrawalHistoryItem | null>(null);
+  const [selectedWithdrawal, setSelectedWithdrawal] = useState<AdminWithdrawalItem | null>(null);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [payoutTxnId, setPayoutTxnId] = useState('');
   const [isSubmittingApprove, setIsSubmittingApprove] = useState(false);
@@ -112,8 +112,8 @@ export default function AdminWithdrawalsPage() {
     setLoading(true);
     try {
       const data = await getAllWithdrawals();
-      setWithdrawals(data);
-    } catch (err: any) {
+      setWithdrawals(data as AdminWithdrawalItem[]);
+    } catch {
       toast.error('Failed to load withdrawal requests');
     } finally {
       setLoading(false);
@@ -166,13 +166,23 @@ export default function AdminWithdrawalsPage() {
       // Search filter
       if (search.trim()) {
         const query = search.toLowerCase();
-        const withdrawalNoMatches = `#${wdr.withdrawalNo}`.toLowerCase().includes(query) || wdr.withdrawalNo.toLowerCase().includes(query);
-        const userNameMatches = (wdr as any).user?.name?.toLowerCase().includes(query);
-        const userEmailMatches = (wdr as any).user?.email?.toLowerCase().includes(query);
+        const withdrawalNoMatches =
+          `#${wdr.withdrawalNo}`.toLowerCase().includes(query) ||
+          wdr.withdrawalNo.toLowerCase().includes(query);
+        const userNameMatches = wdr.user?.name?.toLowerCase().includes(query);
+        const userEmailMatches = wdr.user?.email?.toLowerCase().includes(query);
         const txnIdMatches = wdr.payoutTxnId?.toLowerCase().includes(query);
-        const methodMatches = wdr.paymentMethodDetails?.type?.toLowerCase().includes(query) || wdr.paymentMethodDetails?.accountNumber?.toLowerCase().includes(query);
+        const methodMatches =
+          wdr.paymentMethodDetails?.type?.toLowerCase().includes(query) ||
+          wdr.paymentMethodDetails?.accountNumber?.toLowerCase().includes(query);
 
-        if (!withdrawalNoMatches && !userNameMatches && !userEmailMatches && !txnIdMatches && !methodMatches) {
+        if (
+          !withdrawalNoMatches &&
+          !userNameMatches &&
+          !userEmailMatches &&
+          !txnIdMatches &&
+          !methodMatches
+        ) {
           return false;
         }
       }
@@ -182,8 +192,8 @@ export default function AdminWithdrawalsPage() {
 
   const sortedWithdrawals = useMemo(() => {
     return [...filteredWithdrawals].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: number | string;
+      let bValue: number | string;
 
       if (sortBy === 'grossAmount') {
         aValue = a.grossAmount;
@@ -216,18 +226,15 @@ export default function AdminWithdrawalsPage() {
   const showingFrom = totalCount === 0 ? 0 : (page - 1) * limit + 1;
   const showingTo = Math.min(page * limit, totalCount);
 
-  const pageNumbers = useMemo(
-    () => generatePageNumbers(page, totalPages),
-    [page, totalPages]
-  );
+  const pageNumbers = useMemo(() => generatePageNumbers(page, totalPages), [page, totalPages]);
 
-  const handleOpenApprove = (wdr: WithdrawalHistoryItem) => {
+  const handleOpenApprove = (wdr: AdminWithdrawalItem) => {
     setSelectedWithdrawal(wdr);
     setPayoutTxnId('');
     setIsApproveModalOpen(true);
   };
 
-  const handleOpenReject = (wdr: WithdrawalHistoryItem) => {
+  const handleOpenReject = (wdr: AdminWithdrawalItem) => {
     setSelectedWithdrawal(wdr);
     setRejectionReason('');
     setIsRejectModalOpen(true);
@@ -247,8 +254,9 @@ export default function AdminWithdrawalsPage() {
       toast.success(`Withdrawal #${selectedWithdrawal.withdrawalNo} approved!`);
       setIsApproveModalOpen(false);
       fetchWithdrawals();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to approve withdrawal');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } } };
+      toast.error(errorObj.response?.data?.message || 'Failed to approve withdrawal');
     } finally {
       setIsSubmittingApprove(false);
     }
@@ -264,8 +272,9 @@ export default function AdminWithdrawalsPage() {
       toast.success(`Withdrawal #${selectedWithdrawal.withdrawalNo} rejected.`);
       setIsRejectModalOpen(false);
       fetchWithdrawals();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to reject withdrawal');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } } };
+      toast.error(errorObj.response?.data?.message || 'Failed to reject withdrawal');
     } finally {
       setIsSubmittingReject(false);
     }
@@ -397,21 +406,23 @@ export default function AdminWithdrawalsPage() {
                     STATUS_BADGE_CLASS[wdr.status] || STATUS_BADGE_CLASS['PENDING'];
 
                   return (
-                    <tr key={wdr.id} className="hover:bg-slate-50/60 transition-colors duration-150">
-                      <td className="px-5 py-4 font-semibold text-blue-600">
-                        #{wdr.withdrawalNo}
-                      </td>
+                    <tr
+                      key={wdr.id}
+                      className="hover:bg-slate-50/60 transition-colors duration-150"
+                    >
+                      <td className="px-5 py-4 font-semibold text-blue-600">#{wdr.withdrawalNo}</td>
                       <td className="px-5 py-4">
                         <p className="font-semibold text-foreground text-sm">
-                          {(wdr as any).user?.name || 'Traveler'}
+                          {wdr.user?.name || 'Traveler'}
                         </p>
-                        <p className="text-xs text-slate-400">{(wdr as any).user?.email}</p>
+                        <p className="text-xs text-slate-400">{wdr.user?.email}</p>
                       </td>
                       <td className="px-5 py-4 font-semibold text-slate-700">
                         ${wdr.grossAmount.toFixed(2)}
                       </td>
                       <td className="px-5 py-4 text-slate-500">
-                        -${wdr.commissionAmount.toFixed(2)} ({Math.round(wdr.commissionRate * 100)}%)
+                        -${wdr.commissionAmount.toFixed(2)} ({Math.round(wdr.commissionRate * 100)}
+                        %)
                       </td>
                       <td className="px-5 py-4 font-bold text-emerald-600">
                         ${wdr.netAmount.toFixed(2)}
@@ -436,9 +447,7 @@ export default function AdminWithdrawalsPage() {
                         {wdr.payoutTxnId && (
                           <p className="text-xs text-slate-400 font-mono mt-1">
                             Txn ID:{' '}
-                            <span className="font-semibold text-slate-600">
-                              {wdr.payoutTxnId}
-                            </span>
+                            <span className="font-semibold text-slate-600">{wdr.payoutTxnId}</span>
                           </p>
                         )}
                       </td>
@@ -609,7 +618,7 @@ export default function AdminWithdrawalsPage() {
               <p>
                 <span className="text-slate-500">Traveler:</span>{' '}
                 <span className="font-semibold text-slate-900">
-                  {(selectedWithdrawal as any)?.user?.name}
+                  {selectedWithdrawal?.user?.name}
                 </span>
               </p>
               <p>
@@ -667,8 +676,8 @@ export default function AdminWithdrawalsPage() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Reject Withdrawal Request</DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              State the reason for rejecting this request. Funds will be unlocked back to traveler's
-              available balance.
+              State the reason for rejecting this request. Funds will be unlocked back to
+              traveler&apos;s available balance.
             </DialogDescription>
           </DialogHeader>
 
