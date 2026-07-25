@@ -19,6 +19,7 @@ import {
   LifeBuoy,
   Bell,
   Percent,
+  DollarSign,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSession, authClient } from '@/lib/auth-client';
@@ -79,6 +80,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       label: 'Settlements',
       href: ROUTES.SETTLEMENTS,
       icon: Scale,
+    },
+    {
+      label: 'Payments',
+      href: ROUTES.ADMIN_PAYMENTS,
+      icon: DollarSign,
     },
     {
       label: 'Withdrawals',
