@@ -128,7 +128,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of departure" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === shipmentTo}>
                     <div className="flex items-center gap-2">
@@ -169,7 +172,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of arrival" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === shipmentFrom}>
                     <div className="flex items-center gap-2">
@@ -191,7 +197,10 @@ export function HomeQuickActions() {
               <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {categories?.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>
                     {cat.name}
@@ -231,7 +240,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of departure" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === tripTo}>
                     <div className="flex items-center gap-2">
@@ -272,7 +284,10 @@ export function HomeQuickActions() {
                   <SelectValue placeholder="Select country of arrival" />
                 )}
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[280px]">
+              <SelectContent
+                position="popper"
+                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
+              >
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code} disabled={c.code === tripFrom}>
                     <div className="flex items-center gap-2">
