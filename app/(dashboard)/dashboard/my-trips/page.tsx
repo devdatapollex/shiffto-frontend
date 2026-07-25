@@ -376,8 +376,7 @@ export default function MyTripsPage() {
             )}
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {visibleShipments.map((shipment, index) => {
-                const clockBadge = getClockBadge(shipmentIndex + index);
+              {visibleShipments.map((shipment) => {
                 const fromCountry = getCountryByCode(shipment.fromCountry);
                 const toCountry = getCountryByCode(shipment.toCountry);
                 const isOffered = !!(shipment.offers && shipment.offers.length > 0);
@@ -388,26 +387,6 @@ export default function MyTripsPage() {
                     className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-lg overflow-hidden bg-white shadow-xs"
                   >
                     <CardContent className="px-5 flex flex-col justify-between h-full space-y-4">
-                      {/* Time limit badge / Offered badge */}
-                      <div className="flex justify-between items-center">
-                        {isOffered ? (
-                          <Badge className="bg-[#ECFDF5] hover:bg-[#ECFDF5] text-[#059669] border-[#D1FAE5] font-semibold px-2.5 py-1 rounded-full text-xs flex items-center gap-1">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            Already Offered
-                          </Badge>
-                        ) : (
-                          <div
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${clockBadge.class}`}
-                          >
-                            <Clock className="h-3.5 w-3.5" />
-                            <span>{clockBadge.time}</span>
-                          </div>
-                        )}
-                        <span className="text-[#0B3A8E] font-bold text-lg">
-                          ${shipment.pricePerKg}/kg
-                        </span>
-                      </div>
-
                       <div className="flex gap-4 items-start">
                         {/* Product image placeholder */}
                         <div className="h-16 w-16 rounded-lg border border-slate-100 bg-slate-50 shrink-0 overflow-hidden flex items-center justify-center">
@@ -425,9 +404,14 @@ export default function MyTripsPage() {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <h4 className="font-bold text-[#0B3A8E] text-base truncate">
-                            {shipment.itemName}
-                          </h4>
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-bold text-[#0B3A8E] text-base truncate">
+                              {shipment.itemName}
+                            </h4>
+                            <span className="text-[#0B3A8E] font-bold text-lg shrink-0">
+                              ${shipment.pricePerKg}/kg
+                            </span>
+                          </div>
                           <div className="flex items-center gap-1 mt-1 text-slate-500 text-xs font-medium">
                             <span>{fromCountry?.name}</span>
                             <span>&rarr;</span>
@@ -439,23 +423,29 @@ export default function MyTripsPage() {
                         </div>
                       </div>
 
-                      {/* Action buttons */}
-                      <div className="grid grid-cols-2 gap-3 pt-2">
-                        <Button
-                          variant="outline"
-                          className=""
-                          onClick={() => handleOpenCounterDialog(shipment)}
-                          disabled={isOffered}
-                        >
-                          Counter Offer
-                        </Button>
-                        <Button
-                          className="bg-foreground text-white transition-colors hover:bg-foreground/90"
-                          onClick={() => handleOpenAcceptDialog(shipment)}
-                          disabled={isOffered}
-                        >
-                          Accept
-                        </Button>
+                      {/* Action buttons / Offered status badge */}
+                      <div className="pt-2">
+                        {isOffered ? (
+                          <div className="w-full bg-[#ECFDF5] border border-[#D1FAE5] text-[#059669] font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 h-8">
+                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                            <span>Already Offered</span>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-3">
+                            <Button
+                              variant="outline"
+                              onClick={() => handleOpenCounterDialog(shipment)}
+                            >
+                              Counter Offer
+                            </Button>
+                            <Button
+                              className="bg-foreground text-white transition-colors hover:bg-foreground/90"
+                              onClick={() => handleOpenAcceptDialog(shipment)}
+                            >
+                              Accept
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
