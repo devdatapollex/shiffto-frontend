@@ -46,7 +46,7 @@ export interface WithdrawalHistoryItem {
   commissionAmount: number;
   netAmount: number;
   paymentMethodId: string | null;
-  paymentMethodDetails: Record<string, unknown> | null;
+  paymentMethodDetails: Record<string, any> | null;
   payoutTxnId: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   rejectionReason: string | null;

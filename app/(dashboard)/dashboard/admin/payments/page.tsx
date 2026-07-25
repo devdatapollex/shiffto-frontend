@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   DollarSign,
   ShieldCheck,
@@ -17,6 +17,9 @@ import {
   User,
   ArrowUpDown,
   X,
+  MoreHorizontal,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,14 +28,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -48,12 +43,19 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
   PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
 } from '@/components/ui/pagination';
 import { RoleGuard } from '@/components/auth/role-guard';
 import {
@@ -93,6 +95,20 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
 
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
+function generatePageNumbers(currentPage: number, totalPages: number): (number | '...')[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+  const pages: (number | '...')[] = [1];
+  if (currentPage > 3) pages.push('...');
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (currentPage < totalPages - 2) pages.push('...');
+  pages.push(totalPages);
+  return pages;
+}
+
 export default function AdminPaymentsPage() {
   const [data, setData] = useState<AdminPaymentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,6 +120,7 @@ export default function AdminPaymentsPage() {
   const [status, setStatus] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [customRowsInput, setCustomRowsInput] = useState('');
 
   // Selected Transaction for Drawer/Modal
   const [selectedTx, setSelectedTx] = useState<AdminPaymentTransaction | null>(null);
@@ -139,28 +156,51 @@ export default function AdminPaymentsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const toggleSort = (field: string) => {
+  const handleSort = (field: string) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(field);
       setSortOrder('desc');
     }
+    setPage(1);
+  };
+
+  const handleRowsPerPageChange = (value: string) => {
+    if (value === 'custom') {
+      setCustomRowsInput(String(limit));
+    } else {
+      setCustomRowsInput('');
+      setLimit(Number(value));
+      setPage(1);
+    }
+  };
+
+  const handleCustomRowsSubmit = () => {
+    const num = parseInt(customRowsInput, 10);
+    if (!isNaN(num) && num > 0) {
+      setLimit(num);
+      setPage(1);
+    } else {
+      setCustomRowsInput('');
+    }
   };
 
   const totalPages = data?.meta ? Math.ceil(data.meta.total / limit) : 1;
+  const pageNumbers = useMemo(() => generatePageNumbers(page, totalPages), [page, totalPages]);
+  const showingFrom = data?.meta.total === 0 ? 0 : (page - 1) * limit + 1;
+  const showingTo = Math.min(page * limit, data?.meta.total || 0);
 
   return (
     <RoleGuard roles={['admin']}>
-      <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16 max-w-7xl mx-auto p-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Payment Transactions
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Monitor escrow balances, completed payouts, platform revenues, and transaction histories
-            across SHIFFTO.
+            Monitor escrow balances, completed payouts, platform revenues, and transaction histories across SHIFFTO.
           </p>
         </div>
 
@@ -173,11 +213,7 @@ export default function AdminPaymentsPage() {
                   Total Gross Volume
                 </p>
                 <h3 className="text-xl font-bold text-foreground mt-1">
-                  $
-                  {data?.stats.totalGrossVolume.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) || '0.00'}
+                  ${data?.stats.totalGrossVolume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-1">Processed transactions</p>
               </div>
@@ -194,11 +230,7 @@ export default function AdminPaymentsPage() {
                   Funds in Escrow
                 </p>
                 <h3 className="text-xl font-bold text-amber-600 mt-1">
-                  $
-                  {data?.stats.totalEscrowed.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) || '0.00'}
+                  ${data?.stats.totalEscrowed.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-1">Held until delivery</p>
               </div>
@@ -215,11 +247,7 @@ export default function AdminPaymentsPage() {
                   Released Earnings
                 </p>
                 <h3 className="text-xl font-bold text-blue-600 mt-1">
-                  $
-                  {data?.stats.totalReleased.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) || '0.00'}
+                  ${data?.stats.totalReleased.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-1">Traveler earnings released</p>
               </div>
@@ -236,11 +264,7 @@ export default function AdminPaymentsPage() {
                   Platform Revenue
                 </p>
                 <h3 className="text-xl font-bold text-purple-600 mt-1">
-                  $
-                  {data?.stats.estimatedCommission.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) || '0.00'}
+                  ${data?.stats.estimatedCommission.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-1">Based on 30% commission</p>
               </div>
@@ -257,11 +281,7 @@ export default function AdminPaymentsPage() {
                   Refunds & Failed
                 </p>
                 <h3 className="text-xl font-bold text-rose-600 mt-1">
-                  $
-                  {data?.stats.totalRefunded.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) || '0.00'}
+                  ${data?.stats.totalRefunded.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-1">Disputed / Canceled</p>
               </div>
@@ -272,29 +292,64 @@ export default function AdminPaymentsPage() {
           </Card>
         </div>
 
-        {/* Toolbar & Filters (Matching Shipments Page) */}
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-card p-4 rounded-xl border border-border shadow-xs">
-          {/* Search Bar */}
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search Txn ID, Stripe ID, Item, Sender..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 text-sm"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
+        {/* Table Section (Matching My Shipments Page layout & styling) */}
+        <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
+          {/* Title and Controls Header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
+            <h3 className="text-xl text-muted-foreground tracking-tight">Payment Transactions History</h3>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Search Input */}
+              <div className="relative flex-grow sm:flex-grow-0">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search payments..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                  className="h-9 w-full sm:w-60 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-4 text-xs transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary shadow-sm"
+                />
+                {search && (
+                  <button
+                    onClick={() => {
+                      setSearch('');
+                      setPage(1);
+                    }}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Sort Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  <DropdownMenuItem onClick={() => handleSort('createdAt')}>
+                    Sort by Date {sortBy === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort('grossAmount')}>
+                    Sort by Amount {sortBy === 'grossAmount' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-          {/* Status Pills */}
-          <div className="flex flex-wrap gap-1.5 items-center">
+          {/* Status Tab Filters */}
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-2 overflow-x-auto scrollbar-none">
             {STATUS_TABS.map((tab) => {
               const isActive = status === tab.value;
               return (
@@ -304,10 +359,10 @@ export default function AdminPaymentsPage() {
                     setStatus(tab.value);
                     setPage(1);
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-all whitespace-nowrap ${
                     isActive
-                      ? 'bg-primary text-primary-foreground shadow-xs'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'bg-[#0D307A]/10 text-[#0D307A] border-transparent'
+                      : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   {tab.label}
@@ -316,273 +371,286 @@ export default function AdminPaymentsPage() {
             })}
           </div>
 
-          {/* Rows Per Page */}
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            <span className="text-xs text-muted-foreground">Per page:</span>
-            <Select
-              value={limit.toString()}
-              onValueChange={(val) => {
-                setLimit(Number(val));
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="h-8 w-[70px] text-xs">
-                <SelectValue placeholder="10" />
-              </SelectTrigger>
-              <SelectContent>
-                {ROWS_PER_PAGE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt} value={opt.toString()} className="text-xs">
-                    {opt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Payments Table */}
-        <div className="bg-card border border-border rounded-xl shadow-xs overflow-hidden">
-          <Table>
-            <TableHeader className="bg-muted/40">
-              <TableRow>
-                <TableHead className="w-[140px] text-xs font-semibold">Txn ID</TableHead>
-                <TableHead className="text-xs font-semibold">Shipment Item</TableHead>
-                <TableHead className="text-xs font-semibold">Sender</TableHead>
-                <TableHead className="text-xs font-semibold">Traveler</TableHead>
-                <TableHead className="text-xs font-semibold">
-                  <button
-                    className="flex items-center gap-1 hover:text-foreground"
-                    onClick={() => toggleSort('grossAmount')}
-                  >
-                    Gross Amount <ArrowUpDown className="h-3 w-3" />
-                  </button>
-                </TableHead>
-                <TableHead className="text-xs font-semibold">Commission (30%)</TableHead>
-                <TableHead className="text-xs font-semibold">Net Payout</TableHead>
-                <TableHead className="text-xs font-semibold">Status</TableHead>
-                <TableHead className="text-xs font-semibold">
-                  <button
-                    className="flex items-center gap-1 hover:text-foreground"
-                    onClick={() => toggleSort('createdAt')}
-                  >
-                    Date <ArrowUpDown className="h-3 w-3" />
-                  </button>
-                </TableHead>
-                <TableHead className="w-[80px] text-right text-xs font-semibold">Details</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={10} className="h-32 text-center">
-                    <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Loading payment transactions...
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : !data?.data || data.data.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={10}
-                    className="h-32 text-center text-muted-foreground text-sm"
-                  >
-                    No payment transactions found matching the current filters.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.data.map((tx) => (
-                  <TableRow key={tx.id} className="hover:bg-muted/30 transition-colors text-xs">
-                    {/* Txn ID */}
-                    <TableCell className="font-mono font-medium text-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <span title={tx.transactionId}>
-                          {tx.transactionId.length > 12
-                            ? `${tx.transactionId.substring(0, 10)}...`
-                            : tx.transactionId}
-                        </span>
-                        <button
-                          onClick={() => handleCopy(tx.transactionId)}
-                          className="text-muted-foreground hover:text-foreground p-0.5 rounded"
-                          title="Copy Transaction ID"
-                        >
-                          {copiedId === tx.transactionId ? (
-                            <Check className="h-3 w-3 text-emerald-600" />
-                          ) : (
-                            <Copy className="h-3 w-3" />
-                          )}
-                        </button>
-                      </div>
-                    </TableCell>
-
-                    {/* Shipment Item */}
-                    <TableCell className="font-medium text-foreground">
-                      <Link
-                        href={`/dashboard/admin/shipments/${tx.shipmentId}`}
-                        className="hover:underline flex items-center gap-1.5 text-primary"
-                      >
-                        <Package className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        <span className="truncate max-w-[140px]">{tx.shipment.itemName}</span>
-                      </Link>
-                    </TableCell>
-
-                    {/* Sender */}
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full bg-muted overflow-hidden relative shrink-0">
-                          {tx.sender.image ? (
-                            <Image
-                              src={toRelativeImageUrl(tx.sender.image)}
-                              alt={tx.sender.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-primary/10 text-primary">
-                              {tx.sender.name.charAt(0)}
-                            </div>
-                          )}
-                        </div>
-                        <div className="truncate max-w-[110px]">
-                          <p className="font-medium text-foreground truncate">{tx.sender.name}</p>
-                          <p className="text-[10px] text-muted-foreground truncate">
-                            {tx.sender.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    {/* Traveler */}
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full bg-muted overflow-hidden relative shrink-0">
-                          {tx.traveller.image ? (
-                            <Image
-                              src={toRelativeImageUrl(tx.traveller.image)}
-                              alt={tx.traveller.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-blue-500/10 text-blue-600">
-                              {tx.traveller.name.charAt(0)}
-                            </div>
-                          )}
-                        </div>
-                        <div className="truncate max-w-[110px]">
-                          <p className="font-medium text-foreground truncate">
-                            {tx.traveller.name}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground truncate">
-                            {tx.traveller.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    {/* Gross Amount */}
-                    <TableCell className="font-semibold text-foreground">
-                      ${tx.grossAmount.toFixed(2)}
-                    </TableCell>
-
-                    {/* Commission */}
-                    <TableCell className="text-muted-foreground">
-                      ${tx.commissionAmount.toFixed(2)}
-                    </TableCell>
-
-                    {/* Net Amount */}
-                    <TableCell className="font-medium text-emerald-700">
-                      ${tx.netAmount.toFixed(2)}
-                    </TableCell>
-
-                    {/* Status Badge */}
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
-                          STATUS_BADGE_CLASS[tx.status] ||
-                          'bg-slate-50 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        {STATUS_DISPLAY_MAP[tx.status] || tx.status}
-                      </Badge>
-                    </TableCell>
-
-                    {/* Date */}
-                    <TableCell className="text-muted-foreground">
-                      {new Date(tx.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </TableCell>
-
-                    {/* Details Action Button */}
-                    <TableCell className="text-right">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                        onClick={() => setSelectedTx(tx)}
-                        title="View Full Transaction Details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-
-          {/* Table Footer / Pagination */}
-          {data && data.meta.total > 0 && (
-            <div className="p-4 border-t border-border flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                Showing {Math.min((page - 1) * limit + 1, data.meta.total)} to{' '}
-                {Math.min(page * limit, data.meta.total)} of {data.meta.total} transactions
+          {/* Payments Table */}
+          {loading ? (
+            <div className="space-y-4 py-6">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 h-16 w-full bg-slate-50 animate-pulse rounded-lg px-4"
+                />
+              ))}
+            </div>
+          ) : !data?.data || data.data.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+              <Package className="h-12 w-12 text-slate-200 mb-3" />
+              <p className="text-sm font-medium text-slate-500">No payment transactions found</p>
+              <p className="text-xs text-slate-400 mt-1">
+                Try resetting your search query or status filter.
               </p>
-
-              {totalPages > 1 && (
-                <Pagination className="justify-end w-auto">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        className={
-                          page === 1
-                            ? 'pointer-events-none opacity-50 text-xs'
-                            : 'cursor-pointer text-xs'
-                        }
-                      />
-                    </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
-                      .map((pNum) => (
-                        <PaginationItem key={pNum}>
-                          <PaginationLink
-                            onClick={() => setPage(pNum)}
-                            isActive={page === pNum}
-                            className="cursor-pointer text-xs"
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border border-slate-100">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    <th className="px-5 py-4 font-semibold">Txn ID</th>
+                    <th className="px-5 py-4 font-semibold max-w-[130px]">Shipment item</th>
+                    <th className="px-5 py-4 font-semibold">Sender</th>
+                    <th className="px-5 py-4 font-semibold">Traveler</th>
+                    <th className="px-5 py-4 font-semibold">Gross / Commission</th>
+                    <th className="px-5 py-4 font-semibold">Net Payout</th>
+                    <th className="px-5 py-4 font-semibold">Status</th>
+                    <th className="px-5 py-4 font-semibold">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700 text-sm">
+                  {data.data.map((tx) => (
+                    <tr
+                      key={tx.id}
+                      className="hover:bg-slate-50/60 transition-colors duration-150 cursor-pointer"
+                      onClick={() => setSelectedTx(tx)}
+                    >
+                      {/* Txn ID */}
+                      <td className="px-5 py-4 font-mono font-medium text-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <span title={tx.transactionId}>
+                            {tx.transactionId.length > 12
+                              ? `${tx.transactionId.substring(0, 10)}...`
+                              : tx.transactionId}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopy(tx.transactionId);
+                            }}
+                            className="text-slate-400 hover:text-slate-600 p-0.5 rounded"
+                            title="Copy Transaction ID"
                           >
-                            {pNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        className={
-                          page === totalPages
-                            ? 'pointer-events-none opacity-50 text-xs'
-                            : 'cursor-pointer text-xs'
-                        }
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
+                            {copiedId === tx.transactionId ? (
+                              <Check className="h-3 w-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* Shipment Item */}
+                      <td className="px-5 py-4 font-medium text-foreground max-w-[130px]">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Package className="h-4 w-4 text-slate-400 shrink-0" />
+                          <span className="truncate max-w-[100px] font-semibold">{tx.shipment.itemName}</span>
+                        </div>
+                      </td>
+
+                      {/* Sender */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-slate-100 overflow-hidden relative shrink-0">
+                            {tx.sender.image ? (
+                              <Image
+                                src={toRelativeImageUrl(tx.sender.image)}
+                                alt={tx.sender.name}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-primary/10 text-primary">
+                                {tx.sender.name.charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="truncate max-w-[110px]">
+                            <p className="font-semibold text-foreground truncate">{tx.sender.name}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{tx.sender.email}</p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Traveler */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-slate-100 overflow-hidden relative shrink-0">
+                            {tx.traveller.image ? (
+                              <Image
+                                src={toRelativeImageUrl(tx.traveller.image)}
+                                alt={tx.traveller.name}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-blue-500/10 text-blue-600">
+                                {tx.traveller.name.charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="truncate max-w-[110px]">
+                            <p className="font-semibold text-foreground truncate">{tx.traveller.name}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{tx.traveller.email}</p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Gross Amount & Commission */}
+                      <td className="px-5 py-4">
+                        <span className="font-semibold text-foreground block">
+                          ${tx.grossAmount.toFixed(2)}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium block mt-0.5">
+                          ${tx.commissionAmount.toFixed(2)} (30%)
+                        </span>
+                      </td>
+
+                      {/* Net Amount */}
+                      <td className="px-5 py-4 font-semibold text-emerald-700">
+                        ${tx.netAmount.toFixed(2)}
+                      </td>
+
+                      {/* Status Badge */}
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+                            STATUS_BADGE_CLASS[tx.status] || 'bg-slate-50 text-slate-500 border-slate-200'
+                          }`}
+                        >
+                          {STATUS_DISPLAY_MAP[tx.status] || tx.status}
+                        </span>
+                      </td>
+
+                      {/* Date */}
+                      <td className="px-5 py-4 text-slate-500 text-xs">
+                        {new Date(tx.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Pagination Footer (Identical to My Shipments page layout) */}
+          {data && data.meta.total > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+              {/* Rows per page + custom input */}
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span>Rows per page:</span>
+                <Select value={String(limit)} onValueChange={handleRowsPerPageChange}>
+                  <SelectTrigger className="h-8 w-[70px] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROWS_PER_PAGE_OPTIONS.map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {customRowsInput !== '' || !ROWS_PER_PAGE_OPTIONS.includes(limit) ? (
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={
+                        customRowsInput ||
+                        (!ROWS_PER_PAGE_OPTIONS.includes(limit) ? String(limit) : '')
+                      }
+                      onChange={(e) => setCustomRowsInput(e.target.value)}
+                      onBlur={handleCustomRowsSubmit}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleCustomRowsSubmit();
+                      }}
+                      className="h-8 w-16 text-xs px-2"
+                      placeholder="n"
+                    />
+                  </div>
+                ) : null}
+              </div>
+
+              {/* Showing X-Y of Z */}
+              <span className="text-xs text-slate-500">
+                Showing {showingFrom}–{showingTo} of {data.meta.total} payments
+              </span>
+
+              {/* Page navigation */}
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage(1);
+                      }}
+                      aria-label="First page"
+                      className={page <= 1 ? 'pointer-events-none opacity-40' : ''}
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (page > 1) setPage(page - 1);
+                      }}
+                      className={page <= 1 ? 'pointer-events-none opacity-40' : ''}
+                    />
+                  </PaginationItem>
+                  {pageNumbers.map((p, i) =>
+                    p === '...' ? (
+                      <PaginationItem key={`ellipsis-${i}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          isActive={p === page}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPage(p as number);
+                          }}
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (page < totalPages) setPage(page + 1);
+                      }}
+                      className={page >= totalPages ? 'pointer-events-none opacity-40' : ''}
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage(totalPages);
+                      }}
+                      aria-label="Last page"
+                      className={page >= totalPages ? 'pointer-events-none opacity-40' : ''}
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>
@@ -615,21 +683,15 @@ export default function AdminPaymentsPage() {
                 <div className="bg-muted/40 p-4 rounded-xl border border-border space-y-2.5">
                   <div className="flex justify-between items-center text-sm font-bold border-b border-border/60 pb-2">
                     <span className="text-foreground">Gross Amount Paid:</span>
-                    <span className="text-foreground">
-                      ${selectedTx.grossAmount.toFixed(2)} {selectedTx.currency}
-                    </span>
+                    <span className="text-foreground">${selectedTx.grossAmount.toFixed(2)} {selectedTx.currency}</span>
                   </div>
                   <div className="flex justify-between items-center text-muted-foreground">
                     <span>Platform Commission (30%):</span>
-                    <span className="font-medium text-purple-600">
-                      -${selectedTx.commissionAmount.toFixed(2)}
-                    </span>
+                    <span className="font-medium text-purple-600">-${selectedTx.commissionAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center text-muted-foreground">
                     <span>Net Traveler Earnings:</span>
-                    <span className="font-semibold text-emerald-700">
-                      ${selectedTx.netAmount.toFixed(2)}
-                    </span>
+                    <span className="font-semibold text-emerald-700">${selectedTx.netAmount.toFixed(2)}</span>
                   </div>
                   {selectedTx.gatewayTxnId && (
                     <div className="flex justify-between items-center pt-1 text-[11px] text-muted-foreground">
@@ -677,19 +739,14 @@ export default function AdminPaymentsPage() {
                       <Package className="h-3.5 w-3.5 text-amber-600" />
                       <span>{selectedTx.shipment.itemName}</span>
                     </span>
-                    <span className="text-muted-foreground text-[11px]">
-                      Weight: {selectedTx.shipment.weight} kg
-                    </span>
+                    <span className="text-muted-foreground text-[11px]">Weight: {selectedTx.shipment.weight} kg</span>
                   </div>
 
                   {selectedTx.offer?.trip && (
                     <div className="flex items-center justify-between text-muted-foreground pt-1">
                       <span className="flex items-center gap-1">
                         <Plane className="h-3.5 w-3.5 text-blue-600" />
-                        <span>
-                          Route: {selectedTx.offer.trip.fromCountry} →{' '}
-                          {selectedTx.offer.trip.toCountry}
-                        </span>
+                        <span>Route: {selectedTx.offer.trip.fromCountry} → {selectedTx.offer.trip.toCountry}</span>
                       </span>
                     </div>
                   )}
