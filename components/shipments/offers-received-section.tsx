@@ -324,7 +324,7 @@ export function OffersReceivedSection({
                               cancelCheckoutMutation.isPending || acceptOfferMutation.isPending
                             }
                             onClick={() => handleAcceptOffer(offer.id, travelerName)}
-                            className="bg-foreground hover:bg-foreground/10 text-white shadow-xs"
+                            className="bg-foreground hover:bg-foreground/90 text-white shadow-xs"
                           >
                             {acceptOfferMutation.isPending ? 'Redirecting...' : 'Pay Now'}
                           </Button>
@@ -348,7 +348,7 @@ export function OffersReceivedSection({
                               rejectOfferMutation.isPending || acceptOfferMutation.isPending
                             }
                             onClick={() => handleAcceptOffer(offer.id, travelerName)}
-                            className="bg-foreground hover:bg-foreground/10 text-white shadow-xs"
+                            className="bg-foreground hover:bg-foreground/90 text-white shadow-xs"
                           >
                             {acceptOfferMutation.isPending ? 'Accepting...' : 'Accept'}
                           </Button>
