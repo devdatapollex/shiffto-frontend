@@ -137,8 +137,10 @@ export interface AdminPaymentTransaction {
 
 export interface AdminPaymentsResponse {
   stats: {
+    totalPlatformRevenue: number;
     totalGrossVolume: number;
     totalEscrowed: number;
+    totalPendingRelease: number;
     totalReleased: number;
     totalRefunded: number;
     estimatedCommission: number;

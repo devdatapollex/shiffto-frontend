@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   TrendingUp,
   AlertTriangle,
+  Clock,
   Search,
   Copy,
   Check,
@@ -206,57 +207,7 @@ export default function AdminPaymentsPage() {
 
         {/* Top 5 KPI Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Total Gross Volume
-                </p>
-                <h3 className="text-xl font-bold text-foreground mt-1">
-                  ${data?.stats.totalGrossVolume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
-                </h3>
-                <p className="text-[11px] text-muted-foreground mt-1">Processed transactions</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                <DollarSign className="h-5 w-5" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Funds in Escrow
-                </p>
-                <h3 className="text-xl font-bold text-amber-600 mt-1">
-                  ${data?.stats.totalEscrowed.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
-                </h3>
-                <p className="text-[11px] text-muted-foreground mt-1">Held until delivery</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Released Earnings
-                </p>
-                <h3 className="text-xl font-bold text-blue-600 mt-1">
-                  ${data?.stats.totalReleased.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
-                </h3>
-                <p className="text-[11px] text-muted-foreground mt-1">Traveler earnings released</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-            </CardContent>
-          </Card>
-
+          {/* Card 1: Platform Revenue (Main) & Gross Volume (Subtext) */}
           <Card className="border border-border/60 shadow-xs bg-card">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
@@ -264,16 +215,73 @@ export default function AdminPaymentsPage() {
                   Platform Revenue
                 </p>
                 <h3 className="text-xl font-bold text-purple-600 mt-1">
-                  ${data?.stats.estimatedCommission.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                  ${(data?.stats.totalPlatformRevenue ?? data?.stats.estimatedCommission ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </h3>
-                <p className="text-[11px] text-muted-foreground mt-1">Total commission collected</p>
+                <p className="text-[11px] font-medium text-slate-500 mt-1">
+                  Gross Vol: ${(data?.stats.totalGrossVolume ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+              <div className="h-10 w-10 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </CardContent>
           </Card>
 
+          {/* Card 2: Funds in Escrow */}
+          <Card className="border border-border/60 shadow-xs bg-card">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Funds in Escrow
+                </p>
+                <h3 className="text-xl font-bold text-amber-600 mt-1">
+                  ${(data?.stats.totalEscrowed ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1">Held until delivery</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Pending Release */}
+          <Card className="border border-border/60 shadow-xs bg-card">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Pending Release
+                </p>
+                <h3 className="text-xl font-bold text-sky-600 mt-1">
+                  ${(data?.stats.totalPendingRelease ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1">Delivered, awaiting payout</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
+                <Clock className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 4: Released Earnings (Traveler Cut) */}
+          <Card className="border border-border/60 shadow-xs bg-card">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Released Earnings
+                </p>
+                <h3 className="text-xl font-bold text-blue-600 mt-1">
+                  ${(data?.stats.totalReleased ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1">Traveler net payouts</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 5: Refunds & Failed (as is) */}
           <Card className="border border-border/60 shadow-xs bg-card">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
@@ -281,11 +289,11 @@ export default function AdminPaymentsPage() {
                   Refunds & Failed
                 </p>
                 <h3 className="text-xl font-bold text-rose-600 mt-1">
-                  ${data?.stats.totalRefunded.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                  ${(data?.stats.totalRefunded ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-1">Disputed / Canceled</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
+              <div className="h-10 w-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
                 <AlertTriangle className="h-5 w-5" />
               </div>
             </CardContent>
