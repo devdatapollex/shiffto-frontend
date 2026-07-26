@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import {
   Users,
   Search,
   CheckCircle,
-  AlertTriangle,
   UserMinus,
-  UserCheck,
   Calendar,
   Award,
   Package,
@@ -19,7 +17,6 @@ import {
   Trash2,
   Lock,
   RefreshCw,
-  MoreVertical,
   CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,12 +26,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Pagination,
   PaginationContent,
@@ -457,22 +448,26 @@ export default function AdminUsersPage() {
               <Pagination className="m-0 w-auto justify-end">
                 <PaginationContent>
                   <PaginationItem>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className="flex items-center gap-1 h-8 px-2"
-                    >
-                      <PaginationPrevious className="h-4 w-4" />
-                    </Button>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) setCurrentPage((p) => Math.max(1, p - 1));
+                      }}
+                      className={
+                        currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                      }
+                    />
                   </PaginationItem>
                   {Array.from({ length: Math.ceil(usersData.meta.total / limitPerPage) }).map(
                     (_, idx) => (
                       <PaginationItem key={idx}>
                         <PaginationLink
                           isActive={currentPage === idx + 1}
-                          onClick={() => setCurrentPage(idx + 1)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(idx + 1);
+                          }}
                           className="h-8 w-8 text-xs cursor-pointer"
                         >
                           {idx + 1}
@@ -481,15 +476,19 @@ export default function AdminUsersPage() {
                     )
                   )}
                   <PaginationItem>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={currentPage >= Math.ceil(usersData.meta.total / limitPerPage)}
-                      onClick={() => setCurrentPage((p) => p + 1)}
-                      className="flex items-center gap-1 h-8 px-2"
-                    >
-                      <PaginationNext className="h-4 w-4" />
-                    </Button>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const totalPages = Math.ceil(usersData.meta.total / limitPerPage);
+                        if (currentPage < totalPages) setCurrentPage((p) => p + 1);
+                      }}
+                      className={
+                        currentPage >= Math.ceil(usersData.meta.total / limitPerPage)
+                          ? 'pointer-events-none opacity-50'
+                          : 'cursor-pointer'
+                      }
+                    />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
