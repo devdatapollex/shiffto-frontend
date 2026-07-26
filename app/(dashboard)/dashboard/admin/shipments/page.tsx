@@ -189,13 +189,37 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 
 // --- Category Validation ---
 
+const optionalPositiveNumber = z.preprocess(
+  (val) =>
+    val === '' || val === null || val === undefined || Number.isNaN(Number(val))
+      ? null
+      : Number(val),
+  z.number().positive('Must be greater than 0').nullable().optional()
+);
+
+const optionalPositiveInteger = z.preprocess(
+  (val) =>
+    val === '' || val === null || val === undefined || Number.isNaN(Number(val))
+      ? null
+      : Number(val),
+  z.number().int('Must be a whole number').positive('Must be at least 1').nullable().optional()
+);
+
 const categorySchema = z.object({
   name: z.string().min(1, 'Category name is required'),
   slug: z.string().min(1, 'Slug is required'),
-  maxWeight: z.coerce.number().positive().optional().nullable(),
-  minPrice: z.coerce.number().positive('Minimum price is required'),
-  maxPrice: z.coerce.number().positive().optional().nullable(),
-  maxQuantity: z.coerce.number().int().positive().optional().nullable(),
+  maxWeight: optionalPositiveNumber,
+  minPrice: z.preprocess(
+    (val) =>
+      val === '' || val === null || val === undefined || Number.isNaN(Number(val))
+        ? undefined
+        : Number(val),
+    z
+      .number({ message: 'Minimum price is required' })
+      .positive('Minimum price must be greater than 0')
+  ),
+  maxPrice: optionalPositiveNumber,
+  maxQuantity: optionalPositiveInteger,
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -877,6 +901,11 @@ function CategoriesTab() {
                   step="0.01"
                   {...createForm.register('maxPrice')}
                 />
+                {createForm.formState.errors.maxPrice && (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.maxPrice.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -888,6 +917,11 @@ function CategoriesTab() {
                   step="0.01"
                   {...createForm.register('maxWeight')}
                 />
+                {createForm.formState.errors.maxWeight && (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.maxWeight.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="create-maxQuantity">Max Quantity</Label>
@@ -896,6 +930,11 @@ function CategoriesTab() {
                   type="number"
                   {...createForm.register('maxQuantity')}
                 />
+                {createForm.formState.errors.maxQuantity && (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.maxQuantity.message}
+                  </p>
+                )}
               </div>
             </div>
             <DialogFooter className="gap-2 pt-2">
@@ -963,6 +1002,11 @@ function CategoriesTab() {
                   step="0.01"
                   {...editForm.register('maxPrice')}
                 />
+                {editForm.formState.errors.maxPrice && (
+                  <p className="text-xs text-destructive">
+                    {editForm.formState.errors.maxPrice.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -974,10 +1018,20 @@ function CategoriesTab() {
                   step="0.01"
                   {...editForm.register('maxWeight')}
                 />
+                {editForm.formState.errors.maxWeight && (
+                  <p className="text-xs text-destructive">
+                    {editForm.formState.errors.maxWeight.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-maxQuantity">Max Quantity</Label>
                 <Input id="edit-maxQuantity" type="number" {...editForm.register('maxQuantity')} />
+                {editForm.formState.errors.maxQuantity && (
+                  <p className="text-xs text-destructive">
+                    {editForm.formState.errors.maxQuantity.message}
+                  </p>
+                )}
               </div>
             </div>
             <DialogFooter className="gap-2 pt-2">
