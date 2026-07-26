@@ -106,16 +106,18 @@ export function OffersReceivedSection({
     }
   };
 
-  const handleCounterOffer = async (offerId: string, travellerName: string) => {
-    const counterAmount = window.prompt(`Enter your counter offer price for ${travellerName}:`);
-    if (!counterAmount) return;
-    toast.info(`Counter offer of $${counterAmount} submitted for ${travellerName}.`);
+  const handleRejectOffer = async (offerId: string, travellerName: string) => {
     try {
       await rejectOfferMutation.mutateAsync(offerId);
-    } catch {
-      // Toast notification is handled above
+      toast.success(`Offer from ${travellerName} rejected.`);
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(
+        errorObj?.response?.data?.message || errorObj?.message || 'Failed to reject offer'
+      );
     }
   };
+
 
   const handleCancelCheckout = async (offerId: string, travellerName: string) => {
     try {
@@ -385,11 +387,12 @@ export function OffersReceivedSection({
                             disabled={
                               rejectOfferMutation.isPending || acceptOfferMutation.isPending
                             }
-                            onClick={() => handleCounterOffer(offer.id, travelerName)}
-                            className="border-foreground text-foreground hover:bg-foreground/10"
+                            onClick={() => handleRejectOffer(offer.id, travelerName)}
+                            className="border-destructive text-destructive hover:bg-destructive/10 cursor-pointer"
                           >
-                            {rejectOfferMutation.isPending ? 'Processing...' : 'Counter offer'}
+                            {rejectOfferMutation.isPending ? 'Rejecting...' : 'Reject'}
                           </Button>
+
                           <Button
                             size="sm"
                             disabled={
