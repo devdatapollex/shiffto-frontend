@@ -125,6 +125,13 @@ export async function getAvailableShipments(params?: {
   return data;
 }
 
+export async function getAvailableShipmentsCount(): Promise<number> {
+  const { data } = await apiClient.get<{ success: boolean; data: { count: number } }>(
+    '/trips/available-shipments/count'
+  );
+  return data.data.count;
+}
+
 export async function sendShipmentOtp(): Promise<void> {
   await apiClient.post('/shipments/send-otp');
 }

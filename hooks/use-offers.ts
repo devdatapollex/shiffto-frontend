@@ -23,6 +23,14 @@ export function useReceivedOffers() {
   });
 }
 
+export function useReceivedOffersCount() {
+  return useQuery({
+    queryKey: ['offers', 'received-count'],
+    queryFn: offerService.getReceivedOffersCount,
+    staleTime: 1000 * 30,
+  });
+}
+
 export function useCreateOffer() {
   const queryClient = useQueryClient();
   return useMutation({
