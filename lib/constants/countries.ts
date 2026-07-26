@@ -7,12 +7,20 @@ export interface Country {
   callingCode: string;
 }
 
-export const COUNTRIES: Country[] = CountryList.getAll().map((country) => ({
-  code: country.code,
-  name: country.name,
-  flag: country.flag,
-  callingCode: country.dial_code,
-}));
+const seenCodes = new Set<string>();
+
+export const COUNTRIES: Country[] = CountryList.getAll()
+  .filter((country) => {
+    if (seenCodes.has(country.code)) return false;
+    seenCodes.add(country.code);
+    return true;
+  })
+  .map((country) => ({
+    code: country.code,
+    name: country.name,
+    flag: country.flag,
+    callingCode: country.dial_code,
+  }));
 
 export function getCountryByCode(code: string): Country | undefined {
   const country = CountryList.findOneByCountryCode(code);
