@@ -178,15 +178,15 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
   }
 
   return (
-    <div className="bg-accent-foreground/10 border border-accent-foreground/20 rounded-lg p-6 shadow-sm space-y-5">
+    <div className="bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-5">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-lg bg-accent-foreground/15 border border-accent-foreground/30 flex items-center justify-center text-foreground shrink-0">
+          <div className="h-11 w-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-foreground shrink-0">
             <PackageCheck className="h-6 w-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-widest bg-accent-foreground/20 text-foreground border border-accent-foreground/40 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] uppercase font-bold tracking-widest bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full shadow-xs">
                 Traveller Action Required
               </span>
             </div>
@@ -196,7 +196,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
         </div>
       </div>
 
-      <div className="space-y-4 pt-2 border-t border-accent-foreground/20">
+      <div className="space-y-4 pt-2 border-t border-slate-200/60">
         {/* Photo Upload for Pickup or Delivery */}
         {(stage === 'PICKED_UP' || stage === 'DELIVERED') && (
           <div className="space-y-2">
@@ -206,7 +206,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
             </Label>
 
             {photoUrl ? (
-              <div className="relative w-36 h-28 rounded-lg overflow-hidden border-2 border-accent-foreground/50 group shadow-sm">
+              <div className="relative w-36 h-28 rounded-lg overflow-hidden border-2 border-slate-200 group shadow-sm">
                 <Image
                   src={toRelativeImageUrl(photoUrl)}
                   alt="Proof photo"
@@ -222,7 +222,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-accent-foreground/30 hover:border-accent-foreground/60 rounded-lg cursor-pointer bg-accent-foreground/5 hover:bg-accent-foreground/10 transition-all">
+              <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-200 hover:border-slate-300 rounded-lg cursor-pointer bg-slate-50/50 hover:bg-slate-50 transition-all">
                 {isUploading ? (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Loader2 className="h-5 w-5 animate-spin text-foreground" />
@@ -264,7 +264,7 @@ export function StepAdvancementCard({ shipment, steps }: StepAdvancementCardProp
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
-            className="bg-background/80 border-accent-foreground/20 text-foreground placeholder:text-muted-foreground text-xs rounded-lg focus:border-primary focus:ring-primary"
+            className="bg-white border-slate-200 text-foreground placeholder:text-muted-foreground text-xs rounded-lg focus:border-primary focus:ring-primary"
           />
         </div>
 
