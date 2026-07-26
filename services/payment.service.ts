@@ -37,13 +37,24 @@ export interface SenderSummaryResponse {
 
 export type TravelerEarningsTransaction = PaymentTransaction;
 
+export interface WithdrawalPaymentMethodDetails {
+  type?: string;
+  accountName?: string;
+  accountNumber?: string;
+  bankName?: string;
+  branchName?: string;
+  routingNumber?: string;
+  cryptoAddress?: string;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 export interface WithdrawalHistoryItem {
   id: string;
   withdrawalNo: string;
   userId: string;
   amount: number;
   paymentMethodId: string | null;
-  paymentMethodDetails: Record<string, unknown> | null;
+  paymentMethodDetails: WithdrawalPaymentMethodDetails | null;
   payoutTxnId: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   rejectionReason: string | null;
