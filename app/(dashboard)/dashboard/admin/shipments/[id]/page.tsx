@@ -82,6 +82,7 @@ export default function AdminShipmentDetailsPage() {
   const router = useRouter();
   const shipmentId = params?.id as string;
 
+  const { user } = useRole();
   const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; title: string } | null>(null);
   const [isReleasing, setIsReleasing] = useState(false);
@@ -177,7 +178,6 @@ export default function AdminShipmentDetailsPage() {
     );
   }
 
-  const { user } = useRole();
   const isTraveller = Boolean(user && shipment.trip?.user?.id === user.id);
   const shortShipmentId = `SH-${shipment.id.slice(-6).toUpperCase()}`;
   const canAdvanceStep = shipment.status === 'ACTIVE';
