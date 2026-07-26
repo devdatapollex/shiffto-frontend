@@ -51,7 +51,6 @@ import {
   PlaneTakeoff,
   Luggage,
   XCircle,
-
   AlertCircle,
   HelpCircle,
   Navigation,
@@ -382,7 +381,14 @@ export default function MyTripsPage() {
               {visibleShipments.map((shipment) => {
                 const fromCountry = getCountryByCode(shipment.fromCountry);
                 const toCountry = getCountryByCode(shipment.toCountry);
-                const isOffered = !!(shipment.offers && shipment.offers.length > 0);
+                const isOffered = !!(
+                  shipment.offers &&
+                  shipment.offers.some((o) =>
+                    ['PENDING', 'PAYMENT_PENDING', 'PAYMENT_CANCELED', 'ACCEPTED'].includes(
+                      o.status
+                    )
+                  )
+                );
                 const totalPrice = (shipment.pricePerKg * shipment.weight).toFixed(0);
 
                 return (
@@ -465,7 +471,6 @@ export default function MyTripsPage() {
                   </div>
                 );
               })}
-
             </div>
 
             {shipmentIndex + 3 < availableShipments.length && (
