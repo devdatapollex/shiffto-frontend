@@ -16,6 +16,8 @@ import { CountryFlag } from '@/components/shipments/create/country-flag';
 import type { CreateTripValues } from '@/lib/validations/trip';
 import { ArrowLeftRight } from 'lucide-react';
 import { DatePicker, TimePicker } from '@/components/ui/custom-picker';
+import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
+
 
 export function FlightDetailsStep() {
   const { control, setValue, watch } = useFormContext<CreateTripValues>();
@@ -92,32 +94,14 @@ export function FlightDetailsStep() {
               <FormLabel className="text-[#0B3A8E] font-semibold text-sm">
                 From <span className="text-red-500">*</span>
               </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl className="w-full">
-                  <SelectTrigger className="w-full h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg">
-                    {field.value ? (
-                      <span className="flex items-center gap-2">
-                        <CountryFlag code={field.value} className="h-5 w-7" />
-                        <span>{getCountryByCode(field.value)?.name}</span>
-                      </span>
-                    ) : (
-                      <SelectValue placeholder="Departure country" />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent position="popper" className="max-h-[300px]">
-                  {COUNTRIES.map((country) => (
-                    <SelectItem
-                      key={country.code}
-                      value={country.code}
-                      disabled={country.code === toCountry}
-                    >
-                      <CountryFlag code={country.code} className="h-4 w-6 mr-2" />
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <SearchableCountrySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Departure country"
+                  disabledCode={toCountry}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -142,37 +126,20 @@ export function FlightDetailsStep() {
               <FormLabel className="text-[#0B3A8E] font-semibold text-sm">
                 To <span className="text-red-500">*</span>
               </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl className="w-full">
-                  <SelectTrigger className="w-full h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg">
-                    {field.value ? (
-                      <span className="flex items-center gap-2">
-                        <CountryFlag code={field.value} className="h-5 w-7" />
-                        <span>{getCountryByCode(field.value)?.name}</span>
-                      </span>
-                    ) : (
-                      <SelectValue placeholder="Destination country" />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent position="popper" className="max-h-[300px]">
-                  {COUNTRIES.map((country) => (
-                    <SelectItem
-                      key={country.code}
-                      value={country.code}
-                      disabled={country.code === fromCountry}
-                    >
-                      <CountryFlag code={country.code} className="h-4 w-6 mr-2" />
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <SearchableCountrySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Destination country"
+                  disabledCode={fromCountry}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
+
 
       {/* Flight Schedule Details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
