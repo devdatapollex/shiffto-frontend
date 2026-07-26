@@ -1,4 +1,5 @@
 import apiClient from '@/lib/api-client';
+import { DocumentType } from '@/services/profile.service';
 
 export interface UserActivity {
   shipmentsCreated: number;
@@ -73,7 +74,7 @@ export interface UserDetailData {
   kyc: {
     id: string;
     userId: string;
-    documentType: string;
+    documentType: DocumentType;
     documentNumber: string;
     nationality: string;
     phoneNumber: string;

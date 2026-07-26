@@ -763,7 +763,7 @@ function CategoriesTab() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-[#0B3A8E]"
+                        className="h-8 w-8 text-slate-400 hover:text-white hover:bg-primary"
                         onClick={() => openEditDialog(category)}
                       >
                         <Pencil className="h-4 w-4" />
@@ -771,7 +771,7 @@ function CategoriesTab() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-destructive"
+                        className="h-8 w-8 text-slate-400 hover:text-white hover:bg-destructive"
                         onClick={() => {
                           setSelectedCategory(category);
                           setShowDeleteDialog(true);
@@ -1159,7 +1159,7 @@ function StepDefinitionsTab() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-slate-400 hover:text-[#0B3A8E]"
+                      className="h-8 w-8 text-slate-400 hover:text-white hover:bg-primary"
                       onClick={() => openEditDialog(step)}
                     >
                       <Pencil className="h-4 w-4" />

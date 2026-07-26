@@ -140,8 +140,8 @@ export default function CommissionSettingsPage() {
             className="lg:col-span-7 space-y-6"
           >
             {/* Active Rate Status Banner */}
-            <Card className="border-primary/20 bg-primary/[0.02]">
-              <CardContent className="pt-6">
+            <Card className="border-primary/20 bg-primary/[0.1]">
+              <CardContent className="">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <span className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
@@ -153,10 +153,6 @@ export default function CommissionSettingsPage() {
                         ({(activeRate / 100).toFixed(2)} decimal cut)
                       </span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Live System Setting
                   </div>
                 </div>
               </CardContent>
