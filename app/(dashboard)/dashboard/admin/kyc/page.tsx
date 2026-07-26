@@ -467,30 +467,25 @@ export default function AdminKycPage() {
                   )}
                 </div>
 
-                <DialogFooter className="gap-2 border-t pt-4">
-                  <Button variant="outline" onClick={() => setShowDetailDialog(false)}>
-                    Close
-                  </Button>
+                {selectedKyc.status === 'PENDING' && (
+                  <DialogFooter className="gap-2 border-t pt-4">
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowRejectDialog(true)}
+                      disabled={submittingReview}
+                    >
+                      <X className="mr-1.5 h-4 w-4" /> Reject
+                    </Button>
+                    <Button
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => handleApprove(selectedKyc.id)}
+                      disabled={submittingReview}
+                    >
+                      <Check className="mr-1.5 h-4 w-4" /> Approve
+                    </Button>
+                  </DialogFooter>
+                )}
 
-                  {selectedKyc.status === 'PENDING' && (
-                    <>
-                      <Button
-                        variant="destructive"
-                        onClick={() => setShowRejectDialog(true)}
-                        disabled={submittingReview}
-                      >
-                        <X className="mr-1.5 h-4 w-4" /> Reject
-                      </Button>
-                      <Button
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleApprove(selectedKyc.id)}
-                        disabled={submittingReview}
-                      >
-                        <Check className="mr-1.5 h-4 w-4" /> Approve
-                      </Button>
-                    </>
-                  )}
-                </DialogFooter>
               </>
             )}
           </DialogContent>

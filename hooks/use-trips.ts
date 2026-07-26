@@ -88,7 +88,9 @@ export function useVerifyTrip() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trips'] });
       queryClient.invalidateQueries({ queryKey: ['my-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trip-details'] });
     },
+
   });
 }
 

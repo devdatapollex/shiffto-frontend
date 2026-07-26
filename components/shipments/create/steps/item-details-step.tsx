@@ -198,6 +198,16 @@ export function ItemDetailsStep() {
                   {...field}
                 />
               </FormControl>
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1 select-none">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-400" />
+                <span>
+                  {selectedCategory
+                    ? maxQuantity !== null
+                      ? `Allowed range: 1 - ${maxQuantity}`
+                      : 'Any quantity allowed'
+                    : 'Select a category to see allowed quantity range'}
+                </span>
+              </div>
               <FormMessage />
             </FormItem>
           )}

@@ -6,14 +6,22 @@ import { ReactNode } from 'react';
 
 interface RoleGuardProps {
   children: ReactNode;
-  roles: UserRole[];
+  roles?: UserRole[];
+  allowedRoles?: UserRole[];
   fallback?: ReactNode;
 }
 
-export function RoleGuard({ children, roles, fallback = null }: RoleGuardProps) {
+export function RoleGuard({ children, roles, allowedRoles, fallback = null }: RoleGuardProps) {
   const { user, isAuthenticated } = useRole();
 
-  if (!isAuthenticated || !user || !roles.includes(user.role as UserRole)) {
+  const targetRoles = roles || allowedRoles || [];
+
+  if (
+    !isAuthenticated ||
+    !user ||
+    !Array.isArray(targetRoles) ||
+    !targetRoles.includes(user.role as UserRole)
+  ) {
     return fallback;
   }
 
