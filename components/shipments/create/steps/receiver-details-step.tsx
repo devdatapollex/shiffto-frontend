@@ -25,15 +25,13 @@ export function ReceiverDetailsStep() {
     }
   }, [toCountryCode, receiverPhoneExt, setValue]);
 
-  // Keep combined receiverPhone in sync
+  // Keep combined receiverPhone in sync without triggering full form re-validation on every keypress
   useEffect(() => {
     const country = COUNTRIES.find((c) => c.code === receiverPhoneExt);
     const callingCode = country?.callingCode ?? '';
-    setValue('receiverPhone', `${callingCode}${receiverPhoneNum || ''}`, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    setValue('receiverPhone', `${callingCode}${receiverPhoneNum || ''}`);
   }, [receiverPhoneExt, receiverPhoneNum, setValue]);
+
 
   return (
     <div className="space-y-6">
