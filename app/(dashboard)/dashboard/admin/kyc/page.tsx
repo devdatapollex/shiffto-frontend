@@ -58,6 +58,20 @@ type KycSubmission = KycDetails & {
   };
 };
 
+function formatDateTime(dateStr?: string | Date | null): string {
+  if (!dateStr) return 'N/A';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+
 export default function AdminKycPage() {
   const [submissions, setSubmissions] = useState<KycSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -388,8 +402,8 @@ export default function AdminKycPage() {
                       <span className="text-slate-400">Phone:</span>
                       <span className="text-slate-700">{selectedKyc.user?.phone || 'N/A'}</span>
                       <span className="text-slate-400">Submission Date:</span>
-                      <span className="text-slate-700">
-                        {new Date(selectedKyc.createdAt).toLocaleDateString()}
+                      <span className="text-slate-700 font-medium">
+                        {formatDateTime(selectedKyc.createdAt)}
                       </span>
                     </div>
                   </div>
@@ -485,7 +499,6 @@ export default function AdminKycPage() {
                     </Button>
                   </DialogFooter>
                 )}
-
               </>
             )}
           </DialogContent>
