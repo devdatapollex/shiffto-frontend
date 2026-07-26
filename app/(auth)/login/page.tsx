@@ -70,9 +70,15 @@ export default function LoginPage() {
       return;
     }
     toast.success('Welcome back!');
-    router.push(callbackUrl);
+    const userRole = (data?.user as { role?: string })?.role;
+    const hasCustomCallback = searchParams.has('callbackUrl');
+    const targetUrl =
+      userRole === 'admin' && !hasCustomCallback ? ROUTES.ADMIN_DASHBOARD : callbackUrl;
+
+    router.push(targetUrl);
     router.refresh();
   };
+
 
   const handleGoogleSignIn = () => {
     authClient.signIn.social({ provider: 'google', callbackURL: callbackUrl });

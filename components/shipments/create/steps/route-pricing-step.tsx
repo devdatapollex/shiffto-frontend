@@ -18,6 +18,8 @@ import { RestrictedItemsDialog } from '../restricted-items-dialog';
 import { useCategories } from '@/hooks/use-categories';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 import { ArrowLeftRight, CheckCircle2 } from 'lucide-react';
+import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
+
 
 export function RoutePricingStep() {
   const { control, watch, setValue, setError, clearErrors } =
@@ -69,7 +71,7 @@ export function RoutePricingStep() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-end gap-3 w-full">
+      <div className="flex flex-col md:flex-row items-end gap-3 w-full">
         <FormField
           control={control}
           name="fromCountry"
@@ -78,32 +80,14 @@ export function RoutePricingStep() {
               <FormLabel className="text-[#0b3a8e] font-semibold text-sm">
                 From <span className="text-red-500">*</span>
               </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl className="w-full">
-                  <SelectTrigger className="w-full h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg">
-                    {field.value ? (
-                      <span className="flex items-center gap-2">
-                        <CountryFlag code={field.value} className="h-5 w-7" />
-                        <span>{getCountryByCode(field.value)?.name}</span>
-                      </span>
-                    ) : (
-                      <SelectValue placeholder="Select country of departure" />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent position="popper">
-                  {COUNTRIES.map((country) => (
-                    <SelectItem
-                      key={country.code}
-                      value={country.code}
-                      disabled={country.code === toCountry}
-                    >
-                      <CountryFlag code={country.code} className="h-4 w-6" />
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <SearchableCountrySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Select country of departure"
+                  disabledCode={toCountry}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -128,32 +112,14 @@ export function RoutePricingStep() {
               <FormLabel className="text-[#0b3a8e] font-semibold text-sm">
                 To <span className="text-red-500">*</span>
               </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl className="w-full">
-                  <SelectTrigger className="w-full h-11 bg-white border-[#e2e8f0] text-slate-700 rounded-lg">
-                    {field.value ? (
-                      <span className="flex items-center gap-2">
-                        <CountryFlag code={field.value} className="h-5 w-7" />
-                        <span>{getCountryByCode(field.value)?.name}</span>
-                      </span>
-                    ) : (
-                      <SelectValue placeholder="Select country of arrival" />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent position="popper">
-                  {COUNTRIES.map((country) => (
-                    <SelectItem
-                      key={country.code}
-                      value={country.code}
-                      disabled={country.code === fromCountry}
-                    >
-                      <CountryFlag code={country.code} className="h-4 w-6" />
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <SearchableCountrySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Select country of arrival"
+                  disabledCode={fromCountry}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

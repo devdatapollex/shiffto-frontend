@@ -48,7 +48,10 @@ import {
   Plane,
   Package,
   CheckCircle2,
+  PlaneTakeoff,
+  Luggage,
   XCircle,
+
   AlertCircle,
   HelpCircle,
   Navigation,
@@ -380,77 +383,89 @@ export default function MyTripsPage() {
                 const fromCountry = getCountryByCode(shipment.fromCountry);
                 const toCountry = getCountryByCode(shipment.toCountry);
                 const isOffered = !!(shipment.offers && shipment.offers.length > 0);
+                const totalPrice = (shipment.pricePerKg * shipment.weight).toFixed(0);
 
                 return (
-                  <Card
+                  <div
                     key={shipment.id}
-                    className="border border-[#e2e8f0] hover:border-slate-300 transition-all rounded-lg overflow-hidden bg-white shadow-xs"
+                    className="relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200"
                   >
-                    <CardContent className="px-5 flex flex-col justify-between h-full space-y-4">
-                      <div className="flex gap-4 items-start">
-                        {/* Product image placeholder */}
-                        <div className="h-16 w-16 rounded-lg border border-slate-100 bg-slate-50 shrink-0 overflow-hidden flex items-center justify-center">
+                    <div>
+                      {/* Shipment Item Header */}
+                      <div className="flex gap-3.5 items-start mb-4">
+                        <div className="w-14 h-14 bg-slate-200/80 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
                           {shipment.itemPhotos && shipment.itemPhotos.length > 0 ? (
                             <Image
                               src={toRelativeImageUrl(shipment.itemPhotos[0])}
                               alt={shipment.itemName}
-                              className="h-full w-full object-cover"
-                              width={64}
-                              height={64}
+                              className="object-cover w-full h-full"
+                              width={56}
+                              height={56}
                             />
                           ) : (
-                            <Package className="h-7 w-7 text-slate-400" />
+                            <Package className="h-6 w-6 text-slate-400" />
                           )}
                         </div>
 
-                        <div className="min-w-0 flex-1">
+                        <div className="space-y-1 min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <h4 className="font-bold text-[#0B3A8E] text-base truncate">
+                            <h3 className="text-base font-bold text-[#0B3A8E] truncate">
                               {shipment.itemName}
-                            </h4>
-                            <span className="text-[#0B3A8E] font-bold text-lg shrink-0">
-                              ${shipment.pricePerKg}/kg
+                            </h3>
+                            <span className="text-xl font-bold text-[#0B3A8E] shrink-0">
+                              ${totalPrice}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1 mt-1 text-slate-500 text-xs font-medium">
-                            <span>{fromCountry?.name}</span>
-                            <span>&rarr;</span>
-                            <span>{toCountry?.name}</span>
-                          </div>
-                          <p className="text-slate-400 text-xs mt-1">
-                            {shipment.weight} Kg &bull; {shipment.quantity}pcs
+                          <p className="text-xs text-slate-500 flex items-center gap-1.5 truncate">
+                            <PlaneTakeoff className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <span className="truncate">
+                              {fromCountry?.name ?? shipment.fromCountry} -{' '}
+                              {toCountry?.name ?? shipment.toCountry}
+                            </span>
+                          </p>
+                          <p className="text-xs text-slate-500 flex items-center gap-1.5 truncate">
+                            <Luggage className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <span>
+                              {shipment.weight} Kg • {shipment.quantity}pcs
+                            </span>
                           </p>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Action buttons / Offered status badge */}
-                      <div className="pt-2">
-                        {isOffered ? (
-                          <div className="w-full bg-[#ECFDF5] border border-[#D1FAE5] text-[#059669] font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 h-8">
-                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                            <span>Already Offered</span>
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-3">
-                            <Button
-                              variant="outline"
-                              onClick={() => handleOpenCounterDialog(shipment)}
-                            >
-                              Counter Offer
-                            </Button>
-                            <Button
-                              className="bg-foreground text-white transition-colors hover:bg-foreground/90"
-                              onClick={() => handleOpenAcceptDialog(shipment)}
-                            >
-                              Accept
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                    <hr className="border-slate-200/80 my-3" />
+
+                    {/* Action buttons / Offered status badge */}
+                    <div>
+                      {isOffered ? (
+                        <div className="w-full bg-[#ECFDF5] border border-[#D1FAE5] text-[#059669] font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 h-9">
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                          <span>Already Offered</span>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenCounterDialog(shipment)}
+                            className="border-foreground text-foreground hover:bg-foreground/10 cursor-pointer"
+                          >
+                            Counter Offer
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-foreground hover:bg-foreground/90 text-white shadow-xs cursor-pointer"
+                            onClick={() => handleOpenAcceptDialog(shipment)}
+                          >
+                            Accept
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
+
             </div>
 
             {shipmentIndex + 3 < availableShipments.length && (

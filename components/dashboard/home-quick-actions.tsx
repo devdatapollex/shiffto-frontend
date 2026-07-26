@@ -9,6 +9,8 @@ import { useCategories } from '@/hooks/use-categories';
 import { useCreateShipmentStore } from '@/store/create-shipment-store';
 import { useCreateTripStore } from '@/store/create-trip-store';
 import { DatePicker } from '@/components/ui/custom-picker';
+import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
+
 import {
   Select,
   SelectContent,
@@ -117,31 +119,12 @@ export function HomeQuickActions() {
             <label className="text-[#0B3A8E] font-semibold text-xs sm:text-sm block">
               From <span className="text-red-500">*</span>
             </label>
-            <Select value={shipmentFrom} onValueChange={setShipmentFrom}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
-                {shipmentFrom ? (
-                  <span className="flex items-center gap-2 truncate">
-                    <CountryFlag code={shipmentFrom} className="h-4 w-6 shrink-0" />
-                    <span className="truncate">{getCountryByCode(shipmentFrom)?.name}</span>
-                  </span>
-                ) : (
-                  <SelectValue placeholder="Select country of departure" />
-                )}
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
-              >
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code} disabled={c.code === shipmentTo}>
-                    <div className="flex items-center gap-2">
-                      <CountryFlag code={c.code} className="h-4 w-6 shrink-0" />
-                      <span>{c.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableCountrySelect
+              value={shipmentFrom}
+              onValueChange={setShipmentFrom}
+              placeholder="Select country of departure"
+              disabledCode={shipmentTo}
+            />
           </div>
 
           {/* Swap Button */}
@@ -161,32 +144,14 @@ export function HomeQuickActions() {
             <label className="text-[#0B3A8E] font-semibold text-xs sm:text-sm block">
               To <span className="text-red-500">*</span>
             </label>
-            <Select value={shipmentTo} onValueChange={setShipmentTo}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
-                {shipmentTo ? (
-                  <span className="flex items-center gap-2 truncate">
-                    <CountryFlag code={shipmentTo} className="h-4 w-6 shrink-0" />
-                    <span className="truncate">{getCountryByCode(shipmentTo)?.name}</span>
-                  </span>
-                ) : (
-                  <SelectValue placeholder="Select country of arrival" />
-                )}
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
-              >
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code} disabled={c.code === shipmentFrom}>
-                    <div className="flex items-center gap-2">
-                      <CountryFlag code={c.code} className="h-4 w-6 shrink-0" />
-                      <span>{c.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableCountrySelect
+              value={shipmentTo}
+              onValueChange={setShipmentTo}
+              placeholder="Select country of arrival"
+              disabledCode={shipmentFrom}
+            />
           </div>
+
 
           {/* Category */}
           <div className="flex-1 space-y-1.5 min-w-0">
@@ -229,31 +194,12 @@ export function HomeQuickActions() {
             <label className="text-[#0B3A8E] font-semibold text-xs sm:text-sm block">
               From <span className="text-red-500">*</span>
             </label>
-            <Select value={tripFrom} onValueChange={setTripFrom}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
-                {tripFrom ? (
-                  <span className="flex items-center gap-2 truncate">
-                    <CountryFlag code={tripFrom} className="h-4 w-6 shrink-0" />
-                    <span className="truncate">{getCountryByCode(tripFrom)?.name}</span>
-                  </span>
-                ) : (
-                  <SelectValue placeholder="Select country of departure" />
-                )}
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
-              >
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code} disabled={c.code === tripTo}>
-                    <div className="flex items-center gap-2">
-                      <CountryFlag code={c.code} className="h-4 w-6 shrink-0" />
-                      <span>{c.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableCountrySelect
+              value={tripFrom}
+              onValueChange={setTripFrom}
+              placeholder="Select country of departure"
+              disabledCode={tripTo}
+            />
           </div>
 
           {/* Swap Button */}
@@ -273,32 +219,14 @@ export function HomeQuickActions() {
             <label className="text-[#0B3A8E] font-semibold text-xs sm:text-sm block">
               To <span className="text-red-500">*</span>
             </label>
-            <Select value={tripTo} onValueChange={setTripTo}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
-                {tripTo ? (
-                  <span className="flex items-center gap-2 truncate">
-                    <CountryFlag code={tripTo} className="h-4 w-6 shrink-0" />
-                    <span className="truncate">{getCountryByCode(tripTo)?.name}</span>
-                  </span>
-                ) : (
-                  <SelectValue placeholder="Select country of arrival" />
-                )}
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                className="w-[var(--radix-select-trigger-width)] max-h-[280px]"
-              >
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code} disabled={c.code === tripFrom}>
-                    <div className="flex items-center gap-2">
-                      <CountryFlag code={c.code} className="h-4 w-6 shrink-0" />
-                      <span>{c.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableCountrySelect
+              value={tripTo}
+              onValueChange={setTripTo}
+              placeholder="Select country of arrival"
+              disabledCode={tripFrom}
+            />
           </div>
+
 
           {/* Departure Date */}
           <div className="flex-1 space-y-1.5 min-w-0">
