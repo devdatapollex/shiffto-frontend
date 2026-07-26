@@ -90,7 +90,7 @@ export default function PaymentEarningsPage() {
       if (primary) {
         setSelectedMethodId(primary.id);
       }
-    } catch (err: any) {
+    } catch {
       toast.error('Failed to load payment & earnings data');
     } finally {
       setLoading(false);
@@ -112,26 +112,22 @@ export default function PaymentEarningsPage() {
     setIsSubmittingWithdraw(true);
     try {
       await requestWithdrawal({
-        grossAmount: amount,
+        amount: amount,
         paymentMethodId: selectedMethodId,
       });
       toast.success('Withdrawal request submitted successfully!');
       setIsWithdrawModalOpen(false);
       setWithdrawAmount('');
       fetchData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to submit withdrawal request');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } } };
+      toast.error(errorObj.response?.data?.message || 'Failed to submit withdrawal request');
     } finally {
       setIsSubmittingWithdraw(false);
     }
   };
 
-  const currentCommissionRate = travelerData?.stats.commissionRate || 0.3;
-  const currentCommissionPercentage = travelerData?.stats.commissionPercentage || 30;
-
   const parsedWithdrawAmount = parseFloat(withdrawAmount) || 0;
-  const calculatedCommissionCut = parsedWithdrawAmount * currentCommissionRate;
-  const calculatedNetPayout = Math.max(0, parsedWithdrawAmount - calculatedCommissionCut);
 
   return (
     <div className="space-y-6 max-w-[1144px] mx-auto">
@@ -157,7 +153,7 @@ export default function PaymentEarningsPage() {
         {/* EARNINGS TAB (Traveler View) */}
         <TabsContent value="earnings" className="space-y-6 mt-6">
           {/* Top Summary Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="border-slate-200 shadow-sm bg-white">
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
@@ -167,6 +163,7 @@ export default function PaymentEarningsPage() {
                   <p className="text-3xl font-extrabold text-slate-900">
                     ${travelerData?.stats.totalEarnings.toFixed(2) || '0.00'}
                   </p>
+                  <p className="text-xs text-slate-400">Total net payout from released shipments</p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl">
                   $
@@ -183,9 +180,27 @@ export default function PaymentEarningsPage() {
                   <p className="text-3xl font-extrabold text-amber-600">
                     ${travelerData?.stats.awaitingPayout.toFixed(2) || '0.00'}
                   </p>
+                  <p className="text-xs text-slate-400">Withdrawal requests pending transfer</p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                   <Clock className="w-6 h-6" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200 shadow-sm bg-white">
+              <CardContent className="p-6 flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    In Escrow
+                  </p>
+                  <p className="text-3xl font-extrabold text-indigo-600">
+                    ${travelerData?.stats.escrowedEarnings?.toFixed(2) || '0.00'}
+                  </p>
+                  <p className="text-xs text-slate-400">Held in escrow for active shipments</p>
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <WalletIcon className="w-6 h-6" />
                 </div>
               </CardContent>
             </Card>
@@ -217,8 +232,7 @@ export default function PaymentEarningsPage() {
                   ${travelerData?.stats.availableForWithdrawal.toFixed(2) || '0.00'}
                 </p>
                 <p className="text-xs text-slate-500">
-                  Total Earnings minus withdrawn amounts. Current commission rate:{' '}
-                  <span className="font-semibold">{currentCommissionPercentage}%</span>
+                  Net withdrawable earnings balance
                 </p>
               </div>
 
@@ -276,7 +290,7 @@ export default function PaymentEarningsPage() {
                           <span className="font-semibold">${item.grossAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-slate-400">
-                          <span>Commission ({currentCommissionPercentage}%):</span>
+                          <span>Commission ({Math.round((item.commissionRate || 0.3) * 100)}%):</span>
                           <span>-${item.commissionAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-emerald-600 font-bold pt-1 text-sm border-t border-dashed">
@@ -334,7 +348,7 @@ export default function PaymentEarningsPage() {
                       <div className="space-y-1">
                         <p className="text-xs text-slate-500">Amount:</p>
                         <p className="text-xl font-extrabold text-slate-900">
-                          ${wdr.netAmount.toFixed(2)}
+                          ${wdr.amount.toFixed(2)}
                         </p>
                         <p className="text-xs text-slate-400">
                           Method:{' '}
@@ -621,16 +635,12 @@ export default function PaymentEarningsPage() {
             {parsedWithdrawAmount > 0 && (
               <div className="rounded-lg bg-slate-50 p-3 text-xs space-y-1 border border-slate-100">
                 <div className="flex justify-between text-slate-600">
-                  <span>Gross Withdrawal:</span>
+                  <span>Requested Withdrawal:</span>
                   <span className="font-semibold">${parsedWithdrawAmount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-slate-500">
-                  <span>Commission Fee ({currentCommissionPercentage}%):</span>
-                  <span>-${calculatedCommissionCut.toFixed(2)}</span>
-                </div>
                 <div className="flex justify-between text-emerald-600 font-bold border-t pt-1 border-slate-200 text-sm">
-                  <span>Net Payout to Wallet:</span>
-                  <span>${calculatedNetPayout.toFixed(2)}</span>
+                  <span>Net Payout Amount:</span>
+                  <span>${parsedWithdrawAmount.toFixed(2)}</span>
                 </div>
               </div>
             )}

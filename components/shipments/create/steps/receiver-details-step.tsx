@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { COUNTRIES } from '@/lib/constants/countries';
 import { CountryFlag } from '../country-flag';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
+import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
+
 
 export function ReceiverDetailsStep() {
   const { control, watch, setValue } = useFormContext<CreateShipmentValues>();
@@ -25,15 +27,13 @@ export function ReceiverDetailsStep() {
     }
   }, [toCountryCode, receiverPhoneExt, setValue]);
 
-  // Keep combined receiverPhone in sync
+  // Keep combined receiverPhone in sync without triggering full form re-validation on every keypress
   useEffect(() => {
     const country = COUNTRIES.find((c) => c.code === receiverPhoneExt);
     const callingCode = country?.callingCode ?? '';
-    setValue('receiverPhone', `${callingCode}${receiverPhoneNum || ''}`, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    setValue('receiverPhone', `${callingCode}${receiverPhoneNum || ''}`);
   }, [receiverPhoneExt, receiverPhoneNum, setValue]);
+
 
   return (
     <div className="space-y-6">
@@ -66,37 +66,18 @@ export function ReceiverDetailsStep() {
           <FormField
             control={control}
             name="receiverPhoneExt"
-            render={({ field }) => {
-              const selectedCountry =
-                COUNTRIES.find((c) => c.code === field.value) ||
-                COUNTRIES.find((c) => c.code === 'US');
-              return (
-                <FormItem className="space-y-0 flex items-center">
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="border-0 bg-transparent p-0 h-auto focus:ring-0 shadow-none gap-1 hover:opacity-80 transition-opacity [&>svg]:hidden shrink-0 cursor-pointer select-none">
-                        <span className="flex items-center gap-1.5">
-                          <CountryFlag code={field.value} className="h-4 w-5" />
-                          <span className="text-slate-700 font-medium text-sm">
-                            {selectedCountry?.callingCode}
-                          </span>
-                        </span>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent position="popper" className="max-h-[250px] bg-white">
-                      {COUNTRIES.map((country) => (
-                        <SelectItem key={country.code} value={country.code}>
-                          <CountryFlag code={country.code} className="h-4 w-5" />
-                          <span className="font-medium mr-1.5">{country.callingCode}</span>
-                          <span className="text-slate-400">({country.name})</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem className="space-y-0 flex items-center">
+                <SearchableCountrySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  showCallingCode
+                  triggerClassName="border-0 bg-transparent p-0 h-auto focus:ring-0 shadow-none gap-1 hover:opacity-80 transition-opacity [&>svg]:hidden shrink-0 cursor-pointer select-none"
+                />
+              </FormItem>
+            )}
           />
+
 
           <span className="h-5 w-px bg-slate-200 mx-3 self-center shrink-0" />
 

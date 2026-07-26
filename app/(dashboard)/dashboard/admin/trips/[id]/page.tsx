@@ -96,6 +96,10 @@ export default function AdminTripDetailsPage() {
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
 
   const handleApprove = async () => {
+    if (trip?.status !== 'PENDING') {
+      toast.error('Only pending trips can be approved or rejected');
+      return;
+    }
     try {
       await verifyTripMutation.mutateAsync({
         id: tripId,
@@ -108,6 +112,10 @@ export default function AdminTripDetailsPage() {
   };
 
   const handleRejectSubmit = async () => {
+    if (trip?.status !== 'PENDING') {
+      toast.error('Only pending trips can be approved or rejected');
+      return;
+    }
     if (!rejectionReason.trim()) {
       toast.error('Rejection reason is required');
       return;
@@ -124,6 +132,7 @@ export default function AdminTripDetailsPage() {
       toast.error(err?.message || 'Failed to reject trip');
     }
   };
+
 
   if (isLoading) {
     return (
@@ -237,14 +246,14 @@ export default function AdminTripDetailsPage() {
                 variant="destructive"
                 onClick={() => setShowRejectDialog(true)}
                 disabled={verifyTripMutation.isPending}
-                className="flex-1 sm:flex-none sm:px-6 rounded-lg h-11 font-semibold"
+                className="flex-1 sm:w-36 rounded-lg h-11 font-semibold"
               >
                 <X className="mr-1.5 h-4 w-4" /> Reject
               </Button>
               <Button
                 onClick={handleApprove}
                 disabled={verifyTripMutation.isPending}
-                className="flex-1 sm:flex-none sm:px-6 bg-green-600 hover:bg-green-700 text-white rounded-lg h-11 font-semibold"
+                className="flex-1 sm:w-36 bg-green-600 hover:bg-green-700 text-white rounded-lg h-11 font-semibold"
               >
                 {verifyTripMutation.isPending ? (
                   <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
@@ -254,6 +263,7 @@ export default function AdminTripDetailsPage() {
                 Approve
               </Button>
             </div>
+
           </div>
         )}
 

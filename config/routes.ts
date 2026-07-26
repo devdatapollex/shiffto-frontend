@@ -28,6 +28,7 @@ export const ROUTES = {
   NOTIFICATIONS: '/dashboard/notifications',
 
   // Admin-only Routes
+  ADMIN_DASHBOARD: '/dashboard/admin',
   ADMIN_SHIPMENTS: '/dashboard/admin/shipments',
   SETTLEMENTS: '/dashboard/settlements',
   WITHDRAWALS: '/dashboard/withdrawals',
@@ -37,6 +38,7 @@ export const ROUTES = {
   ADMIN_TRIPS: '/dashboard/admin/trips',
   ADMIN_TICKETS: '/dashboard/admin/tickets',
   ADMIN_COMMISSION: '/dashboard/admin/commission',
+  ADMIN_PAYMENTS: '/dashboard/admin/payments',
 } as const;
 
 export const PUBLIC_ROUTES = [
