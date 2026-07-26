@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { userService } from '@/services/user.service';
+import { DocumentType } from '@/services/profile.service';
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-100',
@@ -365,7 +366,15 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                         <span className="text-muted-foreground block text-[10px] font-semibold uppercase">
                           Document Type
                         </span>
-                        <strong className="text-foreground mt-0.5 block">{kyc.documentType}</strong>
+                        <strong className="text-foreground mt-0.5 block">
+                          {kyc.documentType === DocumentType.PASSPORT
+                            ? 'Passport'
+                            : kyc.documentType === DocumentType.DRIVING_LICENSE
+                            ? 'Driving License'
+                            : kyc.documentType === DocumentType.NID
+                            ? 'National ID (NID)'
+                            : String(kyc.documentType).replace('_', ' ')}
+                        </strong>
                       </div>
                       <div className="p-3 bg-muted/30 border border-primary/5 rounded-lg">
                         <span className="text-muted-foreground block text-[10px] font-semibold uppercase">

@@ -1,9 +1,15 @@
 import apiClient from '@/lib/api-client';
 
+export enum DocumentType {
+  PASSPORT = 'PASSPORT',
+  DRIVING_LICENSE = 'DRIVING_LICENSE',
+  NID = 'NID',
+}
+
 export interface KycDetails {
   id: string;
   userId: string;
-  documentType: 'PASSPORT' | 'DRIVING_LICENSE' | 'NID';
+  documentType: DocumentType;
   documentNumber: string;
   nationality: string;
   phoneNumber: string;
@@ -73,7 +79,7 @@ export async function changePassword(payload: Record<string, string>): Promise<v
 }
 
 export async function submitKyc(payload: {
-  documentType: 'PASSPORT' | 'DRIVING_LICENSE' | 'NID';
+  documentType: DocumentType;
   documentNumber: string;
   nationality: string;
   phoneNumber: string;

@@ -52,6 +52,7 @@ import {
   deactivateAccount,
   deleteAccount,
   UserProfile,
+  DocumentType,
 } from '@/services/profile.service';
 import { uploadPhotos } from '@/services/upload.service';
 import { ROUTES } from '@/config/routes';
@@ -107,7 +108,7 @@ export default function ProfilePage() {
   const [savingPassword, setSavingPassword] = useState(false);
 
   // KYC States
-  const [docType, setDocType] = useState<'PASSPORT' | 'DRIVING_LICENSE' | 'NID'>('PASSPORT');
+  const [docType, setDocType] = useState<DocumentType>(DocumentType.PASSPORT);
   const [docNumber, setDocNumber] = useState('');
   const [nationality, setNationality] = useState('');
   const [kycPhone, setKycPhone] = useState('');
@@ -671,7 +672,7 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold">Document Type</Label>
                     <div className="flex flex-wrap gap-4">
-                      {['PASSPORT', 'DRIVING_LICENSE', 'NID'].map((type) => (
+                      {[DocumentType.PASSPORT, DocumentType.DRIVING_LICENSE, DocumentType.NID].map((type) => (
                         <label
                           key={type}
                           className={`flex items-center gap-2 border rounded-lg px-4 py-3 cursor-pointer text-sm transition-all ${
@@ -685,14 +686,12 @@ export default function ProfilePage() {
                             name="documentType"
                             value={type}
                             checked={docType === type}
-                            onChange={() =>
-                              setDocType(type as 'PASSPORT' | 'DRIVING_LICENSE' | 'NID')
-                            }
+                            onChange={() => setDocType(type)}
                             className="text-primary focus:ring-primary h-4 w-4"
                           />
-                          {type === 'PASSPORT' && 'Passport'}
-                          {type === 'DRIVING_LICENSE' && 'Driving License'}
-                          {type === 'NID' && 'National ID (NID)'}
+                          {type === DocumentType.PASSPORT && 'Passport'}
+                          {type === DocumentType.DRIVING_LICENSE && 'Driving License'}
+                          {type === DocumentType.NID && 'National ID (NID)'}
                         </label>
                       ))}
                     </div>
