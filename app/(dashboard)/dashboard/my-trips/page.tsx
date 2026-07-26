@@ -239,7 +239,8 @@ export default function MyTripsPage() {
 
   const handleOpenCounterDialog = (shipment: Shipment) => {
     setSelectedCounterShipment(shipment);
-    setCounterPrice(shipment.pricePerKg.toString());
+    const initialTotalPrice = shipment.pricePerKg * shipment.weight;
+    setCounterPrice(initialTotalPrice.toFixed(0));
     setCounterTripId('');
     setCounterBagType('checkIn');
   };
@@ -247,8 +248,8 @@ export default function MyTripsPage() {
   const handleCounterOfferSubmit = async () => {
     if (!selectedCounterShipment || !counterTripId) return;
 
-    const price = parseFloat(counterPrice);
-    if (isNaN(price) || price <= 0) {
+    const totalPrice = parseFloat(counterPrice);
+    if (isNaN(totalPrice) || totalPrice <= 0) {
       toast.error('Please enter a valid positive price');
       return;
     }
@@ -258,21 +259,32 @@ export default function MyTripsPage() {
       toast.error('Shipment category is missing');
       return;
     }
-    if (price < category.minPrice) {
-      toast.error(`Price cannot be less than the category minimum of $${category.minPrice}`);
+
+    const weight = selectedCounterShipment.weight || 1;
+    const minTotalPrice = category.minPrice * weight;
+    const maxTotalPrice = category.maxPrice !== null ? category.maxPrice * weight : null;
+
+    if (totalPrice < minTotalPrice) {
+      toast.error(
+        `Total price cannot be less than the allowed minimum of $${minTotalPrice.toFixed(0)}`
+      );
       return;
     }
-    if (category.maxPrice !== null && price > category.maxPrice) {
-      toast.error(`Price cannot be more than the category maximum of $${category.maxPrice}`);
+    if (maxTotalPrice !== null && totalPrice > maxTotalPrice) {
+      toast.error(
+        `Total price cannot be more than the allowed maximum of $${maxTotalPrice.toFixed(0)}`
+      );
       return;
     }
+
+    const offeredPricePerKg = totalPrice / weight;
 
     try {
       await createOfferMutation.mutateAsync({
         tripId: counterTripId,
         shipmentId: selectedCounterShipment.id,
         bagType: counterBagType,
-        offeredPrice: price,
+        offeredPrice: offeredPricePerKg,
       });
       toast.success('Counter-offer submitted successfully!');
       setSelectedCounterShipment(null);
@@ -944,15 +956,29 @@ export default function MyTripsPage() {
                   <strong className="text-slate-800">{selectedCounterShipment?.weight} KG</strong>
                 </div>
                 <div className="flex justify-between text-slate-500 text-sm">
-                  <span>Current price per KG:</span>
-                  <strong className="text-slate-800">${selectedCounterShipment?.pricePerKg}</strong>
+                  <span>Initial Total Price:</span>
+                  <strong className="text-slate-800">
+                    $
+                    {(
+                      (selectedCounterShipment?.pricePerKg || 0) *
+                      (selectedCounterShipment?.weight || 1)
+                    ).toFixed(0)}
+                  </strong>
                 </div>
                 <div className="flex justify-between text-slate-500 text-sm">
-                  <span>Allowed price range:</span>
+                  <span>Allowed total price range:</span>
                   <strong className="text-indigo-600">
-                    ${selectedCounterShipment?.category?.minPrice || 0} -{' '}
+                    $
+                    {(
+                      (selectedCounterShipment?.category?.minPrice || 0) *
+                      (selectedCounterShipment?.weight || 1)
+                    ).toFixed(0)}{' '}
+                    -{' '}
                     {selectedCounterShipment?.category?.maxPrice
-                      ? `$${selectedCounterShipment?.category?.maxPrice}`
+                      ? `$${(
+                          selectedCounterShipment.category.maxPrice *
+                          (selectedCounterShipment.weight || 1)
+                        ).toFixed(0)}`
                       : 'Unlimited'}
                   </strong>
                 </div>
@@ -960,7 +986,7 @@ export default function MyTripsPage() {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Your Offered Price (per KG)
+                  Your Offered Price (Total)
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-slate-400 font-semibold">$</span>

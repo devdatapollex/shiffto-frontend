@@ -118,7 +118,6 @@ export function OffersReceivedSection({
     }
   };
 
-
   const handleCancelCheckout = async (offerId: string, travellerName: string) => {
     try {
       await cancelCheckoutMutation.mutateAsync(offerId);
@@ -211,6 +210,11 @@ export function OffersReceivedSection({
                 const isExpired = timeStatus.isExpired || offer.status === 'EXPIRED';
                 const travelerName = offer.traveller?.name || 'Unknown Traveler';
                 const offeredPrice = offer.offeredPrice;
+                const shipmentWeight = offer.shipment?.weight || 1;
+                const senderTotalPrice = (
+                  (offer.senderPrice ?? offer.shipment?.pricePerKg ?? 0) * shipmentWeight
+                ).toFixed(0);
+                const offeredTotalPrice = (offeredPrice * shipmentWeight).toFixed(0);
 
                 return (
                   <motion.div
@@ -257,7 +261,7 @@ export function OffersReceivedSection({
                               {offer.shipment?.itemName || 'Unknown Item'}
                             </h3>
                             <span className="text-xl font-bold text-[#94A3B8] shrink-0">
-                              ${offer.senderPrice}
+                              ${senderTotalPrice}
                             </span>
                           </div>
                           <p className="text-xs text-slate-500 flex items-center gap-1.5 truncate">
@@ -314,7 +318,7 @@ export function OffersReceivedSection({
                         </div>
                         <div className="text-right pl-2 shrink-0">
                           <span className="text-xl font-bold text-[#0B3A8E] block">
-                            ${offeredPrice}
+                            ${offeredTotalPrice}
                           </span>
                           <span className="text-xs text-slate-400 font-normal block leading-tight">
                             {offer.isCounterOffer ? (
