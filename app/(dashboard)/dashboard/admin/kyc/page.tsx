@@ -37,7 +37,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RoleGuard } from '@/components/auth/role-guard';
-import { getKycSubmissions, reviewKyc, KycDetails } from '@/services/profile.service';
+import { getKycSubmissions, reviewKyc, KycDetails, DocumentType } from '@/services/profile.service';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
 import {
@@ -57,6 +57,20 @@ type KycSubmission = KycDetails & {
     phone: string | null;
   };
 };
+
+function formatDocumentType(type?: DocumentType | string | null): string {
+  if (!type) return 'N/A';
+  switch (type) {
+    case DocumentType.PASSPORT:
+      return 'Passport';
+    case DocumentType.DRIVING_LICENSE:
+      return 'Driving License';
+    case DocumentType.NID:
+      return 'National ID (NID)';
+    default:
+      return String(type).toLowerCase().replace('_', ' ');
+  }
+}
 
 function formatDateTime(dateStr?: string | Date | null): string {
   if (!dateStr) return 'N/A';
@@ -237,8 +251,8 @@ export default function AdminKycPage() {
                           {sub.user?.name || 'Unknown User'}
                         </TableCell>
                         <TableCell className="text-slate-600">{sub.user?.email}</TableCell>
-                        <TableCell className="capitalize text-slate-700">
-                          {sub.documentType.toLowerCase().replace('_', ' ')}
+                        <TableCell className="text-slate-700 font-medium">
+                          {formatDocumentType(sub.documentType)}
                         </TableCell>
                         <TableCell className="font-mono text-slate-600">
                           {sub.documentNumber}
@@ -415,8 +429,8 @@ export default function AdminKycPage() {
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <span className="text-slate-400">Type:</span>
-                      <span className="font-semibold text-slate-700 capitalize">
-                        {selectedKyc.documentType.toLowerCase().replace('_', ' ')}
+                      <span className="font-semibold text-slate-700">
+                        {formatDocumentType(selectedKyc.documentType)}
                       </span>
                       <span className="text-slate-400">Number:</span>
                       <span className="font-mono text-slate-700">{selectedKyc.documentNumber}</span>

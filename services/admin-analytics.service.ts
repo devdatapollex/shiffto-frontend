@@ -1,4 +1,5 @@
 import apiClient from '@/lib/api-client';
+import { DocumentType } from '@/services/profile.service';
 
 export interface AdminStats {
   totalUsers: number;
@@ -27,7 +28,7 @@ export interface AdminChartData {
 
 export interface AdminRecentKyc {
   id: string;
-  documentType: 'PASSPORT' | 'DRIVING_LICENSE' | 'NID';
+  documentType: DocumentType;
   documentNumber: string;
   nationality: string;
   phoneNumber: string;
