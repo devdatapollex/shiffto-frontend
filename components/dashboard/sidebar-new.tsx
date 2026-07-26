@@ -14,6 +14,7 @@ import { ROUTES } from '@/config/routes';
 import { toast } from 'sonner';
 
 import { useNotifications } from '@/hooks/use-notifications';
+import { useReceivedOffers } from '@/hooks/use-offers';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,7 +26,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const { role: userRole, hasPermission } = useRole();
   const { data: session } = useSession();
   const { data: notifications } = useNotifications();
+  const { data: receivedOffers } = useReceivedOffers();
+  const pendingOffersCount = receivedOffers ? receivedOffers.length : 0;
   const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
+
   const router = useRouter();
   const role = userRole || 'user';
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -145,15 +149,16 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       </motion.span>
                     )}
 
-                    {item.label === 'My Shipments' && !isCollapsed && (
+                    {item.label === 'My Shipments' && pendingOffersCount > 0 && !isCollapsed && (
                       <span className="ml-auto flex h-5 px-2 items-center justify-center rounded-md bg-[#ffece0] text-[11px] font-bold text-primary">
-                        3
+                        {pendingOffersCount}
                       </span>
                     )}
 
-                    {item.label === 'My Shipments' && isCollapsed && (
+                    {item.label === 'My Shipments' && pendingOffersCount > 0 && isCollapsed && (
                       <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary" />
                     )}
+
                   </Link>
                 );
               })}
