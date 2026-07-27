@@ -4,10 +4,15 @@ import { useFormContext } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import type { CreateTripValues } from '@/lib/validations/trip';
-import { Briefcase, Luggage } from 'lucide-react';
+import { AlertCircle, Briefcase, Luggage } from 'lucide-react';
 
 export function LuggageCapacityStep() {
-  const { control } = useFormContext<CreateTripValues>();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<CreateTripValues>();
+
+  const isTotalCapacityError = errors.checkInBagCapacity?.message?.includes('Total bag capacity');
 
   return (
     <div className="space-y-6">
@@ -83,11 +88,18 @@ export function LuggageCapacityStep() {
                   </span>
                 </div>
               </FormControl>
-              <FormMessage />
+              {!isTotalCapacityError && <FormMessage />}
             </FormItem>
           )}
         />
       </div>
+
+      {isTotalCapacityError && (
+        <div className="rounded-lg bg-red-50 border border-red-200 p-3.5 flex items-center gap-2.5 text-sm text-red-600 font-medium">
+          <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+          <span>{errors.checkInBagCapacity?.message}</span>
+        </div>
+      )}
 
       <div className="rounded-lg bg-orange-50/50 border border-orange-100 p-4 text-xs md:text-sm text-slate-600">
         <p className="font-semibold text-orange-600 mb-1">Important Note:</p>
