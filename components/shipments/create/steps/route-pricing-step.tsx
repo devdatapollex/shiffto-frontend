@@ -71,7 +71,7 @@ export function RoutePricingStep() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-end gap-3 w-full">
+      <div className="flex flex-col md:flex-row items-start gap-3 w-full">
         <FormField
           control={control}
           name="fromCountry"
@@ -93,7 +93,7 @@ export function RoutePricingStep() {
           )}
         />
 
-        <div className="flex-none h-11 flex items-center justify-center">
+        <div className="flex-none h-11 flex items-center justify-center self-center md:mt-[26px]">
           <button
             type="button"
             onClick={handleSwapCountries}
