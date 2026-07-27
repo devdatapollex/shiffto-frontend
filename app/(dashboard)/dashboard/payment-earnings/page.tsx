@@ -165,7 +165,7 @@ export default function PaymentEarningsPage() {
                     {(
                       travelerData?.stats.totalWithdrawn ??
                       travelerData?.withdrawalHistory
-                        .filter((w) => w.status === 'APPROVED' || w.status === 'PENDING')
+                        .filter((w) => w.status === 'APPROVED')
                         .reduce((sum, w) => sum + w.amount, 0) ??
                       0
                     ).toFixed(2)}
