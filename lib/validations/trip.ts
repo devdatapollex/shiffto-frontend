@@ -34,7 +34,17 @@ export const tripSchema = z
   .refine((data) => data.fromCountry !== data.toCountry, {
     message: 'Origin and destination must be different',
     path: ['toCountry'],
-  });
+  })
+  .refine(
+    (data) =>
+      data.cabinBagCapacity !== undefined &&
+      data.checkInBagCapacity !== undefined &&
+      data.cabinBagCapacity + data.checkInBagCapacity > 0,
+    {
+      message: 'Total bag capacity (Cabin + Check-in) must be greater than 0 KG',
+      path: ['checkInBagCapacity'],
+    }
+  );
 
 export type CreateTripValues = z.infer<typeof tripSchema>;
 

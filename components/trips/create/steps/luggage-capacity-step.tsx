@@ -28,10 +28,14 @@ export function LuggageCapacityStep() {
                     type="number"
                     min="0"
                     placeholder="e.g., 7"
-                    value={value === 0 ? '' : String(value)}
+                    value={
+                      value === undefined || value === null || Number.isNaN(value)
+                        ? ''
+                        : String(value)
+                    }
                     onChange={(e) => {
                       const v = e.target.value;
-                      onChange(v === '' ? 0 : parseFloat(v));
+                      onChange(v === '' ? undefined : parseFloat(v));
                     }}
                     className="h-11 pl-4 pr-12 bg-white border-[#e2e8f0] text-slate-700 rounded-lg font-medium"
                     {...field}
@@ -62,10 +66,14 @@ export function LuggageCapacityStep() {
                     type="number"
                     min="0"
                     placeholder="e.g., 23"
-                    value={value === 0 ? '' : String(value)}
+                    value={
+                      value === undefined || value === null || Number.isNaN(value)
+                        ? ''
+                        : String(value)
+                    }
                     onChange={(e) => {
                       const v = e.target.value;
-                      onChange(v === '' ? 0 : parseFloat(v));
+                      onChange(v === '' ? undefined : parseFloat(v));
                     }}
                     className="h-11 pl-4 pr-12 bg-white border-[#e2e8f0] text-slate-700 rounded-lg font-medium"
                     {...field}
@@ -83,7 +91,8 @@ export function LuggageCapacityStep() {
 
       <div className="rounded-lg bg-orange-50/50 border border-orange-100 p-4 text-xs md:text-sm text-slate-600">
         <p className="font-semibold text-orange-600 mb-1">Important Note:</p>
-        Please freely specify the luggage capacity you are willing to offer for shipping. These limits will help Senders request shipment matches that align with your travel capacities.
+        Please freely specify the luggage capacity you are willing to offer for shipping. These
+        limits will help Senders request shipment matches that align with your travel capacities.
       </div>
     </div>
   );
