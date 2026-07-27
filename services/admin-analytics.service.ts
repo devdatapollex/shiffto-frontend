@@ -98,6 +98,7 @@ export interface AdminSidebarCounts {
   pendingTripsCount: number;
   openTicketsCount: number;
   pendingWithdrawalsCount: number;
+  pendingShipmentsCount: number;
 }
 
 export async function getAdminSidebarCounts(): Promise<AdminSidebarCounts> {

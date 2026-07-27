@@ -46,6 +46,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const pendingTripsCount = adminCounts?.pendingTripsCount ?? 0;
   const openTicketsCount = adminCounts?.openTicketsCount ?? 0;
   const pendingWithdrawalsCount = adminCounts?.pendingWithdrawalsCount ?? 0;
+  const pendingShipmentsCount = adminCounts?.pendingShipmentsCount ?? 0;
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -232,6 +233,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                       let count = 0;
                       if (item.label === 'Notifications') count = unreadCount;
                       else if (item.label === 'KYC Verifications') count = pendingKycCount;
+                      else if (item.label === 'Shipments') count = pendingShipmentsCount;
                       else if (item.label === 'Trips') count = pendingTripsCount;
                       else if (item.label === 'Support Tickets') count = openTicketsCount;
                       else if (item.label === 'Withdrawals') count = pendingWithdrawalsCount;
