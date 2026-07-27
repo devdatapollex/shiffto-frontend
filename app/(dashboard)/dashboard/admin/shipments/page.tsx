@@ -21,6 +21,7 @@ import {
   Loader2,
   GripVertical,
   Eye,
+  Hourglass,
 } from 'lucide-react';
 import Link from 'next/link';
 import { getShipments, type Shipment, type ShipmentCategory } from '@/services/shipment.service';
@@ -78,13 +79,13 @@ import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
 import { RoleGuard } from '@/components/auth/role-guard';
-import apiClient from '@/lib/api-client';
 
 // --- Tabs ---
 
-type TabValue = 'shipments' | 'categories' | 'step-definitions';
+type TabValue = 'pending-release' | 'shipments' | 'categories' | 'step-definitions';
 
 const MAIN_TABS: { label: string; value: TabValue; icon: React.ElementType }[] = [
+  { label: 'Pending Release', value: 'pending-release', icon: Hourglass },
   { label: 'Shipments', value: 'shipments', icon: Package },
   { label: 'Categories', value: 'categories', icon: Tags },
   { label: 'Step Definitions', value: 'step-definitions', icon: ListChecks },
@@ -242,6 +243,394 @@ interface CategoryPayload {
   minPrice: number;
   maxPrice?: number | null;
   maxQuantity?: number | null;
+}
+
+// ============================================
+// PENDING RELEASE TAB
+// ============================================
+
+function PendingReleaseTab() {
+  const [filters, dispatch] = useReducer(filtersReducer, {
+    page: 1,
+    search: '',
+    status: 'PENDING_RELEASE',
+    limit: DEFAULT_ROWS_PER_PAGE,
+    sortBy: 'createdAt',
+    sortOrder: 'asc' as const,
+  });
+  const [customRowsInput, setCustomRowsInput] = useState('');
+
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
+  const { data: apiResponse, isLoading } = useQuery({
+    queryKey: [
+      'admin-pending-release-shipments',
+      {
+        page: filters.page,
+        limit: filters.limit,
+        search: debouncedSearch,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      },
+    ],
+    queryFn: () =>
+      getShipments({
+        page: filters.page,
+        limit: filters.limit,
+        search: debouncedSearch || undefined,
+        status: 'PENDING_RELEASE',
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      }),
+  });
+
+  const shipments: Shipment[] = apiResponse?.data ?? [];
+  const meta = apiResponse?.meta ?? { page: 1, limit: DEFAULT_ROWS_PER_PAGE, total: 0 };
+  const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
+
+  const handleSort = (field: string) => {
+    const newOrder = filters.sortBy === field && filters.sortOrder === 'asc' ? 'desc' : 'asc';
+    dispatch({ type: 'SET_SORT', sortBy: field, sortOrder: newOrder });
+  };
+
+  const sortIndicator = (field: string) => {
+    if (filters.sortBy !== field) return null;
+    return filters.sortOrder === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  const handleRowsPerPageChange = (value: string) => {
+    if (value === 'custom') {
+      setCustomRowsInput('');
+      return;
+    }
+    const num = Number(value);
+    if (!isNaN(num) && num > 0) {
+      dispatch({ type: 'SET_LIMIT', limit: num });
+      setCustomRowsInput('');
+    }
+  };
+
+  const handleCustomRowsSubmit = () => {
+    const num = Number(customRowsInput);
+    if (!isNaN(num) && num > 0) {
+      dispatch({ type: 'SET_LIMIT', limit: num });
+    }
+  };
+
+  const pageNumbers = useMemo(
+    () => generatePageNumbers(meta.page, totalPages),
+    [meta.page, totalPages]
+  );
+
+  const showingFrom = meta.total === 0 ? 0 : (meta.page - 1) * meta.limit + 1;
+  const showingTo = Math.min(meta.page * meta.limit, meta.total);
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
+      {/* Controls Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
+        <div>
+          <h3 className="text-xl text-muted-foreground tracking-tight">
+            Pending Release Shipments
+          </h3>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Delivered shipments awaiting admin verification and payment release to traveler.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="relative flex-grow sm:flex-grow-0">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search pending release..."
+              value={filters.search}
+              onChange={(e) => dispatch({ type: 'SET_SEARCH', search: e.target.value })}
+              className="h-9 w-full sm:w-60 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-4 text-xs transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary shadow-sm"
+            />
+            {filters.search && (
+              <button
+                onClick={() => dispatch({ type: 'SET_SEARCH', search: '' })}
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => handleSort('createdAt')}>
+                Sort by Date{sortIndicator('createdAt')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('itemName')}>
+                Sort by Name{sortIndicator('itemName')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('pricePerKg')}>
+                Sort by Price{sortIndicator('pricePerKg')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('weight')}>
+                Sort by Weight{sortIndicator('weight')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Table */}
+      {isLoading ? (
+        <div className="space-y-4 py-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="flex items-center gap-4 h-16 w-full bg-slate-50 animate-pulse rounded-lg px-4"
+            />
+          ))}
+        </div>
+      ) : shipments.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+          <Hourglass className="h-12 w-12 text-slate-200 mb-3" />
+          <p className="text-sm font-medium text-slate-500">No pending release shipments found</p>
+          <p className="text-xs text-slate-400 mt-1">
+            All escrow payments for delivered shipments have been processed or no shipments are
+            awaiting release.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-slate-100">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <th className="px-5 py-4 font-semibold">Shipment name & ID</th>
+                <th className="px-5 py-4 font-semibold">Sender</th>
+                <th className="px-5 py-4 font-semibold">Payment Status</th>
+                <th className="px-5 py-4 font-semibold">Route</th>
+                <th className="px-5 py-4 font-semibold">Amount</th>
+                <th className="px-5 py-4 font-semibold">Created</th>
+                <th className="px-5 py-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-slate-700 text-sm">
+              {shipments.map((item) => {
+                const shortId = `SH-${item.id.slice(-6).toUpperCase()}`;
+                const route = `${getCountryByCode(item.fromCountry)?.name ?? item.fromCountry} - ${getCountryByCode(item.toCountry)?.name ?? item.toCountry}`;
+                const grossAmount =
+                  item.paymentTransaction?.grossAmount ?? item.pricePerKg * item.weight;
+                const senderName = item.user?.name || item.user?.email || 'N/A';
+
+                return (
+                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                          {item.itemPhotos?.[0] ? (
+                            <Image
+                              src={toRelativeImageUrl(item.itemPhotos[0])}
+                              alt={item.itemName}
+                              className="object-cover w-full h-full"
+                              width={40}
+                              height={40}
+                            />
+                          ) : (
+                            <Package className="h-5 w-5 text-slate-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <span className="font-semibold text-foreground block truncate">
+                            {item.itemName}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-semibold tracking-wider block mt-0.5">
+                            #{shortId}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="min-w-0">
+                        <span className="font-semibold text-foreground block truncate">
+                          {senderName}
+                        </span>
+                        {item.user?.email && (
+                          <span className="text-xs text-slate-400 block truncate">
+                            {item.user.email}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-amber-50 text-amber-700 border-amber-200">
+                        Pending Release
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="text-muted-foreground font-light">{route}</span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="font-semibold text-muted-foreground">
+                        ${grossAmount.toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="text-xs text-slate-400 font-medium">
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : 'N/A'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <Link href={`/dashboard/admin/shipments/${item.id}`} passHref legacyBehavior>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg cursor-pointer"
+                        >
+                          <a>
+                            <Eye className="mr-1.5 h-3.5 w-3.5" />
+                            See Details
+                          </a>
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Pagination Footer */}
+      {meta.total > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span>Rows per page:</span>
+            <Select value={String(filters.limit)} onValueChange={handleRowsPerPageChange}>
+              <SelectTrigger className="h-8 w-[70px] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ROWS_PER_PAGE_OPTIONS.map((n) => (
+                  <SelectItem key={n} value={String(n)}>
+                    {n}
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+            {customRowsInput !== '' || !ROWS_PER_PAGE_OPTIONS.includes(filters.limit) ? (
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={
+                    customRowsInput ||
+                    (!ROWS_PER_PAGE_OPTIONS.includes(filters.limit) ? String(filters.limit) : '')
+                  }
+                  onChange={(e) => setCustomRowsInput(e.target.value)}
+                  onBlur={handleCustomRowsSubmit}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleCustomRowsSubmit();
+                  }}
+                  className="h-8 w-16 text-xs px-2"
+                  placeholder="n"
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <span className="text-xs text-slate-500">
+            Showing {showingFrom}–{showingTo} of {meta.total} pending release shipments
+          </span>
+
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch({ type: 'SET_PAGE', page: 1 });
+                  }}
+                  aria-label="First page"
+                  className={meta.page <= 1 ? 'pointer-events-none opacity-40' : ''}
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (meta.page > 1) dispatch({ type: 'SET_PAGE', page: meta.page - 1 });
+                  }}
+                  className={meta.page <= 1 ? 'pointer-events-none opacity-40' : ''}
+                />
+              </PaginationItem>
+              {pageNumbers.map((p, i) =>
+                p === '...' ? (
+                  <PaginationItem key={`ellipsis-${i}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      href="#"
+                      isActive={p === meta.page}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dispatch({ type: 'SET_PAGE', page: p });
+                      }}
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (meta.page < totalPages) dispatch({ type: 'SET_PAGE', page: meta.page + 1 });
+                  }}
+                  className={meta.page >= totalPages ? 'pointer-events-none opacity-40' : ''}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch({ type: 'SET_PAGE', page: totalPages });
+                  }}
+                  aria-label="Last page"
+                  className={meta.page >= totalPages ? 'pointer-events-none opacity-40' : ''}
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </PaginationLink>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ============================================
@@ -1292,7 +1681,7 @@ function StepDefinitionsTab() {
 // ============================================
 
 export default function AdminShipmentsPage() {
-  const [activeTab, setActiveTab] = useState<TabValue>('shipments');
+  const [activeTab, setActiveTab] = useState<TabValue>('pending-release');
 
   return (
     <RoleGuard
@@ -1333,6 +1722,7 @@ export default function AdminShipmentsPage() {
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'pending-release' && <PendingReleaseTab />}
         {activeTab === 'shipments' && <ShipmentsTab />}
         {activeTab === 'categories' && <CategoriesTab />}
         {activeTab === 'step-definitions' && <StepDefinitionsTab />}
