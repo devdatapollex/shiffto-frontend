@@ -85,8 +85,9 @@ export function ReviewStep({ onEdit }: ReviewStepProps) {
         </div>
 
         {values.instructions && (
-          <div className="mt-4 pt-3 border-t border-slate-200/60 text-[#EA580C] text-sm font-semibold">
-            Special instructions: {values.instructions}
+          <div className="mt-4 pt-3 border-t border-slate-200/60 text-primary text-sm font-semibold">
+            Special instructions:{' '}
+            <span className="font-normal text-muted-foreground">{values.instructions}</span>
           </div>
         )}
       </div>
