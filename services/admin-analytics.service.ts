@@ -95,6 +95,7 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsData> {
 
 export interface AdminSidebarCounts {
   pendingKycCount: number;
+  pendingTripsCount: number;
   openTicketsCount: number;
   pendingWithdrawalsCount: number;
 }
