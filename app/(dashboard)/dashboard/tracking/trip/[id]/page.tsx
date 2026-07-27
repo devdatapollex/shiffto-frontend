@@ -12,9 +12,10 @@ import {
   Eye,
   FileText,
   ExternalLink,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toRelativeImageUrl } from '@/lib/image-utils';
@@ -418,7 +419,7 @@ export default function TripDetailsPage() {
 
       {/* Big ticket preview modal */}
       <Dialog open={!!previewPhotoUrl} onOpenChange={(open) => !open && setPreviewPhotoUrl(null)}>
-        <DialogContent className="max-w-4xl p-1 bg-black/95 border-0">
+        <DialogContent className="max-w-4xl p-1 bg-black/95 border-0" showCloseButton={false}>
           <div className="relative flex items-center justify-center max-h-[85vh] w-full min-h-[400px]">
             {previewPhotoUrl && (
               <Image
@@ -429,12 +430,10 @@ export default function TripDetailsPage() {
                 height={600}
               />
             )}
-            <button
-              onClick={() => setPreviewPhotoUrl(null)}
-              className="absolute top-4 right-4 bg-black/60 hover:bg-black/90 text-white rounded-full h-8 w-8 flex items-center justify-center border border-white/20 font-bold"
-            >
-              ✕
-            </button>
+            <DialogClose className="absolute top-4 right-4 bg-black/60 hover:bg-black/90 text-white rounded-full h-8 w-8 flex items-center justify-center border border-white/20 font-bold cursor-pointer transition-colors">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>

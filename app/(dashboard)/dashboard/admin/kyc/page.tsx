@@ -33,6 +33,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -563,7 +564,7 @@ export default function AdminKycPage() {
 
         {/* Big photo preview modal */}
         <Dialog open={!!previewPhotoUrl} onOpenChange={(open) => !open && setPreviewPhotoUrl(null)}>
-          <DialogContent className="max-w-4xl p-1 bg-black/90">
+          <DialogContent className="max-w-4xl p-1 bg-black/90" showCloseButton={false}>
             <div className="relative flex items-center justify-center max-h-[85vh] w-full min-h-[400px]">
               {previewPhotoUrl && (
                 <Image
@@ -574,12 +575,10 @@ export default function AdminKycPage() {
                   height={600}
                 />
               )}
-              <button
-                onClick={() => setPreviewPhotoUrl(null)}
-                className="absolute top-4 right-4 bg-black/60 hover:bg-black/90 text-white rounded-full h-8 w-8 flex items-center justify-center border border-white/20 font-bold"
-              >
-                X
-              </button>
+              <DialogClose className="absolute top-4 right-4 bg-black/60 hover:bg-black/90 text-white rounded-full h-8 w-8 flex items-center justify-center border border-white/20 font-bold cursor-pointer transition-colors">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
             </div>
           </DialogContent>
         </Dialog>
