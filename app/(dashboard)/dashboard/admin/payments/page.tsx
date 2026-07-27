@@ -201,7 +201,8 @@ export default function AdminPaymentsPage() {
             Payment Transactions
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Monitor escrow balances, completed payouts, platform revenues, and transaction histories across SHIFFTO.
+            Monitor escrow balances, completed payouts, platform revenues, and transaction histories
+            across SHIFFTO.
           </p>
         </div>
 
@@ -214,12 +215,32 @@ export default function AdminPaymentsPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Platform Revenue
                 </p>
-                <h3 className="text-xl font-bold text-purple-600 mt-1">
-                  ${(data?.stats.totalPlatformRevenue ?? data?.stats.estimatedCommission ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h3>
-                <p className="text-[11px] font-medium text-slate-500 mt-1">
-                  Gross Vol: ${(data?.stats.totalGrossVolume ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
+                {loading ? (
+                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                ) : (
+                  <h3 className="text-xl font-bold text-purple-600 mt-1">
+                    $
+                    {(
+                      data?.stats.totalPlatformRevenue ??
+                      data?.stats.estimatedCommission ??
+                      0
+                    ).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h3>
+                )}
+                {loading ? (
+                  <div className="h-3 w-28 bg-slate-200/60 rounded-md animate-pulse mt-1.5" />
+                ) : (
+                  <p className="text-[11px] font-medium text-slate-500 mt-1">
+                    Gross Vol: $
+                    {(data?.stats.totalGrossVolume ?? 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                )}
               </div>
               <div className="h-10 w-10 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
                 <TrendingUp className="h-5 w-5" />
@@ -234,9 +255,17 @@ export default function AdminPaymentsPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Funds in Escrow
                 </p>
-                <h3 className="text-xl font-bold text-amber-600 mt-1">
-                  ${(data?.stats.totalEscrowed ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h3>
+                {loading ? (
+                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                ) : (
+                  <h3 className="text-xl font-bold text-amber-600 mt-1">
+                    $
+                    {(data?.stats.totalEscrowed ?? 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h3>
+                )}
                 <p className="text-[11px] text-muted-foreground mt-1">Held until delivery</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
@@ -252,9 +281,17 @@ export default function AdminPaymentsPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Pending Release
                 </p>
-                <h3 className="text-xl font-bold text-sky-600 mt-1">
-                  ${(data?.stats.totalPendingRelease ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h3>
+                {loading ? (
+                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                ) : (
+                  <h3 className="text-xl font-bold text-sky-600 mt-1">
+                    $
+                    {(data?.stats.totalPendingRelease ?? 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h3>
+                )}
                 <p className="text-[11px] text-muted-foreground mt-1">Delivered, awaiting payout</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
@@ -270,9 +307,17 @@ export default function AdminPaymentsPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Released Earnings
                 </p>
-                <h3 className="text-xl font-bold text-blue-600 mt-1">
-                  ${(data?.stats.totalReleased ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h3>
+                {loading ? (
+                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                ) : (
+                  <h3 className="text-xl font-bold text-blue-600 mt-1">
+                    $
+                    {(data?.stats.totalReleased ?? 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h3>
+                )}
                 <p className="text-[11px] text-muted-foreground mt-1">Traveler net payouts</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
@@ -288,9 +333,17 @@ export default function AdminPaymentsPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Refunds & Failed
                 </p>
-                <h3 className="text-xl font-bold text-rose-600 mt-1">
-                  ${(data?.stats.totalRefunded ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h3>
+                {loading ? (
+                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                ) : (
+                  <h3 className="text-xl font-bold text-rose-600 mt-1">
+                    $
+                    {(data?.stats.totalRefunded ?? 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h3>
+                )}
                 <p className="text-[11px] text-muted-foreground mt-1">Disputed / Canceled</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
@@ -304,7 +357,9 @@ export default function AdminPaymentsPage() {
         <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
           {/* Title and Controls Header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
-            <h3 className="text-xl text-muted-foreground tracking-tight">Payment Transactions History</h3>
+            <h3 className="text-xl text-muted-foreground tracking-tight">
+              Payment Transactions History
+            </h3>
 
             <div className="flex flex-wrap items-center gap-2.5">
               {/* Search Input */}
@@ -448,7 +503,9 @@ export default function AdminPaymentsPage() {
                       <td className="px-5 py-4 font-medium text-foreground max-w-[130px]">
                         <div className="flex items-center gap-2 min-w-0">
                           <Package className="h-4 w-4 text-slate-400 shrink-0" />
-                          <span className="truncate max-w-[100px] font-semibold">{tx.shipment.itemName}</span>
+                          <span className="truncate max-w-[100px] font-semibold">
+                            {tx.shipment.itemName}
+                          </span>
                         </div>
                       </td>
 
@@ -470,7 +527,9 @@ export default function AdminPaymentsPage() {
                             )}
                           </div>
                           <div className="truncate max-w-[110px]">
-                            <p className="font-semibold text-foreground truncate">{tx.sender.name}</p>
+                            <p className="font-semibold text-foreground truncate">
+                              {tx.sender.name}
+                            </p>
                             <p className="text-[10px] text-slate-400 truncate">{tx.sender.email}</p>
                           </div>
                         </div>
@@ -494,8 +553,12 @@ export default function AdminPaymentsPage() {
                             )}
                           </div>
                           <div className="truncate max-w-[110px]">
-                            <p className="font-semibold text-foreground truncate">{tx.traveller.name}</p>
-                            <p className="text-[10px] text-slate-400 truncate">{tx.traveller.email}</p>
+                            <p className="font-semibold text-foreground truncate">
+                              {tx.traveller.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400 truncate">
+                              {tx.traveller.email}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -519,7 +582,8 @@ export default function AdminPaymentsPage() {
                       <td className="px-5 py-4">
                         <span
                           className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                            STATUS_BADGE_CLASS[tx.status] || 'bg-slate-50 text-slate-500 border-slate-200'
+                            STATUS_BADGE_CLASS[tx.status] ||
+                            'bg-slate-50 text-slate-500 border-slate-200'
                           }`}
                         >
                           {STATUS_DISPLAY_MAP[tx.status] || tx.status}
@@ -691,15 +755,21 @@ export default function AdminPaymentsPage() {
                 <div className="bg-muted/40 p-4 rounded-xl border border-border space-y-2.5">
                   <div className="flex justify-between items-center text-sm font-bold border-b border-border/60 pb-2">
                     <span className="text-foreground">Gross Amount Paid:</span>
-                    <span className="text-foreground">${selectedTx.grossAmount.toFixed(2)} {selectedTx.currency}</span>
+                    <span className="text-foreground">
+                      ${selectedTx.grossAmount.toFixed(2)} {selectedTx.currency}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center text-muted-foreground">
                     <span>Platform Commission (30%):</span>
-                    <span className="font-medium text-purple-600">-${selectedTx.commissionAmount.toFixed(2)}</span>
+                    <span className="font-medium text-purple-600">
+                      -${selectedTx.commissionAmount.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center text-muted-foreground">
                     <span>Net Traveler Earnings:</span>
-                    <span className="font-semibold text-emerald-700">${selectedTx.netAmount.toFixed(2)}</span>
+                    <span className="font-semibold text-emerald-700">
+                      ${selectedTx.netAmount.toFixed(2)}
+                    </span>
                   </div>
                   {selectedTx.gatewayTxnId && (
                     <div className="flex justify-between items-center pt-1 text-[11px] text-muted-foreground">
@@ -747,14 +817,19 @@ export default function AdminPaymentsPage() {
                       <Package className="h-3.5 w-3.5 text-amber-600" />
                       <span>{selectedTx.shipment.itemName}</span>
                     </span>
-                    <span className="text-muted-foreground text-[11px]">Weight: {selectedTx.shipment.weight} kg</span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Weight: {selectedTx.shipment.weight} kg
+                    </span>
                   </div>
 
                   {selectedTx.offer?.trip && (
                     <div className="flex items-center justify-between text-muted-foreground pt-1">
                       <span className="flex items-center gap-1">
                         <Plane className="h-3.5 w-3.5 text-blue-600" />
-                        <span>Route: {selectedTx.offer.trip.fromCountry} → {selectedTx.offer.trip.toCountry}</span>
+                        <span>
+                          Route: {selectedTx.offer.trip.fromCountry} →{' '}
+                          {selectedTx.offer.trip.toCountry}
+                        </span>
                       </span>
                     </div>
                   )}
