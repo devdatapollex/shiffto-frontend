@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyTrips, useCancelTrip, useCompleteTrip } from '@/hooks/use-trips';
 import { useCreateOffer } from '@/hooks/use-offers';
@@ -71,7 +71,19 @@ export default function MyTripsPage() {
   // Tabs and search states
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [shipmentIndex, setShipmentIndex] = useState<number>(0);
+
+  // Horizontal scroll states for available shipments
+  const shipmentsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = shipmentsScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 5);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+  }, []);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -179,7 +191,6 @@ export default function MyTripsPage() {
       return aTime - bTime;
     });
   }, [shipmentsData?.data]);
-  const visibleShipments = availableShipments.slice(shipmentIndex, shipmentIndex + 3);
 
   // Filtering trips based on tab and search
   const filteredTrips = trips.filter((trip) => {
@@ -316,15 +327,32 @@ export default function MyTripsPage() {
     }
   };
 
+  useEffect(() => {
+    updateScrollState();
+    const el = shipmentsScrollRef.current;
+    if (!el) return;
+
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [availableShipments, updateScrollState]);
+
   const handleNextShipments = () => {
-    if (shipmentIndex + 3 < availableShipments.length) {
-      setShipmentIndex((prev) => prev + 1);
+    if (shipmentsScrollRef.current) {
+      const container = shipmentsScrollRef.current;
+      const scrollAmount = container.clientWidth * 0.75;
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   const handlePrevShipments = () => {
-    if (shipmentIndex > 0) {
-      setShipmentIndex((prev) => prev - 1);
+    if (shipmentsScrollRef.current) {
+      const container = shipmentsScrollRef.current;
+      const scrollAmount = container.clientWidth * 0.75;
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
   };
 
@@ -399,20 +427,23 @@ export default function MyTripsPage() {
             <p className="text-sm">No new matching shipments available at the moment.</p>
           </Card>
         ) : (
-          <div className="flex items-center gap-4">
-            {shipmentIndex > 0 && (
+          <div className="relative">
+            {canScrollLeft && (
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handlePrevShipments}
-                className="h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-xs hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
+                className="absolute -left-4 sm:-left-5 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-md hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
               >
                 <ChevronLeft className="h-5 w-5 text-[#0B3A8E]" />
               </Button>
             )}
 
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {visibleShipments.map((shipment) => {
+            <div
+              ref={shipmentsScrollRef}
+              className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-3 pt-1"
+            >
+              {availableShipments.map((shipment) => {
                 const fromCountry = getCountryByCode(shipment.fromCountry);
                 const toCountry = getCountryByCode(shipment.toCountry);
                 const isOffered = !!(
@@ -428,7 +459,7 @@ export default function MyTripsPage() {
                 return (
                   <div
                     key={shipment.id}
-                    className="relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200"
+                    className="relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200 w-full min-w-[280px] sm:min-w-[320px] md:w-[calc((100%-3rem)/3)] shrink-0 snap-start"
                   >
                     <div>
                       {/* Shipment Item Header */}
@@ -507,12 +538,12 @@ export default function MyTripsPage() {
               })}
             </div>
 
-            {shipmentIndex + 3 < availableShipments.length && (
+            {canScrollRight && (
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handleNextShipments}
-                className="h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-xs hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
+                className="absolute -right-4 sm:-right-5 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-md hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
               >
                 <ChevronRight className="h-5 w-5 text-[#0B3A8E]" />
               </Button>
