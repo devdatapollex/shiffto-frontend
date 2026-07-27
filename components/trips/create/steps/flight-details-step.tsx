@@ -84,7 +84,7 @@ export function FlightDetailsStep() {
       />
 
       {/* From and To Countries */}
-      <div className="flex flex-col md:flex-row items-start gap-3 w-full">
+      <div className="flex flex-col md:flex-row items-end gap-3 w-full">
         <FormField
           control={control}
           name="fromCountry"
@@ -106,7 +106,7 @@ export function FlightDetailsStep() {
           )}
         />
 
-        <div className="flex-none h-11 flex items-center justify-center self-center md:mt-[26px]">
+        <div className="flex-none h-11 flex items-center justify-center self-center md:self-end">
           <button
             type="button"
             onClick={handleSwapCountries}
