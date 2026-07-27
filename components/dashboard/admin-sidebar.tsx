@@ -115,7 +115,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     },
     {
       label: 'Notifications',
-      href: ROUTES.NOTIFICATIONS,
+      href: ROUTES.ADMIN_NOTIFICATIONS,
       icon: Bell,
     },
     {
