@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyTrips, useCancelTrip, useCompleteTrip } from '@/hooks/use-trips';
 import { useCreateOffer } from '@/hooks/use-offers';
@@ -156,7 +156,29 @@ export default function MyTripsPage() {
 
   // Helper lists
   const trips: Trip[] = tripsData?.data || [];
-  const availableShipments: Shipment[] = shipmentsData?.data || [];
+  const availableShipments: Shipment[] = useMemo(() => {
+    const raw: Shipment[] = shipmentsData?.data || [];
+    return [...raw].sort((a, b) => {
+      const aOffered = !!(
+        a.offers &&
+        a.offers.some((o) =>
+          ['PENDING', 'PAYMENT_PENDING', 'PAYMENT_CANCELED', 'ACCEPTED'].includes(o.status)
+        )
+      );
+      const bOffered = !!(
+        b.offers &&
+        b.offers.some((o) =>
+          ['PENDING', 'PAYMENT_PENDING', 'PAYMENT_CANCELED', 'ACCEPTED'].includes(o.status)
+        )
+      );
+      if (aOffered !== bOffered) return aOffered ? 1 : -1;
+
+      // Secondary sort: oldest shipments first (createdAt ascending)
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return aTime - bTime;
+    });
+  }, [shipmentsData?.data]);
   const visibleShipments = availableShipments.slice(shipmentIndex, shipmentIndex + 3);
 
   // Filtering trips based on tab and search
