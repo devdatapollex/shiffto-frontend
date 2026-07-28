@@ -925,10 +925,13 @@ export default function UserSupportPage() {
                 disabled={
                   createTicketMutation.isPending ||
                   isUploading ||
-                  newRelationId === 'NONE' ||
                   !newTitle.trim() ||
                   !newCategory ||
-                  !newDescription.trim()
+                  !newDescription.trim() ||
+                  (newCategory === 'Order' &&
+                    (newRelationId === 'NONE' || !newRelationId.startsWith('shipment:'))) ||
+                  (newCategory === 'Trip' &&
+                    (newRelationId === 'NONE' || !newRelationId.startsWith('trip:')))
                 }
                 className="bg-primary hover:bg-primary/95 text-white"
               >
