@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyTrips, useCancelTrip, useCompleteTrip } from '@/hooks/use-trips';
 import { useCreateOffer } from '@/hooks/use-offers';
@@ -71,7 +71,19 @@ export default function MyTripsPage() {
   // Tabs and search states
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [shipmentIndex, setShipmentIndex] = useState<number>(0);
+
+  // Horizontal scroll states for available shipments
+  const shipmentsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = shipmentsScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 5);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+  }, []);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -121,24 +133,55 @@ export default function MyTripsPage() {
     }
   );
 
-  const matchingAcceptTrips = acceptMatchingTripsData?.data || [];
+  const rawMatchingAcceptTrips = acceptMatchingTripsData?.data || [];
+  const matchingAcceptTrips = useMemo(() => {
+    if (!selectedShipment) return rawMatchingAcceptTrips;
+    return rawMatchingAcceptTrips.filter((t) => {
+      const maxSlot = Math.max(t.remainingCabinCapacity || 0, t.remainingCheckInCapacity || 0);
+      return selectedShipment.weight <= maxSlot;
+    });
+  }, [rawMatchingAcceptTrips, selectedShipment]);
+
   useEffect(() => {
     if (selectedShipment && matchingAcceptTrips.length > 0) {
-      if (!matchingAcceptTrips.some((t) => t.id === acceptingTripId)) {
+      const activeTrip = matchingAcceptTrips.find((t) => t.id === acceptingTripId) || matchingAcceptTrips[0];
+      if (activeTrip.id !== acceptingTripId) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setAcceptingTripId(matchingAcceptTrips[0].id);
+        setAcceptingTripId(activeTrip.id);
+      }
+      // Ensure selected bagType has sufficient capacity
+      const weight = selectedShipment.weight;
+      if (bagType === 'checkIn' && (activeTrip.remainingCheckInCapacity || 0) < weight && (activeTrip.remainingCabinCapacity || 0) >= weight) {
+        setBagType('cabin');
+      } else if (bagType === 'cabin' && (activeTrip.remainingCabinCapacity || 0) < weight && (activeTrip.remainingCheckInCapacity || 0) >= weight) {
+        setBagType('checkIn');
       }
     } else if (selectedShipment && matchingAcceptTrips.length === 0 && !acceptMatchingLoading) {
       setAcceptingTripId('');
     }
-  }, [matchingAcceptTrips, selectedShipment, acceptMatchingLoading, acceptingTripId]);
+  }, [matchingAcceptTrips, selectedShipment, acceptMatchingLoading, acceptingTripId, bagType]);
 
-  const matchingCounterTrips = counterMatchingTripsData?.data || [];
+  const rawMatchingCounterTrips = counterMatchingTripsData?.data || [];
+  const matchingCounterTrips = useMemo(() => {
+    if (!selectedCounterShipment) return rawMatchingCounterTrips;
+    return rawMatchingCounterTrips.filter((t) => {
+      const maxSlot = Math.max(t.remainingCabinCapacity || 0, t.remainingCheckInCapacity || 0);
+      return selectedCounterShipment.weight <= maxSlot;
+    });
+  }, [rawMatchingCounterTrips, selectedCounterShipment]);
+
   useEffect(() => {
     if (selectedCounterShipment && matchingCounterTrips.length > 0) {
-      if (!matchingCounterTrips.some((t) => t.id === counterTripId)) {
+      const activeTrip = matchingCounterTrips.find((t) => t.id === counterTripId) || matchingCounterTrips[0];
+      if (activeTrip.id !== counterTripId) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCounterTripId(matchingCounterTrips[0].id);
+        setCounterTripId(activeTrip.id);
+      }
+      const weight = selectedCounterShipment.weight;
+      if (counterBagType === 'checkIn' && (activeTrip.remainingCheckInCapacity || 0) < weight && (activeTrip.remainingCabinCapacity || 0) >= weight) {
+        setCounterBagType('cabin');
+      } else if (counterBagType === 'cabin' && (activeTrip.remainingCabinCapacity || 0) < weight && (activeTrip.remainingCheckInCapacity || 0) >= weight) {
+        setCounterBagType('checkIn');
       }
     } else if (
       selectedCounterShipment &&
@@ -147,7 +190,7 @@ export default function MyTripsPage() {
     ) {
       setCounterTripId('');
     }
-  }, [matchingCounterTrips, selectedCounterShipment, counterMatchingLoading, counterTripId]);
+  }, [matchingCounterTrips, selectedCounterShipment, counterMatchingLoading, counterTripId, counterBagType]);
 
   // Mutations
   const cancelTripMutation = useCancelTrip();
@@ -156,8 +199,29 @@ export default function MyTripsPage() {
 
   // Helper lists
   const trips: Trip[] = tripsData?.data || [];
-  const availableShipments: Shipment[] = shipmentsData?.data || [];
-  const visibleShipments = availableShipments.slice(shipmentIndex, shipmentIndex + 3);
+  const availableShipments: Shipment[] = useMemo(() => {
+    const raw: Shipment[] = shipmentsData?.data || [];
+    return [...raw].sort((a, b) => {
+      const aOffered = !!(
+        a.offers &&
+        a.offers.some((o) =>
+          ['PENDING', 'PAYMENT_PENDING', 'PAYMENT_CANCELED', 'ACCEPTED'].includes(o.status)
+        )
+      );
+      const bOffered = !!(
+        b.offers &&
+        b.offers.some((o) =>
+          ['PENDING', 'PAYMENT_PENDING', 'PAYMENT_CANCELED', 'ACCEPTED'].includes(o.status)
+        )
+      );
+      if (aOffered !== bOffered) return aOffered ? 1 : -1;
+
+      // Secondary sort: oldest shipments first (createdAt ascending)
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return aTime - bTime;
+    });
+  }, [shipmentsData?.data]);
 
   // Filtering trips based on tab and search
   const filteredTrips = trips.filter((trip) => {
@@ -294,15 +358,32 @@ export default function MyTripsPage() {
     }
   };
 
+  useEffect(() => {
+    updateScrollState();
+    const el = shipmentsScrollRef.current;
+    if (!el) return;
+
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [availableShipments, updateScrollState]);
+
   const handleNextShipments = () => {
-    if (shipmentIndex + 3 < availableShipments.length) {
-      setShipmentIndex((prev) => prev + 1);
+    if (shipmentsScrollRef.current) {
+      const container = shipmentsScrollRef.current;
+      const scrollAmount = container.clientWidth * 0.75;
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   const handlePrevShipments = () => {
-    if (shipmentIndex > 0) {
-      setShipmentIndex((prev) => prev - 1);
+    if (shipmentsScrollRef.current) {
+      const container = shipmentsScrollRef.current;
+      const scrollAmount = container.clientWidth * 0.75;
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
   };
 
@@ -377,20 +458,23 @@ export default function MyTripsPage() {
             <p className="text-sm">No new matching shipments available at the moment.</p>
           </Card>
         ) : (
-          <div className="flex items-center gap-4">
-            {shipmentIndex > 0 && (
+          <div className="relative">
+            {canScrollLeft && (
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handlePrevShipments}
-                className="h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-xs hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
+                className="absolute -left-4 sm:-left-5 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-md hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
               >
                 <ChevronLeft className="h-5 w-5 text-[#0B3A8E]" />
               </Button>
             )}
 
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {visibleShipments.map((shipment) => {
+            <div
+              ref={shipmentsScrollRef}
+              className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-3 pt-1"
+            >
+              {availableShipments.map((shipment) => {
                 const fromCountry = getCountryByCode(shipment.fromCountry);
                 const toCountry = getCountryByCode(shipment.toCountry);
                 const isOffered = !!(
@@ -406,7 +490,7 @@ export default function MyTripsPage() {
                 return (
                   <div
                     key={shipment.id}
-                    className="relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200"
+                    className="relative flex flex-col justify-between overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition-all hover:shadow-md duration-200 w-full min-w-[280px] sm:min-w-[320px] md:w-[calc((100%-3rem)/3)] shrink-0 snap-start"
                   >
                     <div>
                       {/* Shipment Item Header */}
@@ -485,12 +569,12 @@ export default function MyTripsPage() {
               })}
             </div>
 
-            {shipmentIndex + 3 < availableShipments.length && (
+            {canScrollRight && (
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handleNextShipments}
-                className="h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-xs hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
+                className="absolute -right-4 sm:-right-5 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full border-[#e2e8f0] bg-white shadow-md hover:bg-slate-50 transition-all shrink-0 cursor-pointer flex items-center justify-center"
               >
                 <ChevronRight className="h-5 w-5 text-[#0B3A8E]" />
               </Button>
@@ -866,27 +950,43 @@ export default function MyTripsPage() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Select bag slot
-                </label>
-                <Select
-                  value={bagType}
-                  onValueChange={(val) => setBagType(val as 'cabin' | 'checkIn')}
-                >
-                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
-                    <SelectValue placeholder="Choose bag slot" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border-[#e2e8f0]">
-                    <SelectItem value="checkIn" className="cursor-pointer">
-                      Check-in luggage
-                    </SelectItem>
-                    <SelectItem value="cabin" className="cursor-pointer">
-                      Cabin luggage
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const activeAcceptTrip = matchingAcceptTrips.find((t) => t.id === acceptingTripId);
+                const reqWeight = selectedShipment?.weight || 0;
+                const checkInAvail = activeAcceptTrip?.remainingCheckInCapacity ?? 0;
+                const cabinAvail = activeAcceptTrip?.remainingCabinCapacity ?? 0;
+                return (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Select bag slot
+                    </label>
+                    <Select
+                      value={bagType}
+                      onValueChange={(val) => setBagType(val as 'cabin' | 'checkIn')}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
+                        <SelectValue placeholder="Choose bag slot" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-lg border-[#e2e8f0]">
+                        <SelectItem
+                          value="checkIn"
+                          disabled={checkInAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Check-in luggage ({checkInAvail} KG available)
+                        </SelectItem>
+                        <SelectItem
+                          value="cabin"
+                          disabled={cabinAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Cabin luggage ({cabinAvail} KG available)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -1023,27 +1123,43 @@ export default function MyTripsPage() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Select bag slot
-                </label>
-                <Select
-                  value={counterBagType}
-                  onValueChange={(val) => setCounterBagType(val as 'cabin' | 'checkIn')}
-                >
-                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
-                    <SelectValue placeholder="Choose bag slot" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border-[#e2e8f0]">
-                    <SelectItem value="checkIn" className="cursor-pointer">
-                      Check-in luggage
-                    </SelectItem>
-                    <SelectItem value="cabin" className="cursor-pointer">
-                      Cabin luggage
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const activeCounterTrip = matchingCounterTrips.find((t) => t.id === counterTripId);
+                const reqWeight = selectedCounterShipment?.weight || 0;
+                const checkInAvail = activeCounterTrip?.remainingCheckInCapacity ?? 0;
+                const cabinAvail = activeCounterTrip?.remainingCabinCapacity ?? 0;
+                return (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                      Select bag slot
+                    </label>
+                    <Select
+                      value={counterBagType}
+                      onValueChange={(val) => setCounterBagType(val as 'cabin' | 'checkIn')}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
+                        <SelectValue placeholder="Choose bag slot" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-lg border-[#e2e8f0]">
+                        <SelectItem
+                          value="checkIn"
+                          disabled={checkInAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Check-in luggage ({checkInAvail} KG available)
+                        </SelectItem>
+                        <SelectItem
+                          value="cabin"
+                          disabled={cabinAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Cabin luggage ({cabinAvail} KG available)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })()}
             </div>
           )}
 

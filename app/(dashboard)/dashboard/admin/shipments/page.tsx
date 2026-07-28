@@ -21,6 +21,8 @@ import {
   Loader2,
   GripVertical,
   Eye,
+  Hourglass,
+  ShieldAlert,
 } from 'lucide-react';
 import Link from 'next/link';
 import { getShipments, type Shipment, type ShipmentCategory } from '@/services/shipment.service';
@@ -32,6 +34,13 @@ import {
   useDeleteCategory,
 } from '@/hooks/use-admin-categories';
 import { useUpdateStepDefinition } from '@/hooks/use-step-definitions';
+import {
+  useRestrictedItems,
+  useCreateRestrictedItem,
+  useUpdateRestrictedItem,
+  useDeleteRestrictedItem,
+} from '@/hooks/use-restricted-items';
+import type { RestrictedItem } from '@/services/restricted-item.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -78,16 +87,17 @@ import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
 import { RoleGuard } from '@/components/auth/role-guard';
-import apiClient from '@/lib/api-client';
 
 // --- Tabs ---
 
-type TabValue = 'shipments' | 'categories' | 'step-definitions';
+type TabValue = 'pending-release' | 'shipments' | 'categories' | 'step-definitions' | 'restricted-items';
 
 const MAIN_TABS: { label: string; value: TabValue; icon: React.ElementType }[] = [
+  { label: 'Pending Release', value: 'pending-release', icon: Hourglass },
   { label: 'Shipments', value: 'shipments', icon: Package },
   { label: 'Categories', value: 'categories', icon: Tags },
   { label: 'Step Definitions', value: 'step-definitions', icon: ListChecks },
+  { label: 'Restricted Items', value: 'restricted-items', icon: ShieldAlert },
 ];
 
 // --- Shipment Constants ---
@@ -189,13 +199,37 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 
 // --- Category Validation ---
 
+const optionalPositiveNumber = z.preprocess(
+  (val) =>
+    val === '' || val === null || val === undefined || Number.isNaN(Number(val))
+      ? null
+      : Number(val),
+  z.number().positive('Must be greater than 0').nullable().optional()
+);
+
+const optionalPositiveInteger = z.preprocess(
+  (val) =>
+    val === '' || val === null || val === undefined || Number.isNaN(Number(val))
+      ? null
+      : Number(val),
+  z.number().int('Must be a whole number').positive('Must be at least 1').nullable().optional()
+);
+
 const categorySchema = z.object({
   name: z.string().min(1, 'Category name is required'),
   slug: z.string().min(1, 'Slug is required'),
-  maxWeight: z.coerce.number().positive().optional().nullable(),
-  minPrice: z.coerce.number().positive('Minimum price is required'),
-  maxPrice: z.coerce.number().positive().optional().nullable(),
-  maxQuantity: z.coerce.number().int().positive().optional().nullable(),
+  maxWeight: optionalPositiveNumber,
+  minPrice: z.preprocess(
+    (val) =>
+      val === '' || val === null || val === undefined || Number.isNaN(Number(val))
+        ? undefined
+        : Number(val),
+    z
+      .number({ message: 'Minimum price is required' })
+      .positive('Minimum price must be greater than 0')
+  ),
+  maxPrice: optionalPositiveNumber,
+  maxQuantity: optionalPositiveInteger,
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -209,6 +243,16 @@ const stepDefinitionSchema = z.object({
 
 type StepDefinitionFormValues = z.infer<typeof stepDefinitionSchema>;
 
+// --- Restricted Item Validation ---
+
+const restrictedItemSchema = z.object({
+  name: z.string().min(1, 'Item name is required'),
+  description: z.string().nullable().optional(),
+  isActive: z.boolean().optional(),
+});
+
+type RestrictedItemFormValues = z.infer<typeof restrictedItemSchema>;
+
 // --- Category Payload Type ---
 
 interface CategoryPayload {
@@ -218,6 +262,394 @@ interface CategoryPayload {
   minPrice: number;
   maxPrice?: number | null;
   maxQuantity?: number | null;
+}
+
+// ============================================
+// PENDING RELEASE TAB
+// ============================================
+
+function PendingReleaseTab() {
+  const [filters, dispatch] = useReducer(filtersReducer, {
+    page: 1,
+    search: '',
+    status: 'PENDING_RELEASE',
+    limit: DEFAULT_ROWS_PER_PAGE,
+    sortBy: 'createdAt',
+    sortOrder: 'asc' as const,
+  });
+  const [customRowsInput, setCustomRowsInput] = useState('');
+
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
+  const { data: apiResponse, isLoading } = useQuery({
+    queryKey: [
+      'admin-pending-release-shipments',
+      {
+        page: filters.page,
+        limit: filters.limit,
+        search: debouncedSearch,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      },
+    ],
+    queryFn: () =>
+      getShipments({
+        page: filters.page,
+        limit: filters.limit,
+        search: debouncedSearch || undefined,
+        status: 'PENDING_RELEASE',
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      }),
+  });
+
+  const shipments: Shipment[] = apiResponse?.data ?? [];
+  const meta = apiResponse?.meta ?? { page: 1, limit: DEFAULT_ROWS_PER_PAGE, total: 0 };
+  const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
+
+  const handleSort = (field: string) => {
+    const newOrder = filters.sortBy === field && filters.sortOrder === 'asc' ? 'desc' : 'asc';
+    dispatch({ type: 'SET_SORT', sortBy: field, sortOrder: newOrder });
+  };
+
+  const sortIndicator = (field: string) => {
+    if (filters.sortBy !== field) return null;
+    return filters.sortOrder === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  const handleRowsPerPageChange = (value: string) => {
+    if (value === 'custom') {
+      setCustomRowsInput('');
+      return;
+    }
+    const num = Number(value);
+    if (!isNaN(num) && num > 0) {
+      dispatch({ type: 'SET_LIMIT', limit: num });
+      setCustomRowsInput('');
+    }
+  };
+
+  const handleCustomRowsSubmit = () => {
+    const num = Number(customRowsInput);
+    if (!isNaN(num) && num > 0) {
+      dispatch({ type: 'SET_LIMIT', limit: num });
+    }
+  };
+
+  const pageNumbers = useMemo(
+    () => generatePageNumbers(meta.page, totalPages),
+    [meta.page, totalPages]
+  );
+
+  const showingFrom = meta.total === 0 ? 0 : (meta.page - 1) * meta.limit + 1;
+  const showingTo = Math.min(meta.page * meta.limit, meta.total);
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
+      {/* Controls Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
+        <div>
+          <h3 className="text-xl text-muted-foreground tracking-tight">
+            Pending Release Shipments
+          </h3>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Delivered shipments awaiting admin verification and payment release to traveler.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="relative flex-grow sm:flex-grow-0">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search pending release..."
+              value={filters.search}
+              onChange={(e) => dispatch({ type: 'SET_SEARCH', search: e.target.value })}
+              className="h-9 w-full sm:w-60 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-4 text-xs transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary shadow-sm"
+            />
+            {filters.search && (
+              <button
+                onClick={() => dispatch({ type: 'SET_SEARCH', search: '' })}
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 rounded-lg border-slate-200 text-foreground! hover:text-foreground! bg-white"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => handleSort('createdAt')}>
+                Sort by Date{sortIndicator('createdAt')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('itemName')}>
+                Sort by Name{sortIndicator('itemName')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('pricePerKg')}>
+                Sort by Price{sortIndicator('pricePerKg')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('weight')}>
+                Sort by Weight{sortIndicator('weight')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Table */}
+      {isLoading ? (
+        <div className="space-y-4 py-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="flex items-center gap-4 h-16 w-full bg-slate-50 animate-pulse rounded-lg px-4"
+            />
+          ))}
+        </div>
+      ) : shipments.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+          <Hourglass className="h-12 w-12 text-slate-200 mb-3" />
+          <p className="text-sm font-medium text-slate-500">No pending release shipments found</p>
+          <p className="text-xs text-slate-400 mt-1">
+            All escrow payments for delivered shipments have been processed or no shipments are
+            awaiting release.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-slate-100">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <th className="px-5 py-4 font-semibold">Shipment name & ID</th>
+                <th className="px-5 py-4 font-semibold">Sender</th>
+                <th className="px-5 py-4 font-semibold">Payment Status</th>
+                <th className="px-5 py-4 font-semibold">Route</th>
+                <th className="px-5 py-4 font-semibold">Amount</th>
+                <th className="px-5 py-4 font-semibold">Created</th>
+                <th className="px-5 py-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-slate-700 text-sm">
+              {shipments.map((item) => {
+                const shortId = `SH-${item.id.slice(-6).toUpperCase()}`;
+                const route = `${getCountryByCode(item.fromCountry)?.name ?? item.fromCountry} - ${getCountryByCode(item.toCountry)?.name ?? item.toCountry}`;
+                const grossAmount =
+                  item.paymentTransaction?.grossAmount ?? item.pricePerKg * item.weight;
+                const senderName = item.user?.name || item.user?.email || 'N/A';
+
+                return (
+                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                          {item.itemPhotos?.[0] ? (
+                            <Image
+                              src={toRelativeImageUrl(item.itemPhotos[0])}
+                              alt={item.itemName}
+                              className="object-cover w-full h-full"
+                              width={40}
+                              height={40}
+                            />
+                          ) : (
+                            <Package className="h-5 w-5 text-slate-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <span className="font-semibold text-foreground block truncate">
+                            {item.itemName}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-semibold tracking-wider block mt-0.5">
+                            #{shortId}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="min-w-0">
+                        <span className="font-semibold text-foreground block truncate">
+                          {senderName}
+                        </span>
+                        {item.user?.email && (
+                          <span className="text-xs text-slate-400 block truncate">
+                            {item.user.email}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-amber-50 text-amber-700 border-amber-200">
+                        Pending Release
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="text-muted-foreground font-light">{route}</span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="font-semibold text-muted-foreground">
+                        ${grossAmount.toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="text-xs text-slate-400 font-medium">
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : 'N/A'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <Link href={`/dashboard/admin/shipments/${item.id}`} passHref legacyBehavior>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg cursor-pointer"
+                        >
+                          <a>
+                            <Eye className="mr-1.5 h-3.5 w-3.5" />
+                            See Details
+                          </a>
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Pagination Footer */}
+      {meta.total > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span>Rows per page:</span>
+            <Select value={String(filters.limit)} onValueChange={handleRowsPerPageChange}>
+              <SelectTrigger className="h-8 w-[70px] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ROWS_PER_PAGE_OPTIONS.map((n) => (
+                  <SelectItem key={n} value={String(n)}>
+                    {n}
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+            {customRowsInput !== '' || !ROWS_PER_PAGE_OPTIONS.includes(filters.limit) ? (
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={
+                    customRowsInput ||
+                    (!ROWS_PER_PAGE_OPTIONS.includes(filters.limit) ? String(filters.limit) : '')
+                  }
+                  onChange={(e) => setCustomRowsInput(e.target.value)}
+                  onBlur={handleCustomRowsSubmit}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleCustomRowsSubmit();
+                  }}
+                  className="h-8 w-16 text-xs px-2"
+                  placeholder="n"
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <span className="text-xs text-slate-500">
+            Showing {showingFrom}–{showingTo} of {meta.total} pending release shipments
+          </span>
+
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch({ type: 'SET_PAGE', page: 1 });
+                  }}
+                  aria-label="First page"
+                  className={meta.page <= 1 ? 'pointer-events-none opacity-40' : ''}
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (meta.page > 1) dispatch({ type: 'SET_PAGE', page: meta.page - 1 });
+                  }}
+                  className={meta.page <= 1 ? 'pointer-events-none opacity-40' : ''}
+                />
+              </PaginationItem>
+              {pageNumbers.map((p, i) =>
+                p === '...' ? (
+                  <PaginationItem key={`ellipsis-${i}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      href="#"
+                      isActive={p === meta.page}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dispatch({ type: 'SET_PAGE', page: p });
+                      }}
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (meta.page < totalPages) dispatch({ type: 'SET_PAGE', page: meta.page + 1 });
+                  }}
+                  className={meta.page >= totalPages ? 'pointer-events-none opacity-40' : ''}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch({ type: 'SET_PAGE', page: totalPages });
+                  }}
+                  aria-label="Last page"
+                  className={meta.page >= totalPages ? 'pointer-events-none opacity-40' : ''}
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </PaginationLink>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ============================================
@@ -877,6 +1309,11 @@ function CategoriesTab() {
                   step="0.01"
                   {...createForm.register('maxPrice')}
                 />
+                {createForm.formState.errors.maxPrice && (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.maxPrice.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -888,6 +1325,11 @@ function CategoriesTab() {
                   step="0.01"
                   {...createForm.register('maxWeight')}
                 />
+                {createForm.formState.errors.maxWeight && (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.maxWeight.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="create-maxQuantity">Max Quantity</Label>
@@ -896,6 +1338,11 @@ function CategoriesTab() {
                   type="number"
                   {...createForm.register('maxQuantity')}
                 />
+                {createForm.formState.errors.maxQuantity && (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.maxQuantity.message}
+                  </p>
+                )}
               </div>
             </div>
             <DialogFooter className="gap-2 pt-2">
@@ -963,6 +1410,11 @@ function CategoriesTab() {
                   step="0.01"
                   {...editForm.register('maxPrice')}
                 />
+                {editForm.formState.errors.maxPrice && (
+                  <p className="text-xs text-destructive">
+                    {editForm.formState.errors.maxPrice.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -974,10 +1426,20 @@ function CategoriesTab() {
                   step="0.01"
                   {...editForm.register('maxWeight')}
                 />
+                {editForm.formState.errors.maxWeight && (
+                  <p className="text-xs text-destructive">
+                    {editForm.formState.errors.maxWeight.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-maxQuantity">Max Quantity</Label>
                 <Input id="edit-maxQuantity" type="number" {...editForm.register('maxQuantity')} />
+                {editForm.formState.errors.maxQuantity && (
+                  <p className="text-xs text-destructive">
+                    {editForm.formState.errors.maxQuantity.message}
+                  </p>
+                )}
               </div>
             </div>
             <DialogFooter className="gap-2 pt-2">
@@ -1234,11 +1696,400 @@ function StepDefinitionsTab() {
 }
 
 // ============================================
+// RESTRICTED ITEMS TAB
+// ============================================
+
+function RestrictedItemsTab() {
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
+
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<RestrictedItem | null>(null);
+
+  const { data: response, isLoading } = useRestrictedItems({ page, limit, search: debouncedSearch });
+  const createMutation = useCreateRestrictedItem();
+  const updateMutation = useUpdateRestrictedItem();
+  const deleteMutation = useDeleteRestrictedItem();
+
+  const items = response?.data ?? [];
+  const meta = response?.meta ?? { page: 1, limit: 10, total: 0 };
+  const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
+
+  const createForm = useForm<RestrictedItemFormValues>({
+    resolver: zodResolver(restrictedItemSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      isActive: true,
+    },
+  });
+
+  const editForm = useForm<RestrictedItemFormValues>({
+    resolver: zodResolver(restrictedItemSchema),
+  });
+
+  const handleCreate = async (data: RestrictedItemFormValues) => {
+    try {
+      await createMutation.mutateAsync({
+        name: data.name,
+        description: data.description || null,
+        isActive: data.isActive ?? true,
+      });
+      setShowCreateDialog(false);
+      createForm.reset();
+    } catch {
+      // Error handled by mutation toast
+    }
+  };
+
+  const handleEdit = async (data: RestrictedItemFormValues) => {
+    if (!selectedItem) return;
+    try {
+      await updateMutation.mutateAsync({
+        id: selectedItem.id,
+        data: {
+          name: data.name,
+          description: data.description || null,
+          isActive: data.isActive ?? true,
+        },
+      });
+      setShowEditDialog(false);
+      setSelectedItem(null);
+    } catch {
+      // Error handled by mutation toast
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedItem) return;
+    try {
+      await deleteMutation.mutateAsync(selectedItem.id);
+      setShowDeleteDialog(false);
+      setSelectedItem(null);
+    } catch {
+      // Error handled by mutation toast
+    }
+  };
+
+  const openEditDialog = (item: RestrictedItem) => {
+    setSelectedItem(item);
+    editForm.reset({
+      name: item.name,
+      description: item.description ?? '',
+      isActive: item.isActive,
+    });
+    setShowEditDialog(true);
+  };
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div>
+          <h3 className="text-xl font-semibold text-slate-800 tracking-tight">Restricted Items List</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Manage prohibited items that users cannot carry or ship.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              type="text"
+              placeholder="Search restricted items..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="pl-9 pr-8 text-sm"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+          <Button
+            onClick={() => {
+              createForm.reset({ name: '', description: '', isActive: true });
+              setShowCreateDialog(true);
+            }}
+            className="bg-[#0B3A8E] hover:bg-[#092E72] text-white shrink-0"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Restricted Item
+          </Button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="flex h-48 w-full flex-col items-center justify-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading restricted items...</p>
+        </div>
+      ) : items.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+          <ShieldAlert className="h-12 w-12 text-slate-200 mb-3" />
+          <p className="text-sm font-medium text-slate-500">No restricted items found</p>
+          <p className="text-xs text-slate-400 mt-1">Add items to restrict them in shipment creation.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-slate-100">
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow>
+                <TableHead className="w-[30%]">Item Name</TableHead>
+                <TableHead className="w-[45%]">Description</TableHead>
+                <TableHead className="w-[15%]">Status</TableHead>
+                <TableHead className="w-[10%] text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="font-medium text-slate-900">{item.name}</TableCell>
+                  <TableCell className="text-slate-600 text-sm">
+                    {item.description || <span className="text-slate-400 italic">No description</span>}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                        item.isActive
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-slate-50 text-slate-500 border-slate-200'
+                      }`}
+                    >
+                      {item.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEditDialog(item)}
+                        className="h-8 w-8 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                        title="Edit Item"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setShowDeleteDialog(true);
+                        }}
+                        className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                        title="Delete Item"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!isLoading && items.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <p className="text-xs text-muted-foreground">
+            Showing <span className="font-medium text-slate-700">{items.length}</span> of{' '}
+            <span className="font-medium text-slate-700">{meta.total}</span> items
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Previous
+            </Button>
+            <span className="text-xs font-medium text-slate-600 px-2">
+              Page {meta.page} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Create Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Restricted Item</DialogTitle>
+            <DialogDescription>
+              Add a new prohibited item to the system.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={createForm.handleSubmit(handleCreate)} className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="create-item-name">Item Name *</Label>
+              <Input
+                id="create-item-name"
+                placeholder="e.g. Explosives, flammables"
+                {...createForm.register('name')}
+              />
+              {createForm.formState.errors.name && (
+                <p className="text-xs text-rose-500">{createForm.formState.errors.name.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="create-item-desc">Description</Label>
+              <Textarea
+                id="create-item-desc"
+                placeholder="Brief description of restricted items..."
+                className="resize-none"
+                rows={3}
+                {...createForm.register('description')}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <input
+                type="checkbox"
+                id="create-item-active"
+                className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                {...createForm.register('isActive')}
+              />
+              <Label htmlFor="create-item-active" className="cursor-pointer font-normal">
+                Active (enforced in shipment creation)
+              </Label>
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={createMutation.isPending}
+                className="bg-[#0B3A8E] hover:bg-[#092E72] text-white"
+              >
+                {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Add Item
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Restricted Item</DialogTitle>
+            <DialogDescription>
+              Update details for this restricted item.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={editForm.handleSubmit(handleEdit)} className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-item-name">Item Name *</Label>
+              <Input
+                id="edit-item-name"
+                placeholder="e.g. Explosives, flammables"
+                {...editForm.register('name')}
+              />
+              {editForm.formState.errors.name && (
+                <p className="text-xs text-rose-500">{editForm.formState.errors.name.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-item-desc">Description</Label>
+              <Textarea
+                id="edit-item-desc"
+                placeholder="Brief description of restricted items..."
+                className="resize-none"
+                rows={3}
+                {...editForm.register('description')}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <input
+                type="checkbox"
+                id="edit-item-active"
+                className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                {...editForm.register('isActive')}
+              />
+              <Label htmlFor="edit-item-active" className="cursor-pointer font-normal">
+                Active (enforced in shipment creation)
+              </Label>
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={updateMutation.isPending}
+                className="bg-[#0B3A8E] hover:bg-[#092E72] text-white"
+              >
+                {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Restricted Item</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <span className="font-semibold text-slate-800">{selectedItem?.name}</span>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="pt-4">
+            <Button type="button" variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={handleDelete}
+            >
+              {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete Item
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// ============================================
 // MAIN PAGE
 // ============================================
 
 export default function AdminShipmentsPage() {
-  const [activeTab, setActiveTab] = useState<TabValue>('shipments');
+  const [activeTab, setActiveTab] = useState<TabValue>('pending-release');
 
   return (
     <RoleGuard
@@ -1279,9 +2130,11 @@ export default function AdminShipmentsPage() {
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'pending-release' && <PendingReleaseTab />}
         {activeTab === 'shipments' && <ShipmentsTab />}
         {activeTab === 'categories' && <CategoriesTab />}
         {activeTab === 'step-definitions' && <StepDefinitionsTab />}
+        {activeTab === 'restricted-items' && <RestrictedItemsTab />}
       </div>
     </RoleGuard>
   );

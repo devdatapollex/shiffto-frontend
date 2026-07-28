@@ -56,8 +56,8 @@ export default function RegisterPage() {
       return;
     }
 
-    toast.success('Account created successfully! Please sign in to verify your email.');
-    router.push(`${ROUTES.LOGIN}?email=${encodeURIComponent(values.email)}&registered=true`);
+    toast.success('Account created successfully! Please verify your email.');
+    router.push(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
   };
 
   const handleGoogleSignUp = () => {
@@ -181,15 +181,17 @@ export default function RegisterPage() {
               control={form.control}
               name="terms"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start gap-3 space-y-0">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>I agree to the Terms of Service and Privacy Policy</FormLabel>
-                    <FormDescription>
-                      By creating an account, you agree to our terms.
-                    </FormDescription>
+                <FormItem>
+                  <div className="flex flex-row items-start gap-3">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>I agree to the Terms of Service and Privacy Policy</FormLabel>
+                      <FormDescription>
+                        By creating an account, you agree to our terms.
+                      </FormDescription>
+                    </div>
                   </div>
                   <FormMessage />
                 </FormItem>

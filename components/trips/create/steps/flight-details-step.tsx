@@ -18,7 +18,6 @@ import { ArrowLeftRight } from 'lucide-react';
 import { DatePicker, TimePicker } from '@/components/ui/custom-picker';
 import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
 
-
 export function FlightDetailsStep() {
   const { control, setValue, watch } = useFormContext<CreateTripValues>();
   const [recentFlights, setRecentFlights] = useState<string[]>(() => {
@@ -140,9 +139,8 @@ export function FlightDetailsStep() {
         />
       </div>
 
-
       {/* Flight Schedule Details */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
         {/* Departure Date */}
         <FormField
           control={control}

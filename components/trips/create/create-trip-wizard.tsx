@@ -44,8 +44,8 @@ export function CreateTripWizard() {
       flightTime: formData.flightTime || '',
       airportArrivalTime: formData.airportArrivalTime || '',
       ticketPhoto: formData.ticketPhoto || '',
-      cabinBagCapacity: formData.cabinBagCapacity ?? 0,
-      checkInBagCapacity: formData.checkInBagCapacity ?? 0,
+      cabinBagCapacity: formData.cabinBagCapacity,
+      checkInBagCapacity: formData.checkInBagCapacity,
     },
   });
 

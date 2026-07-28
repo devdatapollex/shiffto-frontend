@@ -18,6 +18,16 @@ interface SearchableCountrySelectProps {
   triggerClassName?: string;
 }
 
+function isSubsequence(query: string, text: string): boolean {
+  let qIdx = 0;
+  for (let tIdx = 0; tIdx < text.length && qIdx < query.length; tIdx++) {
+    if (text[tIdx] === query[qIdx]) {
+      qIdx++;
+    }
+  }
+  return qIdx === query.length;
+}
+
 export function SearchableCountrySelect({
   value,
   onValueChange,
@@ -36,12 +46,19 @@ export function SearchableCountrySelect({
   const filteredCountries = useMemo(() => {
     if (!search.trim()) return COUNTRIES;
     const query = search.toLowerCase().trim();
-    return COUNTRIES.filter(
-      (c) =>
-        c.name.toLowerCase().includes(query) ||
-        c.code.toLowerCase().includes(query) ||
-        c.callingCode.toLowerCase().includes(query)
-    );
+    return COUNTRIES.filter((c) => {
+      const name = c.name.toLowerCase();
+      const code = c.code.toLowerCase();
+      const callingCode = c.callingCode.toLowerCase();
+
+      // Direct substring match
+      if (name.includes(query) || code.includes(query) || callingCode.includes(query)) {
+        return true;
+      }
+
+      // Fuzzy subsequence match (e.g. 'usa' matches 'United States of America')
+      return isSubsequence(query, name);
+    });
   }, [search]);
 
   return (
@@ -116,9 +133,7 @@ export function SearchableCountrySelect({
                     <CountryFlag code={country.code} className="h-4 w-6 shrink-0" />
                     <span className="truncate">{country.name}</span>
                     {showCallingCode && (
-                      <span className="text-slate-400 text-xs shrink-0">
-                        {country.callingCode}
-                      </span>
+                      <span className="text-slate-400 text-xs shrink-0">{country.callingCode}</span>
                     )}
                   </span>
                   {isSelected && <Check className="h-4 w-4 text-[#0B3A8E] shrink-0 ml-2" />}

@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
 
 type QuickTab = 'shipment' | 'trip';
 
@@ -152,14 +151,13 @@ export function HomeQuickActions() {
             />
           </div>
 
-
           {/* Category */}
           <div className="flex-1 space-y-1.5 min-w-0">
             <label className="text-[#0B3A8E] font-semibold text-xs sm:text-sm block">
               Category
             </label>
             <Select value={shipmentCategory} onValueChange={setShipmentCategory}>
-              <SelectTrigger className="w-full h-11 bg-white border-slate-200 text-slate-700 rounded-lg">
+              <SelectTrigger className="w-full h-11 bg-white hover:bg-slate-50 border-slate-200 text-slate-700 rounded-lg shadow-xs cursor-pointer">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent
@@ -177,14 +175,14 @@ export function HomeQuickActions() {
 
           {/* Action Button */}
           <div className="shrink-0 lg:self-end">
-            <Button
-              variant="default"
+            <button
+              type="button"
               onClick={handleContinueShipment}
-              className="w-full lg:w-auto h-11 px-6 bg-foreground hover:bg-foreground/90 font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors"
+              className="w-full lg:w-auto h-11 px-6 rounded-lg bg-[#0B3A8E] hover:bg-[#082a69] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
         </div>
       ) : (
@@ -227,7 +225,6 @@ export function HomeQuickActions() {
             />
           </div>
 
-
           {/* Departure Date */}
           <div className="flex-1 space-y-1.5 min-w-0">
             <label className="text-[#0B3A8E] font-semibold text-xs sm:text-sm block">
@@ -245,7 +242,7 @@ export function HomeQuickActions() {
             <button
               type="button"
               onClick={handleContinueTrip}
-              className="w-full lg:w-auto h-11 px-6 rounded-lg bg-[#0B3A8E] hover:bg-[#082a69] text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+              className="w-full lg:w-auto h-11 px-6 rounded-lg bg-[#0B3A8E] hover:bg-[#082a69] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="h-4 w-4" />

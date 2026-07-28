@@ -9,8 +9,8 @@ const INITIAL_FORM_DATA: Partial<CreateTripValues> = {
   flightDate: undefined,
   flightTime: '',
   ticketPhoto: '',
-  cabinBagCapacity: 0,
-  checkInBagCapacity: 0,
+  cabinBagCapacity: undefined,
+  checkInBagCapacity: undefined,
 };
 
 interface CreateTripState {
