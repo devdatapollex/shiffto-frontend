@@ -1,6 +1,7 @@
 import { Poppins } from 'next/font/google';
 import './globals.css';
 import QueryProvider from '@/components/providers/query-provider';
+import { SocketInitializer } from '@/components/providers/SocketInitializer';
 import { Toaster } from 'sonner';
 
 import { constructMetadata } from '@/utils/metadata.util';
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased uppercase-none`}>
         <QueryProvider>
+          <SocketInitializer />
           {children}
           <Toaster position="top-right" richColors closeButton />
         </QueryProvider>
