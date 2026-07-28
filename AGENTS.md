@@ -94,7 +94,7 @@ See [docs/project-structure.md](./docs/project-structure.md) for the full annota
 
 - **Keep docs in sync:** After any change to behavior, structure, routes, scripts, dependencies, or conventions — review and update `AGENTS.md` + `docs/` **before continuing** so future agents do not rely on stale context.
 - **Project structure doc:** `docs/project-structure.md` is the canonical structure map. Update it when files or directories change.
-- **Atomic conventional commits:** Commit each distinct topic separately with a meaningful conventional-commit message. Never bundle unrelated changes (e.g., dependency changes and feature logic) into a single commit — split them into focused commits even if they were developed together.
+- **Atomic conventional commits:** Commit each distinct topic separately with a meaningful conventional-commit message and a detailed commit body describing what changed and why. Never bundle unrelated changes (e.g., dependency changes and feature logic) into a single commit — split them into focused commits even if they were developed together.
 - **Verification before completion:** Use `verification-before-completion` skill before claiming work is complete or fixed. Run verification commands and show evidence before assertions.
 - **Architecture improvements:** Use `improve-codebase-architecture` skill when making structural changes, introducing module seams, or evaluating refactors.
 - **Frontend/UI work:** Use `frontend-design` and `web-design-guidelines` skills when building or reviewing UI/UX.

@@ -39,6 +39,7 @@ export const ROUTES = {
   ADMIN_TICKETS: '/dashboard/admin/tickets',
   ADMIN_COMMISSION: '/dashboard/admin/commission',
   ADMIN_PAYMENTS: '/dashboard/admin/payments',
+  ADMIN_NOTIFICATIONS: '/dashboard/admin/notifications',
 } as const;
 
 export const PUBLIC_ROUTES = [

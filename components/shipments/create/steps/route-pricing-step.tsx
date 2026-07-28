@@ -19,7 +19,7 @@ import { useCategories } from '@/hooks/use-categories';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 import { ArrowLeftRight, CheckCircle2 } from 'lucide-react';
 import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
-
+import { Label } from '@/components/ui/label';
 
 export function RoutePricingStep() {
   const { control, watch, setValue, setError, clearErrors } =
@@ -182,15 +182,17 @@ export function RoutePricingStep() {
             <span className="text-slate-400 text-xl font-light">×</span>
           </div>
 
-          <div className="flex-1 space-y-1.5">
-            <label className="text-sm font-semibold text-[#0b3a8e] block">Weight</label>
-            <Input
-              type="text"
-              disabled
-              value={`${weight || 0} Kg`}
-              className="h-11 bg-[#F8FAFC] border-[#e2e8f0] text-slate-400 font-semibold rounded-lg opacity-100 disabled:opacity-100 disabled:cursor-not-allowed"
-            />
-          </div>
+          <FormItem className="flex-1 space-y-1.5">
+            <Label className="text-[#0b3a8e] font-semibold text-sm">Weight</Label>
+            <FormControl>
+              <Input
+                type="text"
+                disabled
+                value={`${weight || 0} Kg`}
+                className="h-11 bg-[#F8FAFC] border-[#e2e8f0] text-slate-400 font-semibold rounded-lg opacity-100 disabled:opacity-100 disabled:cursor-not-allowed"
+              />
+            </FormControl>
+          </FormItem>
         </div>
 
         <div className="w-full bg-[#FFF1EB] rounded-lg py-3 px-4 flex justify-end items-center">

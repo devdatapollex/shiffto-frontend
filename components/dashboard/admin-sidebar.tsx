@@ -29,6 +29,7 @@ import { ROUTES } from '@/config/routes';
 import { toast } from 'sonner';
 
 import { useNotifications } from '@/hooks/use-notifications';
+import { useAdminSidebarCounts } from '@/hooks/use-admin-counts';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -40,6 +41,12 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { data: session } = useSession();
   const { data: notifications } = useNotifications();
   const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
+  const { data: adminCounts } = useAdminSidebarCounts();
+  const pendingKycCount = adminCounts?.pendingKycCount ?? 0;
+  const pendingTripsCount = adminCounts?.pendingTripsCount ?? 0;
+  const openTicketsCount = adminCounts?.openTicketsCount ?? 0;
+  const pendingWithdrawalsCount = adminCounts?.pendingWithdrawalsCount ?? 0;
+  const pendingShipmentsCount = adminCounts?.pendingShipmentsCount ?? 0;
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -109,7 +116,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     },
     {
       label: 'Notifications',
-      href: ROUTES.NOTIFICATIONS,
+      href: ROUTES.ADMIN_NOTIFICATIONS,
       icon: Bell,
     },
     {
@@ -222,15 +229,25 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                       </motion.span>
                     )}
 
-                    {item.label === 'Notifications' && unreadCount > 0 && !isCollapsed && (
-                      <span className="ml-auto flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-xs">
-                        {unreadCount}
-                      </span>
-                    )}
+                    {(() => {
+                      let count = 0;
+                      if (item.label === 'Notifications') count = unreadCount;
+                      else if (item.label === 'KYC Verifications') count = pendingKycCount;
+                      else if (item.label === 'Shipments') count = pendingShipmentsCount;
+                      else if (item.label === 'Trips') count = pendingTripsCount;
+                      else if (item.label === 'Support Tickets') count = openTicketsCount;
+                      else if (item.label === 'Withdrawals') count = pendingWithdrawalsCount;
 
-                    {item.label === 'Notifications' && unreadCount > 0 && isCollapsed && (
-                      <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-                    )}
+                      if (count <= 0) return null;
+
+                      return !isCollapsed ? (
+                        <span className="ml-auto flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-xs">
+                          {count}
+                        </span>
+                      ) : (
+                        <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+                      );
+                    })()}
 
                     {isActive && (
                       <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-full shadow-[0_0_10px_rgba(205,7,30,0.5)]" />

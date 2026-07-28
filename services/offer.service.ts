@@ -62,3 +62,10 @@ export async function getReceivedOffers(): Promise<Offer[]> {
   const { data } = await apiClient.get<{ data: Offer[] }>('/offers/received');
   return data.data;
 }
+
+export async function getReceivedOffersCount(): Promise<number> {
+  const { data } = await apiClient.get<{ success: boolean; data: { count: number } }>(
+    '/offers/received/count'
+  );
+  return data.data.count;
+}

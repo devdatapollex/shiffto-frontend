@@ -92,3 +92,18 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsData> {
   );
   return data.data;
 }
+
+export interface AdminSidebarCounts {
+  pendingKycCount: number;
+  pendingTripsCount: number;
+  openTicketsCount: number;
+  pendingWithdrawalsCount: number;
+  pendingShipmentsCount: number;
+}
+
+export async function getAdminSidebarCounts(): Promise<AdminSidebarCounts> {
+  const { data } = await apiClient.get<{ success: boolean; data: AdminSidebarCounts }>(
+    '/admin/sidebar-counts'
+  );
+  return data.data;
+}

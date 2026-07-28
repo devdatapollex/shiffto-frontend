@@ -120,8 +120,6 @@ export function RecentTripsSection({ trips, isLoading }: RecentTripsSectionProps
                   : '';
               const arrDate = t.flightDate ? formatDate(t.flightDate) : formatDate(t.createdAt);
 
-              const totalCap = String(t.totalCapacity ?? 0).padStart(2, '0');
-              const remCap = String(t.remainingCapacity ?? 0).padStart(2, '0');
               const shipmentsCount = t.shipmentsCount ?? 0;
 
               return (
@@ -201,12 +199,16 @@ export function RecentTripsSection({ trips, isLoading }: RecentTripsSectionProps
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 font-medium">Total capacity</span>
-                      <span className="font-semibold text-slate-700">{totalCap} KG</span>
+                      <span className="text-slate-500 font-medium">Cabin Avail</span>
+                      <span className="font-semibold text-[#0D307A]">
+                        {t.remainingCabinCapacity ?? 0} / {t.cabinBagCapacity ?? 0} KG
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 font-medium">Remaining capacity</span>
-                      <span className="font-extrabold text-[#0D307A] text-sm">{remCap} KG</span>
+                      <span className="text-slate-500 font-medium">Check-in Avail</span>
+                      <span className="font-semibold text-[#0D307A]">
+                        {t.remainingCheckInCapacity ?? 0} / {t.checkInBagCapacity ?? 0} KG
+                      </span>
                     </div>
                   </div>
 

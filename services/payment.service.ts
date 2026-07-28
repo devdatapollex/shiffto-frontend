@@ -70,6 +70,7 @@ export interface TravelerSummaryResponse {
     awaitingPayout: number;
     disputeAmount: number;
     availableForWithdrawal: number;
+    totalWithdrawn?: number;
   };
   earningsHistory: TravelerEarningsTransaction[];
   withdrawalHistory: WithdrawalHistoryItem[];

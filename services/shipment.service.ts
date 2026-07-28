@@ -43,8 +43,10 @@ export interface ShipmentTripDetails {
   flightTime: string;
   airportArrivalTime: string | null;
   status: string;
-  totalCapacity?: number;
-  remainingCapacity?: number;
+  cabinBagCapacity?: number;
+  checkInBagCapacity?: number;
+  remainingCabinCapacity?: number;
+  remainingCheckInCapacity?: number;
   user?: {
     id: string;
     name: string;
@@ -92,6 +94,12 @@ export interface Shipment {
   userId: string;
   categoryId: string;
   category?: ShipmentCategory;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string | null;
+  } | null;
   paymentTransaction?: PaymentTransactionDetails | null;
   shipmentSteps?: ShipmentStep[];
   offers?: Offer[];
@@ -123,6 +131,13 @@ export async function getAvailableShipments(params?: {
     params,
   });
   return data;
+}
+
+export async function getAvailableShipmentsCount(): Promise<number> {
+  const { data } = await apiClient.get<{ success: boolean; data: { count: number } }>(
+    '/trips/available-shipments/count'
+  );
+  return data.data.count;
 }
 
 export async function sendShipmentOtp(): Promise<void> {

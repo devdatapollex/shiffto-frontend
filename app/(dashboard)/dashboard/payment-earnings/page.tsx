@@ -158,12 +158,21 @@ export default function PaymentEarningsPage() {
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Total Earnings
+                    Total Withdrawn
                   </p>
                   <p className="text-3xl font-extrabold text-slate-900">
-                    ${travelerData?.stats.totalEarnings.toFixed(2) || '0.00'}
+                    $
+                    {(
+                      travelerData?.stats.totalWithdrawn ??
+                      travelerData?.withdrawalHistory
+                        .filter((w) => w.status === 'APPROVED')
+                        .reduce((sum, w) => sum + w.amount, 0) ??
+                      0
+                    ).toFixed(2)}
                   </p>
-                  <p className="text-xs text-slate-400">Total net payout from released shipments</p>
+                  <p className="text-xs text-slate-400">
+                    Total Earnings: ${travelerData?.stats.totalEarnings.toFixed(2) || '0.00'}
+                  </p>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl">
                   $
@@ -231,9 +240,7 @@ export default function PaymentEarningsPage() {
                 <p className="text-4xl font-extrabold text-emerald-600">
                   ${travelerData?.stats.availableForWithdrawal.toFixed(2) || '0.00'}
                 </p>
-                <p className="text-xs text-slate-500">
-                  Net withdrawable earnings balance
-                </p>
+                <p className="text-xs text-slate-500">Net withdrawable earnings balance</p>
               </div>
 
               <Button
@@ -290,7 +297,9 @@ export default function PaymentEarningsPage() {
                           <span className="font-semibold">${item.grossAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-slate-400">
-                          <span>Commission ({Math.round((item.commissionRate || 0.3) * 100)}%):</span>
+                          <span>
+                            Commission ({Math.round((item.commissionRate || 0.3) * 100)}%):
+                          </span>
                           <span>-${item.commissionAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-emerald-600 font-bold pt-1 text-sm border-t border-dashed">

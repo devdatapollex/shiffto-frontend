@@ -74,7 +74,7 @@ export function ItemDetailsStep() {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 items-start">
         <FormField
           control={control}
           name="itemName"
@@ -126,7 +126,7 @@ export function ItemDetailsStep() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 items-start">
         <FormField
           control={control}
           name="weight"
