@@ -311,15 +311,15 @@ export default function ShipmentDetailsPage() {
                 {isTraveller ? (
                   <>
                     <div className="flex justify-between items-center text-xs md:text-sm">
-                      <span className="text-slate-500 font-medium">Total capacity</span>
-                      <span className="font-semibold text-slate-700">
-                        {shipment.trip.totalCapacity ?? 0} KG
+                      <span className="text-slate-500 font-medium">Cabin Avail</span>
+                      <span className="font-semibold text-[#0D307A]">
+                        {shipment.trip.remainingCabinCapacity ?? 0} / {shipment.trip.cabinBagCapacity ?? 0} KG
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs md:text-sm">
-                      <span className="text-slate-500 font-medium">Remaining capacity</span>
-                      <span className="font-extrabold text-[#0D307A] text-[15px]">
-                        {String(shipment.trip.remainingCapacity ?? 0).padStart(2, '0')} KG
+                      <span className="text-slate-500 font-medium">Check-in Avail</span>
+                      <span className="font-semibold text-[#0D307A]">
+                        {shipment.trip.remainingCheckInCapacity ?? 0} / {shipment.trip.checkInBagCapacity ?? 0} KG
                       </span>
                     </div>
                   </>

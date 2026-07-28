@@ -153,8 +153,10 @@ export interface UserAnalyticsData {
     flightDate: string;
     flightTime?: string | null;
     airportArrivalTime?: string | null;
-    totalCapacity?: number;
-    remainingCapacity?: number;
+    cabinBagCapacity?: number;
+    checkInBagCapacity?: number;
+    remainingCabinCapacity?: number;
+    remainingCheckInCapacity?: number;
     shipmentsCount?: number;
     createdAt: string;
   }[];

@@ -43,8 +43,10 @@ export interface ShipmentTripDetails {
   flightTime: string;
   airportArrivalTime: string | null;
   status: string;
-  totalCapacity?: number;
-  remainingCapacity?: number;
+  cabinBagCapacity?: number;
+  checkInBagCapacity?: number;
+  remainingCabinCapacity?: number;
+  remainingCheckInCapacity?: number;
   user?: {
     id: string;
     name: string;

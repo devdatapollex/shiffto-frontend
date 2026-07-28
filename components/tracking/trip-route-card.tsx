@@ -148,17 +148,21 @@ export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, cl
       <div className="border-t border-slate-100 pt-4 space-y-3">
         <div className="flex items-center justify-between text-xs md:text-sm font-semibold">
           <div className="flex flex-col">
-            <span className="text-slate-400 font-medium">Total capacity</span>
-            <span className="text-slate-800 font-bold mt-0.5">{totalCap} KG</span>
+            <span className="text-slate-400 font-medium">Cabin Luggage</span>
+            <span className="text-slate-800 font-bold mt-0.5">
+              Avail: <span className="text-[#0D307A]">{trip.remainingCabinCapacity ?? 0}</span> / {trip.cabinBagCapacity ?? 0} KG
+            </span>
           </div>
           <div className="flex flex-col text-right">
-            <span className="text-slate-400 font-medium">Remaining capacity</span>
-            <span className="text-[#0D307A] font-extrabold mt-0.5">{remainingCap} KG</span>
+            <span className="text-slate-400 font-medium">Check-in Luggage</span>
+            <span className="text-slate-800 font-bold mt-0.5">
+              Avail: <span className="text-[#0D307A]">{trip.remainingCheckInCapacity ?? 0}</span> / {trip.checkInBagCapacity ?? 0} KG
+            </span>
           </div>
         </div>
 
         {/* Custom Progress Bar */}
-        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden flex">
           <div
             className="h-full bg-indigo-600 transition-all duration-500"
             style={{

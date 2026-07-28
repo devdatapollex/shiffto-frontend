@@ -133,24 +133,55 @@ export default function MyTripsPage() {
     }
   );
 
-  const matchingAcceptTrips = acceptMatchingTripsData?.data || [];
+  const rawMatchingAcceptTrips = acceptMatchingTripsData?.data || [];
+  const matchingAcceptTrips = useMemo(() => {
+    if (!selectedShipment) return rawMatchingAcceptTrips;
+    return rawMatchingAcceptTrips.filter((t) => {
+      const maxSlot = Math.max(t.remainingCabinCapacity || 0, t.remainingCheckInCapacity || 0);
+      return selectedShipment.weight <= maxSlot;
+    });
+  }, [rawMatchingAcceptTrips, selectedShipment]);
+
   useEffect(() => {
     if (selectedShipment && matchingAcceptTrips.length > 0) {
-      if (!matchingAcceptTrips.some((t) => t.id === acceptingTripId)) {
+      const activeTrip = matchingAcceptTrips.find((t) => t.id === acceptingTripId) || matchingAcceptTrips[0];
+      if (activeTrip.id !== acceptingTripId) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setAcceptingTripId(matchingAcceptTrips[0].id);
+        setAcceptingTripId(activeTrip.id);
+      }
+      // Ensure selected bagType has sufficient capacity
+      const weight = selectedShipment.weight;
+      if (bagType === 'checkIn' && (activeTrip.remainingCheckInCapacity || 0) < weight && (activeTrip.remainingCabinCapacity || 0) >= weight) {
+        setBagType('cabin');
+      } else if (bagType === 'cabin' && (activeTrip.remainingCabinCapacity || 0) < weight && (activeTrip.remainingCheckInCapacity || 0) >= weight) {
+        setBagType('checkIn');
       }
     } else if (selectedShipment && matchingAcceptTrips.length === 0 && !acceptMatchingLoading) {
       setAcceptingTripId('');
     }
-  }, [matchingAcceptTrips, selectedShipment, acceptMatchingLoading, acceptingTripId]);
+  }, [matchingAcceptTrips, selectedShipment, acceptMatchingLoading, acceptingTripId, bagType]);
 
-  const matchingCounterTrips = counterMatchingTripsData?.data || [];
+  const rawMatchingCounterTrips = counterMatchingTripsData?.data || [];
+  const matchingCounterTrips = useMemo(() => {
+    if (!selectedCounterShipment) return rawMatchingCounterTrips;
+    return rawMatchingCounterTrips.filter((t) => {
+      const maxSlot = Math.max(t.remainingCabinCapacity || 0, t.remainingCheckInCapacity || 0);
+      return selectedCounterShipment.weight <= maxSlot;
+    });
+  }, [rawMatchingCounterTrips, selectedCounterShipment]);
+
   useEffect(() => {
     if (selectedCounterShipment && matchingCounterTrips.length > 0) {
-      if (!matchingCounterTrips.some((t) => t.id === counterTripId)) {
+      const activeTrip = matchingCounterTrips.find((t) => t.id === counterTripId) || matchingCounterTrips[0];
+      if (activeTrip.id !== counterTripId) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCounterTripId(matchingCounterTrips[0].id);
+        setCounterTripId(activeTrip.id);
+      }
+      const weight = selectedCounterShipment.weight;
+      if (counterBagType === 'checkIn' && (activeTrip.remainingCheckInCapacity || 0) < weight && (activeTrip.remainingCabinCapacity || 0) >= weight) {
+        setCounterBagType('cabin');
+      } else if (counterBagType === 'cabin' && (activeTrip.remainingCabinCapacity || 0) < weight && (activeTrip.remainingCheckInCapacity || 0) >= weight) {
+        setCounterBagType('checkIn');
       }
     } else if (
       selectedCounterShipment &&
@@ -159,7 +190,7 @@ export default function MyTripsPage() {
     ) {
       setCounterTripId('');
     }
-  }, [matchingCounterTrips, selectedCounterShipment, counterMatchingLoading, counterTripId]);
+  }, [matchingCounterTrips, selectedCounterShipment, counterMatchingLoading, counterTripId, counterBagType]);
 
   // Mutations
   const cancelTripMutation = useCancelTrip();
@@ -919,27 +950,43 @@ export default function MyTripsPage() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Select bag slot
-                </label>
-                <Select
-                  value={bagType}
-                  onValueChange={(val) => setBagType(val as 'cabin' | 'checkIn')}
-                >
-                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
-                    <SelectValue placeholder="Choose bag slot" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border-[#e2e8f0]">
-                    <SelectItem value="checkIn" className="cursor-pointer">
-                      Check-in luggage
-                    </SelectItem>
-                    <SelectItem value="cabin" className="cursor-pointer">
-                      Cabin luggage
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const activeAcceptTrip = matchingAcceptTrips.find((t) => t.id === acceptingTripId);
+                const reqWeight = selectedShipment?.weight || 0;
+                const checkInAvail = activeAcceptTrip?.remainingCheckInCapacity ?? 0;
+                const cabinAvail = activeAcceptTrip?.remainingCabinCapacity ?? 0;
+                return (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Select bag slot
+                    </label>
+                    <Select
+                      value={bagType}
+                      onValueChange={(val) => setBagType(val as 'cabin' | 'checkIn')}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
+                        <SelectValue placeholder="Choose bag slot" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-lg border-[#e2e8f0]">
+                        <SelectItem
+                          value="checkIn"
+                          disabled={checkInAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Check-in luggage ({checkInAvail} KG available)
+                        </SelectItem>
+                        <SelectItem
+                          value="cabin"
+                          disabled={cabinAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Cabin luggage ({cabinAvail} KG available)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -1076,27 +1123,43 @@ export default function MyTripsPage() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Select bag slot
-                </label>
-                <Select
-                  value={counterBagType}
-                  onValueChange={(val) => setCounterBagType(val as 'cabin' | 'checkIn')}
-                >
-                  <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
-                    <SelectValue placeholder="Choose bag slot" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border-[#e2e8f0]">
-                    <SelectItem value="checkIn" className="cursor-pointer">
-                      Check-in luggage
-                    </SelectItem>
-                    <SelectItem value="cabin" className="cursor-pointer">
-                      Cabin luggage
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const activeCounterTrip = matchingCounterTrips.find((t) => t.id === counterTripId);
+                const reqWeight = selectedCounterShipment?.weight || 0;
+                const checkInAvail = activeCounterTrip?.remainingCheckInCapacity ?? 0;
+                const cabinAvail = activeCounterTrip?.remainingCabinCapacity ?? 0;
+                return (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                      Select bag slot
+                    </label>
+                    <Select
+                      value={counterBagType}
+                      onValueChange={(val) => setCounterBagType(val as 'cabin' | 'checkIn')}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border-[#e2e8f0] h-11 bg-white">
+                        <SelectValue placeholder="Choose bag slot" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-lg border-[#e2e8f0]">
+                        <SelectItem
+                          value="checkIn"
+                          disabled={checkInAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Check-in luggage ({checkInAvail} KG available)
+                        </SelectItem>
+                        <SelectItem
+                          value="cabin"
+                          disabled={cabinAvail < reqWeight}
+                          className="cursor-pointer"
+                        >
+                          Cabin luggage ({cabinAvail} KG available)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
