@@ -15,7 +15,7 @@ export interface Trip {
   remainingCabinCapacity: number;
   remainingCheckInCapacity: number;
   ticketPhoto: string;
-  status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'REJECTED';
+  status: 'PENDING' | 'ACTIVE' | 'IN_TRANSIT' | 'ARRIVED' | 'COMPLETED' | 'CANCELLED' | 'REJECTED';
   rejectionReason: string | null;
   createdAt: string;
   updatedAt: string;
@@ -104,5 +104,24 @@ export async function verifyTrip(
 
 export async function getTripById(id: string): Promise<Trip> {
   const { data } = await apiClient.get<{ data: Trip }>(`/trips/${id}`);
+  return data.data;
+}
+
+export async function updateTrip(
+  id: string,
+  payload: Partial<{
+    status: Trip['status'];
+    flightNumber: string;
+    fromCountry: string;
+    toCountry: string;
+    flightDate: string;
+    flightTime: string;
+    airportArrivalTime: string;
+    cabinBagCapacity: number;
+    checkInBagCapacity: number;
+    ticketPhoto: string;
+  }>
+): Promise<Trip> {
+  const { data } = await apiClient.patch<{ data: Trip }>(`/trips/${id}`, payload);
   return data.data;
 }

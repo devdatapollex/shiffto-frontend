@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMyTrips, useCancelTrip, useCompleteTrip } from '@/hooks/use-trips';
+import { useMyTrips, useCancelTrip, useCompleteTrip, useUpdateTrip } from '@/hooks/use-trips';
 import { useCreateOffer } from '@/hooks/use-offers';
 import { useAvailableShipments } from '@/hooks/use-available-shipments';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -144,16 +144,25 @@ export default function MyTripsPage() {
 
   useEffect(() => {
     if (selectedShipment && matchingAcceptTrips.length > 0) {
-      const activeTrip = matchingAcceptTrips.find((t) => t.id === acceptingTripId) || matchingAcceptTrips[0];
+      const activeTrip =
+        matchingAcceptTrips.find((t) => t.id === acceptingTripId) || matchingAcceptTrips[0];
       if (activeTrip.id !== acceptingTripId) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setAcceptingTripId(activeTrip.id);
       }
       // Ensure selected bagType has sufficient capacity
       const weight = selectedShipment.weight;
-      if (bagType === 'checkIn' && (activeTrip.remainingCheckInCapacity || 0) < weight && (activeTrip.remainingCabinCapacity || 0) >= weight) {
+      if (
+        bagType === 'checkIn' &&
+        (activeTrip.remainingCheckInCapacity || 0) < weight &&
+        (activeTrip.remainingCabinCapacity || 0) >= weight
+      ) {
         setBagType('cabin');
-      } else if (bagType === 'cabin' && (activeTrip.remainingCabinCapacity || 0) < weight && (activeTrip.remainingCheckInCapacity || 0) >= weight) {
+      } else if (
+        bagType === 'cabin' &&
+        (activeTrip.remainingCabinCapacity || 0) < weight &&
+        (activeTrip.remainingCheckInCapacity || 0) >= weight
+      ) {
         setBagType('checkIn');
       }
     } else if (selectedShipment && matchingAcceptTrips.length === 0 && !acceptMatchingLoading) {
@@ -172,15 +181,24 @@ export default function MyTripsPage() {
 
   useEffect(() => {
     if (selectedCounterShipment && matchingCounterTrips.length > 0) {
-      const activeTrip = matchingCounterTrips.find((t) => t.id === counterTripId) || matchingCounterTrips[0];
+      const activeTrip =
+        matchingCounterTrips.find((t) => t.id === counterTripId) || matchingCounterTrips[0];
       if (activeTrip.id !== counterTripId) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setCounterTripId(activeTrip.id);
       }
       const weight = selectedCounterShipment.weight;
-      if (counterBagType === 'checkIn' && (activeTrip.remainingCheckInCapacity || 0) < weight && (activeTrip.remainingCabinCapacity || 0) >= weight) {
+      if (
+        counterBagType === 'checkIn' &&
+        (activeTrip.remainingCheckInCapacity || 0) < weight &&
+        (activeTrip.remainingCabinCapacity || 0) >= weight
+      ) {
         setCounterBagType('cabin');
-      } else if (counterBagType === 'cabin' && (activeTrip.remainingCabinCapacity || 0) < weight && (activeTrip.remainingCheckInCapacity || 0) >= weight) {
+      } else if (
+        counterBagType === 'cabin' &&
+        (activeTrip.remainingCabinCapacity || 0) < weight &&
+        (activeTrip.remainingCheckInCapacity || 0) >= weight
+      ) {
         setCounterBagType('checkIn');
       }
     } else if (
@@ -190,11 +208,18 @@ export default function MyTripsPage() {
     ) {
       setCounterTripId('');
     }
-  }, [matchingCounterTrips, selectedCounterShipment, counterMatchingLoading, counterTripId, counterBagType]);
+  }, [
+    matchingCounterTrips,
+    selectedCounterShipment,
+    counterMatchingLoading,
+    counterTripId,
+    counterBagType,
+  ]);
 
   // Mutations
   const cancelTripMutation = useCancelTrip();
   const completeTripMutation = useCompleteTrip();
+  const updateTripMutation = useUpdateTrip();
   const createOfferMutation = useCreateOffer();
 
   // Helper lists
@@ -274,6 +299,16 @@ export default function MyTripsPage() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.message || 'Failed to complete trip');
+    }
+  };
+
+  const handleUpdateTripStatus = async (id: string, status: Trip['status']) => {
+    try {
+      await updateTripMutation.mutateAsync({ id, payload: { status } });
+      toast.success(`Trip status updated to ${status.toLowerCase().replace('_', ' ')}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to update trip status');
     }
   };
 
@@ -394,6 +429,18 @@ export default function MyTripsPage() {
         return (
           <Badge className="bg-[#EEF2FF] hover:bg-[#EEF2FF] text-[#4F46E5] border-[#E0E7FF] font-medium px-2.5 py-0.5 rounded-full">
             Active
+          </Badge>
+        );
+      case 'IN_TRANSIT':
+        return (
+          <Badge className="bg-[#E0F2FE] hover:bg-[#E0F2FE] text-[#0284C7] border-[#BAE6FD] font-medium px-2.5 py-0.5 rounded-full">
+            In Transit
+          </Badge>
+        );
+      case 'ARRIVED':
+        return (
+          <Badge className="bg-[#F3E8FF] hover:bg-[#F3E8FF] text-[#7E22CE] border-[#E9D5FF] font-medium px-2.5 py-0.5 rounded-full">
+            Arrived
           </Badge>
         );
       case 'PENDING':
@@ -593,13 +640,22 @@ export default function MyTripsPage() {
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
               <TabsList className="bg-slate-100/80 p-1 rounded-lg flex flex-wrap h-auto gap-1">
-                {['all', 'active', 'pending', 'completed', 'canceled', 'rejected'].map((tab) => (
+                {[
+                  'all',
+                  'active',
+                  'in_transit',
+                  'arrived',
+                  'pending',
+                  'completed',
+                  'canceled',
+                  'rejected',
+                ].map((tab) => (
                   <TabsTrigger
                     key={tab}
                     value={tab}
                     className="rounded-lg text-xs md:text-sm font-semibold capitalize data-[state=active]:bg-white data-[state=active]:text-[#0b3a8e] data-[state=active]:shadow-xs px-3 py-1.5 transition-all cursor-pointer"
                   >
-                    {tab === 'all' ? 'All' : tab}
+                    {tab === 'all' ? 'All' : tab.replace('_', ' ')}
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -684,6 +740,22 @@ export default function MyTripsPage() {
                     const remCap =
                       (trip.remainingCabinCapacity || 0) + (trip.remainingCheckInCapacity || 0);
 
+                    const hasArrivedStep = trip.shipments?.some((s) =>
+                      s.shipmentSteps?.some(
+                        (step) => step.stage === 'ARRIVED_AT_DESTINATION' && step.completedAt
+                      )
+                    );
+                    const hasCheckedInStep = trip.shipments?.some((s) =>
+                      s.shipmentSteps?.some(
+                        (step) => step.stage === 'CHECKED_IN' && step.completedAt
+                      )
+                    );
+
+                    const canRevertToInTransit = trip.status === 'ARRIVED' && !hasArrivedStep;
+                    const canRevertToActive =
+                      (trip.status === 'IN_TRANSIT' || trip.status === 'ARRIVED') &&
+                      !hasCheckedInStep;
+
                     return (
                       <TableRow
                         key={trip.id}
@@ -739,6 +811,64 @@ export default function MyTripsPage() {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {trip.status === 'ACTIVE' && (
+                                  <>
+                                    <DropdownMenuItem
+                                      className="text-sky-600 font-medium rounded-lg cursor-pointer"
+                                      onClick={() => handleUpdateTripStatus(trip.id, 'IN_TRANSIT')}
+                                    >
+                                      Start Transit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="text-purple-600 font-medium rounded-lg cursor-pointer"
+                                      onClick={() => handleUpdateTripStatus(trip.id, 'ARRIVED')}
+                                    >
+                                      Mark Arrived
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                                {trip.status === 'IN_TRANSIT' && (
+                                  <>
+                                    <DropdownMenuItem
+                                      className="text-purple-600 font-medium rounded-lg cursor-pointer"
+                                      onClick={() => handleUpdateTripStatus(trip.id, 'ARRIVED')}
+                                    >
+                                      Mark Arrived
+                                    </DropdownMenuItem>
+                                    {canRevertToActive && (
+                                      <DropdownMenuItem
+                                        className="text-amber-600 font-medium rounded-lg cursor-pointer"
+                                        onClick={() => handleUpdateTripStatus(trip.id, 'ACTIVE')}
+                                      >
+                                        Revert to Active
+                                      </DropdownMenuItem>
+                                    )}
+                                  </>
+                                )}
+                                {trip.status === 'ARRIVED' && (
+                                  <>
+                                    {canRevertToInTransit && (
+                                      <DropdownMenuItem
+                                        className="text-sky-600 font-medium rounded-lg cursor-pointer"
+                                        onClick={() =>
+                                          handleUpdateTripStatus(trip.id, 'IN_TRANSIT')
+                                        }
+                                      >
+                                        Revert to In Transit
+                                      </DropdownMenuItem>
+                                    )}
+                                    {canRevertToActive && (
+                                      <DropdownMenuItem
+                                        className="text-amber-600 font-medium rounded-lg cursor-pointer"
+                                        onClick={() => handleUpdateTripStatus(trip.id, 'ACTIVE')}
+                                      >
+                                        Revert to Active
+                                      </DropdownMenuItem>
+                                    )}
+                                  </>
+                                )}
+                                {(trip.status === 'ACTIVE' ||
+                                  trip.status === 'IN_TRANSIT' ||
+                                  trip.status === 'ARRIVED') && (
                                   <DropdownMenuItem
                                     className="text-emerald-600 font-medium rounded-lg cursor-pointer"
                                     onClick={() => handleCompleteTrip(trip.id)}
