@@ -9,6 +9,8 @@ interface SocketState {
   disconnectSocket: () => void;
   joinRoom: (roomId: string) => void;
   leaveRoom: (roomId: string) => void;
+  joinShipmentChat: (shipmentId: string) => void;
+  leaveShipmentChat: (shipmentId: string) => void;
 }
 
 const SOCKET_SERVER_URL =
@@ -72,6 +74,20 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
     if (socket && roomId) {
       socket.emit('leave-ticket', roomId);
+    }
+  },
+
+  joinShipmentChat: (shipmentId: string) => {
+    const { socket } = get();
+    if (socket && shipmentId) {
+      socket.emit('join-shipment-chat', shipmentId);
+    }
+  },
+
+  leaveShipmentChat: (shipmentId: string) => {
+    const { socket } = get();
+    if (socket && shipmentId) {
+      socket.emit('leave-shipment-chat', shipmentId);
     }
   },
 }));

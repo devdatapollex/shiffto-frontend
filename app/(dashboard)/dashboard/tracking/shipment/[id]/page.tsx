@@ -1,15 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useShipmentDetails } from '@/hooks/use-shipment-details';
 import { useRole } from '@/hooks/use-role';
 import { ShipmentTimeline } from '@/components/tracking/shipment-timeline';
 import { StepAdvancementCard } from '@/components/tracking/step-advancement-card';
+import { ShipmentChatDrawer } from '@/components/shipments/shipment-chat-drawer';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
-import { ChevronLeft, Package, User, Plane, Eye } from 'lucide-react';
+import { ChevronLeft, Package, User, Plane, Eye, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -47,6 +49,7 @@ export default function ShipmentDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const shipmentId = params?.id as string;
+  const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
 
   const { user, isAdmin } = useRole();
   const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
@@ -81,7 +84,7 @@ export default function ShipmentDetailsPage() {
         <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
         <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-md">
-          We couldn't retrieve details for this shipment. It may have been deleted, or you might not
+          We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you might not
           have authorization to view it.
         </p>
         <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
@@ -95,12 +98,14 @@ export default function ShipmentDetailsPage() {
 
   // Check if current user is the traveller for this trip or admin
   const isTraveller = Boolean(user && shipment.trip?.user?.id === user.id);
+  const isSender = Boolean(user && shipment.userId === user.id);
   const canAdvanceStep = (isTraveller || isAdmin) && shipment.status === 'ACTIVE';
+  const canChat = (isTraveller || isSender || isAdmin) && shipment.status === 'ACTIVE' && Boolean(shipment.trip);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       {/* Navigation & Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -118,6 +123,16 @@ export default function ShipmentDetailsPage() {
             <span className="text-slate-800 font-bold">Shipment: #{shortShipmentId}</span>
           </div>
         </div>
+
+        {canChat && (
+          <Button
+            onClick={() => setIsChatDrawerOpen(true)}
+            className="bg-[#0D307A] hover:bg-[#092E72] text-white rounded-lg gap-2 text-xs font-semibold h-9 px-4 shadow-sm cursor-pointer self-start sm:self-auto"
+          >
+            <MessageSquare className="h-4 w-4" />
+            {isTraveller ? 'Message Sender' : isSender ? 'Message Traveler' : 'Shipment Chat'}
+          </Button>
+        )}
       </div>
 
       {/* Progress Timeline Tracker Card */}
@@ -395,13 +410,19 @@ export default function ShipmentDetailsPage() {
               </div>
               <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
               <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                This shipment is currently awaiting a traveler. Once matched, the traveler's flight
+                This shipment is currently awaiting a traveler. Once matched, the traveler&apos;s flight
                 details, bag capacity, and contact info will appear here.
               </p>
             </div>
           )}
         </div>
       </div>
+
+      <ShipmentChatDrawer
+        isOpen={isChatDrawerOpen}
+        onClose={() => setIsChatDrawerOpen(false)}
+        shipmentId={shipment.id}
+      />
     </div>
   );
 }
