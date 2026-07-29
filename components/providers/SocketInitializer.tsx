@@ -9,17 +9,21 @@ import { useSocketStore } from '@/store/useSocketStore';
 export function SocketInitializer() {
   const { data: session, isPending } = useSession();
   const queryClient = useQueryClient();
-  const { socket, connectSocket, disconnectSocket } = useSocketStore();
+  const connectSocket = useSocketStore((state) => state.connectSocket);
+  const disconnectSocket = useSocketStore((state) => state.disconnectSocket);
+  const socket = useSocketStore((state) => state.socket);
+
+  const userId = session?.user?.id;
 
   useEffect(() => {
     if (isPending) return;
 
-    if (session?.user) {
+    if (userId) {
       connectSocket();
     } else {
       disconnectSocket();
     }
-  }, [session?.user, isPending, connectSocket, disconnectSocket]);
+  }, [userId, isPending, connectSocket, disconnectSocket]);
 
   // Global Real-Time Socket Listeners for Notifications, Sidebar Counters & Page Data
   useEffect(() => {

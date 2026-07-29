@@ -23,7 +23,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
   connectSocket: () => {
     const currentSocket = get().socket;
-    if (currentSocket?.connected) return;
+    if (currentSocket && (currentSocket.connected || currentSocket.active)) return;
 
     if (currentSocket) {
       currentSocket.disconnect();
