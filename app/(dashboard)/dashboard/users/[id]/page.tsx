@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +51,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<string>('timeline');
 
@@ -673,53 +675,67 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
                       return (
                         <div className="space-y-3">
-                          {list.map((rev: any) => (
-                            <div key={rev.id} className="p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2">
-                              <div className="flex justify-between items-start gap-3">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
-                                    {rev.reviewer?.image ? (
-                                      <img src={rev.reviewer.image} alt={rev.reviewer.name} className="h-full w-full object-cover" />
-                                    ) : (
-                                      rev.reviewer?.name?.charAt(0).toUpperCase() || 'U'
+                          {list.map((rev: any) => {
+                            const targetShipmentId = rev.shipmentId || rev.shipment?.id;
+                            return (
+                              <div
+                                key={rev.id}
+                                onClick={() => {
+                                  if (targetShipmentId) {
+                                    router.push(`/dashboard/tracking/shipment/${targetShipmentId}`);
+                                  }
+                                }}
+                                className={`p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2 transition-all ${
+                                  targetShipmentId ? 'cursor-pointer hover:border-primary/30 hover:bg-slate-50/80 shadow-2xs' : ''
+                                }`}
+                              >
+                                <div className="flex justify-between items-start gap-3">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
+                                      {rev.reviewer?.image ? (
+                                        <img src={rev.reviewer.image} alt={rev.reviewer.name} className="h-full w-full object-cover" />
+                                      ) : (
+                                        rev.reviewer?.name?.charAt(0).toUpperCase() || 'U'
+                                      )}
+                                    </div>
+                                    <div>
+                                      <span className="text-xs font-bold text-foreground block">
+                                        {rev.reviewer?.name || 'User'}
+                                      </span>
+                                      <span className="text-[10px] text-muted-foreground block">
+                                        {new Date(rev.createdAt).toLocaleString()}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5">
+                                    {rev.shipment?.itemName && (
+                                      <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5 gap-1 hover:bg-primary/5">
+                                        Shipment: {rev.shipment.itemName}
+                                        <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />
+                                      </Badge>
                                     )}
-                                  </div>
-                                  <div>
-                                    <span className="text-xs font-bold text-foreground block">
-                                      {rev.reviewer?.name || 'User'}
-                                    </span>
-                                    <span className="text-[10px] text-muted-foreground block">
-                                      {new Date(rev.createdAt).toLocaleString()}
-                                    </span>
+                                    <div className="flex gap-0.5">
+                                      {Array.from({ length: 5 }).map((_, idx) => (
+                                        <Star
+                                          key={idx}
+                                          className={`h-3.5 w-3.5 ${
+                                            idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-1.5">
-                                  {rev.shipment?.itemName && (
-                                    <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5">
-                                      Shipment: {rev.shipment.itemName}
-                                    </Badge>
-                                  )}
-                                  <div className="flex gap-0.5">
-                                    {Array.from({ length: 5 }).map((_, idx) => (
-                                      <Star
-                                        key={idx}
-                                        className={`h-3.5 w-3.5 ${
-                                          idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
+                                {rev.comment && (
+                                  <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
+                                    "{rev.comment}"
+                                  </p>
+                                )}
                               </div>
-
-                              {rev.comment && (
-                                <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
-                                  "{rev.comment}"
-                                </p>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
 
                           {/* Pagination Controls */}
                           {meta && meta.totalPages > 1 && (
@@ -764,53 +780,67 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
                       return (
                         <div className="space-y-3">
-                          {list.map((rev: any) => (
-                            <div key={rev.id} className="p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2">
-                              <div className="flex justify-between items-start gap-3">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
-                                    {rev.reviewee?.image ? (
-                                      <img src={rev.reviewee.image} alt={rev.reviewee.name} className="h-full w-full object-cover" />
-                                    ) : (
-                                      rev.reviewee?.name?.charAt(0).toUpperCase() || 'U'
+                          {list.map((rev: any) => {
+                            const targetShipmentId = rev.shipmentId || rev.shipment?.id;
+                            return (
+                              <div
+                                key={rev.id}
+                                onClick={() => {
+                                  if (targetShipmentId) {
+                                    router.push(`/dashboard/tracking/shipment/${targetShipmentId}`);
+                                  }
+                                }}
+                                className={`p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2 transition-all ${
+                                  targetShipmentId ? 'cursor-pointer hover:border-primary/30 hover:bg-slate-50/80 shadow-2xs' : ''
+                                }`}
+                              >
+                                <div className="flex justify-between items-start gap-3">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
+                                      {rev.reviewee?.image ? (
+                                        <img src={rev.reviewee.image} alt={rev.reviewee.name} className="h-full w-full object-cover" />
+                                      ) : (
+                                        rev.reviewee?.name?.charAt(0).toUpperCase() || 'U'
+                                      )}
+                                    </div>
+                                    <div>
+                                      <span className="text-xs font-bold text-foreground block">
+                                        {rev.reviewee?.name || 'User'}
+                                      </span>
+                                      <span className="text-[10px] text-muted-foreground block">
+                                        {new Date(rev.createdAt).toLocaleString()}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5">
+                                    {rev.shipment?.itemName && (
+                                      <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5 gap-1 hover:bg-primary/5">
+                                        Shipment: {rev.shipment.itemName}
+                                        <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />
+                                      </Badge>
                                     )}
-                                  </div>
-                                  <div>
-                                    <span className="text-xs font-bold text-foreground block">
-                                      {rev.reviewee?.name || 'User'}
-                                    </span>
-                                    <span className="text-[10px] text-muted-foreground block">
-                                      {new Date(rev.createdAt).toLocaleString()}
-                                    </span>
+                                    <div className="flex gap-0.5">
+                                      {Array.from({ length: 5 }).map((_, idx) => (
+                                        <Star
+                                          key={idx}
+                                          className={`h-3.5 w-3.5 ${
+                                            idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-1.5">
-                                  {rev.shipment?.itemName && (
-                                    <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5">
-                                      Shipment: {rev.shipment.itemName}
-                                    </Badge>
-                                  )}
-                                  <div className="flex gap-0.5">
-                                    {Array.from({ length: 5 }).map((_, idx) => (
-                                      <Star
-                                        key={idx}
-                                        className={`h-3.5 w-3.5 ${
-                                          idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
+                                {rev.comment && (
+                                  <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
+                                    "{rev.comment}"
+                                  </p>
+                                )}
                               </div>
-
-                              {rev.comment && (
-                                <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
-                                  "{rev.comment}"
-                                </p>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
 
                           {/* Pagination Controls */}
                           {meta && meta.totalPages > 1 && (
