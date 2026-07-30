@@ -6,6 +6,7 @@ import { useShipmentDetails } from '@/hooks/use-shipment-details';
 import { useRole } from '@/hooks/use-role';
 import { ShipmentTimeline } from '@/components/tracking/shipment-timeline';
 import { StepAdvancementCard } from '@/components/tracking/step-advancement-card';
+import { ShipmentReviewCard } from '@/components/shipments/shipment-review-card';
 import { ShipmentChatDrawer } from '@/components/shipments/shipment-chat-drawer';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import { getCountryByCode } from '@/lib/constants/countries';
@@ -84,8 +85,8 @@ export default function ShipmentDetailsPage() {
         <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
         <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-md">
-          We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you might not
-          have authorization to view it.
+          We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you
+          might not have authorization to view it.
         </p>
         <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
           <Link href="/dashboard/tracking">Back to Tracking</Link>
@@ -100,7 +101,8 @@ export default function ShipmentDetailsPage() {
   const isTraveller = Boolean(user && shipment.trip?.user?.id === user.id);
   const isSender = Boolean(user && shipment.userId === user.id);
   const canAdvanceStep = (isTraveller || isAdmin) && shipment.status === 'ACTIVE';
-  const canChat = (isTraveller || isSender || isAdmin) && shipment.status === 'ACTIVE' && Boolean(shipment.trip);
+  const canChat =
+    (isTraveller || isSender || isAdmin) && shipment.status === 'ACTIVE' && Boolean(shipment.trip);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
@@ -134,6 +136,9 @@ export default function ShipmentDetailsPage() {
           </Button>
         )}
       </div>
+
+      {/* Shipment Review Card for DELIVERED status */}
+      <ShipmentReviewCard shipment={shipment} currentUser={user} isAdmin={isAdmin} />
 
       {/* Progress Timeline Tracker Card */}
       <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 overflow-hidden">
@@ -328,13 +333,15 @@ export default function ShipmentDetailsPage() {
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-slate-500 font-medium">Cabin Avail</span>
                       <span className="font-semibold text-[#0D307A]">
-                        {shipment.trip.remainingCabinCapacity ?? 0} / {shipment.trip.cabinBagCapacity ?? 0} KG
+                        {shipment.trip.remainingCabinCapacity ?? 0} /{' '}
+                        {shipment.trip.cabinBagCapacity ?? 0} KG
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-slate-500 font-medium">Check-in Avail</span>
                       <span className="font-semibold text-[#0D307A]">
-                        {shipment.trip.remainingCheckInCapacity ?? 0} / {shipment.trip.checkInBagCapacity ?? 0} KG
+                        {shipment.trip.remainingCheckInCapacity ?? 0} /{' '}
+                        {shipment.trip.checkInBagCapacity ?? 0} KG
                       </span>
                     </div>
                   </>
@@ -410,8 +417,8 @@ export default function ShipmentDetailsPage() {
               </div>
               <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
               <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                This shipment is currently awaiting a traveler. Once matched, the traveler&apos;s flight
-                details, bag capacity, and contact info will appear here.
+                This shipment is currently awaiting a traveler. Once matched, the traveler&apos;s
+                flight details, bag capacity, and contact info will appear here.
               </p>
             </div>
           )}

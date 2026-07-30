@@ -123,9 +123,10 @@ components/
 
 ## `hooks/` — Custom React Hooks
 
-| File          | Purpose                                                                                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `use-role.ts` | Central access-control hook. Wraps `useSession()` from better-auth. Returns `role`, `isAdmin`, `isUser`, `user`, `isAuthenticated`, `isPending`, `hasPermission(resource:action)`, `checkAccess(allowedRoles[])`. |
+| File                      | Purpose                                                                                                                                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `use-role.ts`             | Central access-control hook. Wraps `useSession()` from better-auth. Returns `role`, `isAdmin`, `isUser`, `user`, `isAuthenticated`, `isPending`, `hasPermission(resource:action)`, `checkAccess(allowedRoles[])`. |
+| `use-shipment-reviews.ts` | React Query hooks (`useShipmentReviews`, `useCreateReview`) for fetching and submitting shipment reviews.                                                                                                         |
 
 ---
 
