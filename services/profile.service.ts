@@ -107,7 +107,6 @@ export interface UserAnalyticsData {
     name: string;
     email: string;
     image: string | null;
-    trustScore: number;
     kycStatus: string;
   };
   stats: {

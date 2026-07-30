@@ -39,11 +39,12 @@ import {
 } from '@/components/ui/select';
 import { userService } from '@/services/user.service';
 import { DocumentType } from '@/services/profile.service';
+import * as reviewService from '@/services/review.service';
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-100',
   SUSPENDED: 'bg-red-50 text-red-700 border-red-100',
-  DEACTIVATED: 'bg-slate-50 text-slate-600 border-slate-200',
+  DEACTIVATED: 'bg-slate-50 text-slate-700 border-slate-100',
   PENDING_KYC: 'bg-amber-50 text-amber-700 border-amber-100',
 };
 
@@ -51,6 +52,11 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<string>('timeline');
+
+  // Review sub-tab & pagination states
+  const [reviewSubTab, setReviewSubTab] = useState<'received' | 'given'>('received');
+  const [receivedPage, setReceivedPage] = useState<number>(1);
+  const [givenPage, setGivenPage] = useState<number>(1);
 
   // Form states
   const [editName, setEditName] = useState('');
@@ -67,6 +73,20 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   } = useQuery({
     queryKey: ['admin-user-details', id],
     queryFn: () => userService.getUserDetail(id),
+  });
+
+  // Fetch paginated received reviews
+  const { data: receivedReviewsData, isLoading: isReceivedLoading } = useQuery({
+    queryKey: ['admin-user-reviews-received', id, receivedPage],
+    queryFn: () => reviewService.getUserReceivedReviews(id, { page: receivedPage, limit: 5 }),
+    enabled: activeTab === 'trust' && reviewSubTab === 'received',
+  });
+
+  // Fetch paginated given reviews
+  const { data: givenReviewsData, isLoading: isGivenLoading } = useQuery({
+    queryKey: ['admin-user-reviews-given', id, givenPage],
+    queryFn: () => reviewService.getUserGivenReviews(id, { page: givenPage, limit: 5 }),
+    enabled: activeTab === 'trust' && reviewSubTab === 'given',
   });
 
   // Sync form states with retrieved data
@@ -278,7 +298,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
               { id: 'kyc', label: 'KYC Document', icon: ShieldAlert },
               { id: 'transactions', label: 'Transactions', icon: DollarSign },
               { id: 'tickets', label: 'Support Issues', icon: LifeBuoy },
-              { id: 'trust', label: 'Trust & Reviews', icon: Award },
+              { id: 'trust', label: 'Ratings & Reviews', icon: Star },
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -575,10 +595,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
               </div>
             )}
 
-            {/* Trust Score & Reviews Tab */}
+            {/* Ratings & Reviews Tab */}
             {activeTab === 'trust' && (
               <div className="space-y-6">
-                {/* Stats Breakdown */}
+                {/* Stats Breakdown Card */}
                 <div className="flex flex-col sm:flex-row justify-between gap-4 p-4 border border-primary/5 rounded-lg bg-primary/[0.01] items-center">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg font-bold shrink-0">
@@ -586,10 +606,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                     </div>
                     <div>
                       <span className="text-[10px] text-muted-foreground uppercase font-semibold">
-                        Account Trust Score
+                        Average Rating
                       </span>
                       <strong className="text-xl font-extrabold text-foreground block">
-                        {profile.trustScore} / 100
+                        {reviews.averageRating ? `${reviews.averageRating} / 5` : 'No Ratings'}
                       </strong>
                     </div>
                   </div>
@@ -598,79 +618,227 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                     <div>
                       <span className="text-[10px] text-muted-foreground block">Received</span>
                       <strong className="text-sm font-bold text-foreground block">
-                        {reviews.received.length} Ratings
+                        {reviews.receivedCount ?? reviews.received.length} Ratings
                       </strong>
                     </div>
                     <div className="w-px h-8 bg-primary/10" />
                     <div>
                       <span className="text-[10px] text-muted-foreground block">Given</span>
                       <strong className="text-sm font-bold text-foreground block">
-                        {reviews.given.length} Ratings
+                        {reviews.givenCount ?? reviews.given.length} Ratings
                       </strong>
                     </div>
                   </div>
                 </div>
 
+                {/* Sub-tabs for Received vs Given Reviews */}
+                <div className="flex border-b border-primary/10 gap-4">
+                  <button
+                    onClick={() => setReviewSubTab('received')}
+                    className={`pb-2 text-xs font-bold transition-colors border-b-2 ${
+                      reviewSubTab === 'received'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Reviews Received ({reviews.receivedCount ?? reviews.received.length})
+                  </button>
+                  <button
+                    onClick={() => setReviewSubTab('given')}
+                    className={`pb-2 text-xs font-bold transition-colors border-b-2 ${
+                      reviewSubTab === 'given'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Reviews Given ({reviews.givenCount ?? reviews.given.length})
+                  </button>
+                </div>
+
                 {/* Reviews List */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold border-b border-primary/5 pb-2">
-                    Reviews Received ({reviews.received.length})
-                  </h3>
-                  {reviews.received.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic py-4 text-center">
-                      No reviews received yet.
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {reviews.received.map((rev) => (
-                        <div
-                          key={rev.id}
-                          className="p-3 border border-primary/5 rounded-lg bg-card/50 space-y-1.5"
-                        >
-                          <div className="flex justify-between items-start gap-3">
-                            <div className="flex items-center gap-2">
-                              <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-700 shrink-0 overflow-hidden">
-                                {rev.reviewer.image ? (
-                                  <img
-                                    src={rev.reviewer.image}
-                                    alt={rev.reviewer.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  rev.reviewer.name.charAt(0).toUpperCase()
-                                )}
+                  {reviewSubTab === 'received' ? (
+                    (() => {
+                      const list = receivedReviewsData?.data || reviews.received;
+                      const meta = receivedReviewsData?.meta;
+                      const isLoadingList = isReceivedLoading;
+
+                      if (isLoadingList) {
+                        return <p className="text-xs text-muted-foreground italic py-4 text-center">Loading reviews...</p>;
+                      }
+
+                      if (!list || list.length === 0) {
+                        return <p className="text-xs text-muted-foreground italic py-4 text-center">No reviews received yet.</p>;
+                      }
+
+                      return (
+                        <div className="space-y-3">
+                          {list.map((rev: any) => (
+                            <div key={rev.id} className="p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2">
+                              <div className="flex justify-between items-start gap-3">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
+                                    {rev.reviewer?.image ? (
+                                      <img src={rev.reviewer.image} alt={rev.reviewer.name} className="h-full w-full object-cover" />
+                                    ) : (
+                                      rev.reviewer?.name?.charAt(0).toUpperCase() || 'U'
+                                    )}
+                                  </div>
+                                  <div>
+                                    <span className="text-xs font-bold text-foreground block">
+                                      {rev.reviewer?.name || 'User'}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground block">
+                                      {new Date(rev.createdAt).toLocaleString()}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-1.5">
+                                  {rev.shipment?.itemName && (
+                                    <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5">
+                                      Shipment: {rev.shipment.itemName}
+                                    </Badge>
+                                  )}
+                                  <div className="flex gap-0.5">
+                                    {Array.from({ length: 5 }).map((_, idx) => (
+                                      <Star
+                                        key={idx}
+                                        className={`h-3.5 w-3.5 ${
+                                          idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
-                              <span className="text-xs font-semibold text-foreground">
-                                {rev.reviewer.name}
+
+                              {rev.comment && (
+                                <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
+                                  "{rev.comment}"
+                                </p>
+                              )}
+                            </div>
+                          ))}
+
+                          {/* Pagination Controls */}
+                          {meta && meta.totalPages > 1 && (
+                            <div className="flex items-center justify-between pt-2 text-xs">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={receivedPage <= 1}
+                                onClick={() => setReceivedPage((p) => Math.max(1, p - 1))}
+                              >
+                                Previous
+                              </Button>
+                              <span className="text-muted-foreground">
+                                Page {meta.page} of {meta.totalPages}
                               </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={receivedPage >= meta.totalPages}
+                                onClick={() => setReceivedPage((p) => p + 1)}
+                              >
+                                Next
+                              </Button>
                             </div>
-
-                            {/* Stars */}
-                            <div className="flex gap-0.5">
-                              {Array.from({ length: 5 }).map((_, idx) => (
-                                <Star
-                                  key={idx}
-                                  className={`h-3 w-3 ${
-                                    idx < rev.rating
-                                      ? 'fill-amber-500 text-amber-500'
-                                      : 'text-slate-200'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-
-                          {rev.comment && (
-                            <p className="text-xs text-muted-foreground leading-relaxed pl-8 italic">
-                              "{rev.comment}"
-                            </p>
                           )}
-                          <span className="text-[9px] text-muted-foreground block text-right">
-                            {new Date(rev.createdAt).toLocaleDateString()}
-                          </span>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })()
+                  ) : (
+                    (() => {
+                      const list = givenReviewsData?.data || reviews.given;
+                      const meta = givenReviewsData?.meta;
+                      const isLoadingList = isGivenLoading;
+
+                      if (isLoadingList) {
+                        return <p className="text-xs text-muted-foreground italic py-4 text-center">Loading reviews...</p>;
+                      }
+
+                      if (!list || list.length === 0) {
+                        return <p className="text-xs text-muted-foreground italic py-4 text-center">No reviews given yet.</p>;
+                      }
+
+                      return (
+                        <div className="space-y-3">
+                          {list.map((rev: any) => (
+                            <div key={rev.id} className="p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2">
+                              <div className="flex justify-between items-start gap-3">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
+                                    {rev.reviewee?.image ? (
+                                      <img src={rev.reviewee.image} alt={rev.reviewee.name} className="h-full w-full object-cover" />
+                                    ) : (
+                                      rev.reviewee?.name?.charAt(0).toUpperCase() || 'U'
+                                    )}
+                                  </div>
+                                  <div>
+                                    <span className="text-xs font-bold text-foreground block">
+                                      {rev.reviewee?.name || 'User'}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground block">
+                                      {new Date(rev.createdAt).toLocaleString()}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-1.5">
+                                  {rev.shipment?.itemName && (
+                                    <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5">
+                                      Shipment: {rev.shipment.itemName}
+                                    </Badge>
+                                  )}
+                                  <div className="flex gap-0.5">
+                                    {Array.from({ length: 5 }).map((_, idx) => (
+                                      <Star
+                                        key={idx}
+                                        className={`h-3.5 w-3.5 ${
+                                          idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {rev.comment && (
+                                <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
+                                  "{rev.comment}"
+                                </p>
+                              )}
+                            </div>
+                          ))}
+
+                          {/* Pagination Controls */}
+                          {meta && meta.totalPages > 1 && (
+                            <div className="flex items-center justify-between pt-2 text-xs">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={givenPage <= 1}
+                                onClick={() => setGivenPage((p) => Math.max(1, p - 1))}
+                              >
+                                Previous
+                              </Button>
+                              <span className="text-muted-foreground">
+                                Page {meta.page} of {meta.totalPages}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={givenPage >= meta.totalPages}
+                                onClick={() => setGivenPage((p) => p + 1)}
+                              >
+                                Next
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()
                   )}
                 </div>
               </div>

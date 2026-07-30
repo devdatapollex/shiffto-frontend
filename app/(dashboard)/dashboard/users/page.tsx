@@ -334,9 +334,6 @@ export default function AdminUsersPage() {
                             <Link href={`/dashboard/users/${user.id}`} className="truncate">
                               {user.name}
                             </Link>
-                            {user.trustScore >= 90 && (
-                              <CheckCircle2 className="h-4 w-4 text-emerald-500 fill-emerald-50 shrink-0" />
-                            )}
                           </CardTitle>
                           <CardDescription className="text-xs text-muted-foreground truncate mt-0.5">
                             {user.email}
@@ -391,9 +388,9 @@ export default function AdminUsersPage() {
                         {/* Meta Details */}
                         <div className="grid grid-cols-2 gap-y-2 text-xs text-muted-foreground pt-1">
                           <div className="flex items-center gap-1.5">
-                            <Award className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                            <Calendar className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
                             <span>
-                              Trust Score: <strong className="text-foreground">{user.trustScore}</strong>
+                              Joined: <strong className="text-foreground">{new Date(user.createdAt).toLocaleDateString()}</strong>
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5 justify-end">
