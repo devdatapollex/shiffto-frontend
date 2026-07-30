@@ -28,25 +28,25 @@ export function ReviewDisplayCard({ review, type, className = '' }: ReviewDispla
 
   return (
     <Card
-      className={`border-slate-200 shadow-sm bg-white hover:border-slate-300 transition-all flex flex-col justify-between p-0 overflow-hidden ${className}`}
+      className={`border-slate-200 shadow-sm bg-white hover:border-slate-300 transition-all flex flex-col gap-0 justify-between p-0 py-0 overflow-hidden ${className}`}
     >
-      <CardHeader className="bg-slate-50/60 border-b border-slate-100 p-4 block [.border-b]:pb-4">
+      <CardHeader className="bg-slate-50/60 border-b border-slate-100 px-4 py-3 block [.border-b]:pb-3">
         <div className="flex items-center justify-between gap-2">
           {/* User info */}
           <div className="flex items-center gap-2.5 min-w-0">
             {targetUser?.image ? (
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 shrink-0">
+              <div className="w-7 h-7 rounded-full overflow-hidden border border-slate-200 shrink-0">
                 <Image
                   src={toRelativeImageUrl(targetUser.image)}
                   alt={targetUser.name || 'User'}
-                  width={32}
-                  height={32}
+                  width={28}
+                  height={28}
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                <User className="h-4 w-4" />
+              <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+                <User className="h-3.5 w-3.5" />
               </div>
             )}
             <div className="min-w-0">
@@ -67,7 +67,7 @@ export function ReviewDisplayCard({ review, type, className = '' }: ReviewDispla
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+      <CardContent className="p-3.5 space-y-2.5 flex-1 flex flex-col justify-between">
         {/* Star rating & shipment item */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">

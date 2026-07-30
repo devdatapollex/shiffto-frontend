@@ -20,7 +20,7 @@ export function RatingsReviewsHeader({
   const receivedCount = stats?.receivedCount ?? 0;
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-xl p-5 md:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       {/* Left: Title & Subtitle */}
       <div>
         <div className="flex items-center gap-3">
@@ -42,19 +42,19 @@ export function RatingsReviewsHeader({
         </p>
       </div>
 
-      {/* Right: Beautifully Styled Average Rating Badge */}
-      <div className="flex items-center gap-3.5 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-transparent border border-amber-200/80 p-3.5 px-4.5 rounded-xl shrink-0">
-        <div className="w-11 h-11 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
-          <Star className="w-6 h-6 fill-white text-white" />
+      {/* Right: Compact Average Rating Badge (Tight Padding, Original Text Sizes) */}
+      <div className="flex items-center gap-2.5 bg-white border border-slate-200/80 py-1.5 px-3 rounded-lg shadow-sm shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow-sm shrink-0">
+          <Star className="w-5 h-5 fill-white text-white" />
         </div>
         <div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            <span className="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">
               {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
             </span>
             <span className="text-xs font-bold text-amber-600">out of 5.0</span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500">
+          <p className="text-[11px] font-medium text-slate-500 mt-0.5 leading-none">
             {receivedCount > 0
               ? `Based on ${receivedCount} verified ${receivedCount === 1 ? 'rating' : 'ratings'}`
               : 'Average Rating'}

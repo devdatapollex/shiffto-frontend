@@ -115,7 +115,8 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
               <Clock className="h-8 w-8 text-slate-300 mb-2" />
               <h4 className="text-sm font-bold text-slate-700">No Reviews Submitted Yet</h4>
               <p className="text-xs text-slate-400 mt-1 max-w-sm">
-                Neither the sender ({senderName}) nor the traveler ({travelerName}) has left a review for this shipment.
+                Neither the sender ({senderName}) nor the traveler ({travelerName}) has left a
+                review for this shipment.
               </p>
             </div>
           ) : (
@@ -139,10 +140,14 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
                         <User className="h-4 w-4 text-slate-400" />
                       )}
                       <span className="text-xs font-bold text-slate-700">
-                        {senderName}&apos;s Review <span className="font-normal text-slate-500">(Sender)</span>
+                        {senderName}&apos;s Review{' '}
+                        <span className="font-normal text-slate-500">(Sender)</span>
                       </span>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-800">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] bg-emerald-100 text-emerald-800"
+                    >
                       Verified Review
                     </Badge>
                   </div>
@@ -195,10 +200,14 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
                         <User className="h-4 w-4 text-slate-400" />
                       )}
                       <span className="text-xs font-bold text-slate-700">
-                        {travelerName}&apos;s Review <span className="font-normal text-slate-500">(Traveler)</span>
+                        {travelerName}&apos;s Review{' '}
+                        <span className="font-normal text-slate-500">(Traveler)</span>
                       </span>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-800">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] bg-emerald-100 text-emerald-800"
+                    >
                       Verified Review
                     </Badge>
                   </div>
@@ -273,14 +282,17 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
             </div>
 
             {/* Comment area */}
-            <div>
+            <div className="space-y-1">
               <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={`Write a review about ${counterpartyName}... (optional)`}
-                rows={3}
-                className="text-xs md:text-sm border-slate-200 focus-visible:ring-[#0D307A]"
+                maxLength={300}
+                className="text-xs md:text-sm border-slate-200 focus-visible:ring-[#0D307A] resize-none bg-slate-50/30 h-20 max-h-20 overflow-y-auto scrollbar-thin"
               />
+              <div className="flex justify-end">
+                <span className="text-[10px] text-slate-400 font-mono">{comment.length}/300</span>
+              </div>
             </div>
 
             <Button

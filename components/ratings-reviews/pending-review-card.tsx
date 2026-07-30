@@ -43,18 +43,18 @@ export function PendingReviewCard({ item, className = '' }: PendingReviewCardPro
 
   return (
     <Card
-      className={`border-slate-200 shadow-sm bg-white hover:border-slate-300 transition-all flex flex-col justify-between p-0 overflow-hidden ${className}`}
+      className={`border-slate-200 shadow-sm bg-white hover:border-slate-300 transition-all flex flex-col gap-0 justify-between p-0 py-0 overflow-hidden ${className}`}
     >
       {/* Header */}
-      <CardHeader className="bg-slate-50/70 border-b border-slate-100 p-4 block [.border-b]:pb-4">
+      <CardHeader className="bg-slate-50/70 border-b border-slate-100 px-4 py-3 block [.border-b]:pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0 text-amber-600">
-              <Package className="h-4 w-4" />
+            <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0 text-amber-600">
+              <Package className="h-3.5 w-3.5" />
             </div>
             <div className="min-w-0">
               <CardTitle
-                className="text-sm font-bold text-slate-800 truncate"
+                className="text-xs font-bold text-slate-800 truncate"
                 title={item.itemName}
               >
                 {item.itemName}
@@ -77,7 +77,7 @@ export function PendingReviewCard({ item, className = '' }: PendingReviewCardPro
       </CardHeader>
 
       {/* Body / Form */}
-      <CardContent className="p-4 space-y-3.5 flex-1 flex flex-col justify-between">
+      <CardContent className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
         {/* Counterparty Info */}
         <div className="flex items-center justify-between bg-slate-50/50 p-2.5 rounded-lg border border-slate-100">
           <div className="flex items-center gap-2 min-w-0">
@@ -140,14 +140,19 @@ export function PendingReviewCard({ item, className = '' }: PendingReviewCardPro
             </span>
           </div>
 
-          {/* Comment */}
-          <Textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder={`Share feedback for ${item.counterparty.name}... (optional)`}
-            rows={2}
-            className="text-xs border-slate-200 focus-visible:ring-[#0D307A] resize-none bg-slate-50/30"
-          />
+          {/* Comment with Fixed Height & Character Counter */}
+          <div className="space-y-1">
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={`Share feedback for ${item.counterparty.name}... (optional)`}
+              maxLength={300}
+              className="text-xs border-slate-200 focus-visible:ring-[#0D307A] resize-none bg-slate-50/30 h-16 max-h-16 overflow-y-auto scrollbar-thin"
+            />
+            <div className="flex justify-end">
+              <span className="text-[10px] text-slate-400 font-mono">{comment.length}/300</span>
+            </div>
+          </div>
 
           {/* Submit button */}
           <Button
