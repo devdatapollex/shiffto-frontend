@@ -2,6 +2,7 @@
 
 import { Star, Award, MessageSquare, Clock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { usePendingReviewsCount, useUserReviewStats } from '@/hooks/use-ratings-reviews';
 
 interface RatingsReviewsHeaderProps {
@@ -23,7 +24,8 @@ export function RatingsReviewsHeader({
   const givenCount = stats?.givenCount ?? 0;
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-xl p-5 md:p-6 shadow-sm space-y-4">
+    <div className="space-y-6">
+      {/* Title & Description Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
@@ -38,52 +40,81 @@ export function RatingsReviewsHeader({
                 Back
               </Button>
             )}
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-              Ratings & Reviews
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Ratings & Reviews</h1>
           </div>
-          <p className="text-xs md:text-sm text-slate-500 mt-1">
-            Manage pending feedback requests, inspect reviews given, and monitor your received
-            ratings.
+          <p className="text-sm text-slate-500 mt-1">
+            Track your feedback, post reviews for completed shipments, and monitor ratings
           </p>
         </div>
+      </div>
 
-        {/* Summary Metric Pills */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {/* Average Rating Pill */}
-          <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/80 px-3 py-1.5 rounded-lg text-amber-900">
-            <Star className="h-4 w-4 text-amber-500 fill-amber-400" />
-            <span className="text-xs font-bold">
-              {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
-            </span>
-            <span className="text-[10px] text-amber-700 font-medium hidden xs:inline">
-              Avg Rating
-            </span>
-          </div>
+      {/* Top Summary Stat Cards (matching Payments & Earnings page layout) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Average Rating */}
+        <Card className="border-slate-200 shadow-sm bg-white">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Average Rating
+              </p>
+              <p className="text-3xl font-extrabold text-slate-900">
+                {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
+              </p>
+              <p className="text-xs text-slate-400">Based on verified reviews</p>
+            </div>
+            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xl">
+              <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Pending Reviews Badge Pill */}
-          <div className="flex items-center gap-1.5 bg-amber-100/60 border border-amber-300 px-3 py-1.5 rounded-lg text-amber-900">
-            <Clock className="h-4 w-4 text-amber-600" />
-            <span className="text-xs font-bold">{pendingCount}</span>
-            <span className="text-[10px] text-amber-800 font-medium hidden xs:inline">Pending</span>
-          </div>
+        {/* Pending Reviews */}
+        <Card className="border-slate-200 shadow-sm bg-white">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Pending Reviews
+              </p>
+              <p className="text-3xl font-extrabold text-amber-600">{pendingCount}</p>
+              <p className="text-xs text-slate-400">Completed shipments awaiting review</p>
+            </div>
+            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Clock className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Received Pill */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700">
-            <Award className="h-4 w-4 text-slate-500" />
-            <span className="text-xs font-bold">{receivedCount}</span>
-            <span className="text-[10px] text-slate-500 font-medium hidden xs:inline">
-              Received
-            </span>
-          </div>
+        {/* Ratings Received */}
+        <Card className="border-slate-200 shadow-sm bg-white">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Ratings Received
+              </p>
+              <p className="text-3xl font-extrabold text-emerald-600">{receivedCount}</p>
+              <p className="text-xs text-slate-400">Feedback received from counterparties</p>
+            </div>
+            <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Award className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Given Pill */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700">
-            <MessageSquare className="h-4 w-4 text-slate-500" />
-            <span className="text-xs font-bold">{givenCount}</span>
-            <span className="text-[10px] text-slate-500 font-medium hidden xs:inline">Given</span>
-          </div>
-        </div>
+        {/* Ratings Given */}
+        <Card className="border-slate-200 shadow-sm bg-white">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Ratings Given
+              </p>
+              <p className="text-3xl font-extrabold text-blue-600">{givenCount}</p>
+              <p className="text-xs text-slate-400">Reviews submitted for others</p>
+            </div>
+            <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
