@@ -48,12 +48,23 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
     return null;
   }
 
+  const senderId = shipment.userId || shipment.user?.id;
+  const travelerId = shipment.trip?.user?.id;
+
+  const senderName = shipment.user?.name || 'Sender';
+  const travelerName = shipment.trip?.user?.name || 'Traveler';
+
+  const senderReview = reviews.find(
+    (r) => (senderId && r.reviewerId === senderId) || r.revieweeId === travelerId
+  );
+  const travelerReview = reviews.find(
+    (r) => (travelerId && r.reviewerId === travelerId) || r.revieweeId === senderId
+  );
+
   const userReview = reviews.find((r) => r.reviewerId === currentUser?.id);
   const partnerReview = reviews.find((r) => r.reviewerId !== currentUser?.id);
 
-  const counterpartyName = isSender
-    ? shipment.trip?.user?.name || 'Traveler'
-    : shipment.user?.name || 'Sender';
+  const counterpartyName = isSender ? travelerName : senderName;
   const counterpartyRole = isSender ? 'Traveler' : 'Sender';
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -79,7 +90,9 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
                 Shipment Rating & Feedback
               </CardTitle>
               <CardDescription className="text-xs text-slate-500">
-                Review your completed shipment experience with {counterpartyName}
+                {isAdmin
+                  ? 'Overview of ratings & feedback for this completed shipment'
+                  : `Review your completed shipment experience with ${counterpartyName}`}
               </CardDescription>
             </div>
           </div>
@@ -95,6 +108,131 @@ export function ShipmentReviewCard({ shipment, currentUser, isAdmin }: ShipmentR
       <CardContent className="p-6">
         {isLoading ? (
           <div className="h-24 w-full bg-slate-50 animate-pulse rounded-lg" />
+        ) : isAdmin ? (
+          /* Admin View: Shows both Sender's and Traveler's reviews */
+          !senderReview && !travelerReview ? (
+            <div className="p-6 rounded-lg bg-slate-50/50 border border-dashed border-slate-200 text-center flex flex-col items-center justify-center py-8">
+              <Clock className="h-8 w-8 text-slate-300 mb-2" />
+              <h4 className="text-sm font-bold text-slate-700">No Reviews Submitted Yet</h4>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm">
+                Neither the sender ({senderName}) nor the traveler ({travelerName}) has left a review for this shipment.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Sender's Review */}
+              {senderReview ? (
+                <div className="p-4 rounded-lg bg-slate-50/70 border border-slate-200/60 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {senderReview.reviewer?.image ? (
+                        <div className="w-5 h-5 rounded-full overflow-hidden border border-slate-200">
+                          <Image
+                            src={toRelativeImageUrl(senderReview.reviewer.image)}
+                            alt={senderReview.reviewer.name || senderName}
+                            width={20}
+                            height={20}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <User className="h-4 w-4 text-slate-400" />
+                      )}
+                      <span className="text-xs font-bold text-slate-700">
+                        {senderName}&apos;s Review <span className="font-normal text-slate-500">(Sender)</span>
+                      </span>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-800">
+                      Verified Review
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-4 w-4 ${
+                          senderReview.rating >= star
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-slate-200'
+                        }`}
+                      />
+                    ))}
+                    <span className="text-xs font-bold text-slate-700 ml-1.5">
+                      {senderReview.rating}.0
+                    </span>
+                  </div>
+                  {senderReview.comment && (
+                    <p className="text-xs text-slate-600 italic leading-relaxed">
+                      &quot;{senderReview.comment}&quot;
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-slate-50/50 border border-dashed border-slate-200 flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-slate-400 shrink-0" />
+                  <p className="text-xs text-slate-500">
+                    Awaiting review from Sender ({senderName}).
+                  </p>
+                </div>
+              )}
+
+              {/* Traveler's Review */}
+              {travelerReview ? (
+                <div className="p-4 rounded-lg bg-slate-50/70 border border-slate-200/60 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {travelerReview.reviewer?.image ? (
+                        <div className="w-5 h-5 rounded-full overflow-hidden border border-slate-200">
+                          <Image
+                            src={toRelativeImageUrl(travelerReview.reviewer.image)}
+                            alt={travelerReview.reviewer.name || travelerName}
+                            width={20}
+                            height={20}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <User className="h-4 w-4 text-slate-400" />
+                      )}
+                      <span className="text-xs font-bold text-slate-700">
+                        {travelerName}&apos;s Review <span className="font-normal text-slate-500">(Traveler)</span>
+                      </span>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-800">
+                      Verified Review
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-4 w-4 ${
+                          travelerReview.rating >= star
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-slate-200'
+                        }`}
+                      />
+                    ))}
+                    <span className="text-xs font-bold text-slate-700 ml-1.5">
+                      {travelerReview.rating}.0
+                    </span>
+                  </div>
+                  {travelerReview.comment && (
+                    <p className="text-xs text-slate-600 italic leading-relaxed">
+                      &quot;{travelerReview.comment}&quot;
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-slate-50/50 border border-dashed border-slate-200 flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-slate-400 shrink-0" />
+                  <p className="text-xs text-slate-500">
+                    Awaiting review from Traveler ({travelerName}).
+                  </p>
+                </div>
+              )}
+            </div>
+          )
         ) : !userReview && isParticipant ? (
           /* Form to submit review */
           <form onSubmit={handleSubmit} className="space-y-4">
