@@ -1,9 +1,8 @@
 'use client';
 
-import { Star, Award, MessageSquare, Clock, ArrowLeft } from 'lucide-react';
+import { Star, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { usePendingReviewsCount, useUserReviewStats } from '@/hooks/use-ratings-reviews';
+import { useUserReviewStats } from '@/hooks/use-ratings-reviews';
 
 interface RatingsReviewsHeaderProps {
   userId: string;
@@ -17,104 +16,50 @@ export function RatingsReviewsHeader({
   onBackToOverview,
 }: RatingsReviewsHeaderProps) {
   const { data: stats } = useUserReviewStats(userId);
-  const { data: pendingCount = 0 } = usePendingReviewsCount();
-
   const averageRating = stats?.averageRating ?? 0;
   const receivedCount = stats?.receivedCount ?? 0;
-  const givenCount = stats?.givenCount ?? 0;
 
   return (
-    <div className="space-y-6">
-      {/* Title & Description Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            {viewMode === 'all' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onBackToOverview}
-                className="h-8 px-2.5 text-xs text-slate-600 border-slate-200 hover:bg-slate-50 cursor-pointer"
-              >
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                Back
-              </Button>
-            )}
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Ratings & Reviews</h1>
-          </div>
-          <p className="text-sm text-slate-500 mt-1">
-            Track your feedback, post reviews for completed shipments, and monitor ratings
-          </p>
+    <div className="bg-white border border-slate-200/80 rounded-xl p-5 md:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Left: Title & Subtitle */}
+      <div>
+        <div className="flex items-center gap-3">
+          {viewMode === 'all' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onBackToOverview}
+              className="h-8 px-2.5 text-xs text-slate-600 border-slate-200 hover:bg-slate-50 cursor-pointer"
+            >
+              <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+              Back
+            </Button>
+          )}
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Ratings & Reviews</h1>
         </div>
+        <p className="text-sm text-slate-500 mt-1">
+          Track your feedback, post reviews for completed shipments, and monitor ratings
+        </p>
       </div>
 
-      {/* Top Summary Stat Cards (matching Payments & Earnings page layout) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Average Rating */}
-        <Card className="border-slate-200 shadow-sm bg-white">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Average Rating
-              </p>
-              <p className="text-3xl font-extrabold text-slate-900">
-                {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
-              </p>
-              <p className="text-xs text-slate-400">Based on verified reviews</p>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xl">
-              <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Pending Reviews */}
-        <Card className="border-slate-200 shadow-sm bg-white">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Pending Reviews
-              </p>
-              <p className="text-3xl font-extrabold text-amber-600">{pendingCount}</p>
-              <p className="text-xs text-slate-400">Completed shipments awaiting review</p>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Clock className="w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Ratings Received */}
-        <Card className="border-slate-200 shadow-sm bg-white">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Ratings Received
-              </p>
-              <p className="text-3xl font-extrabold text-emerald-600">{receivedCount}</p>
-              <p className="text-xs text-slate-400">Feedback received from counterparties</p>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Award className="w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Ratings Given */}
-        <Card className="border-slate-200 shadow-sm bg-white">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Ratings Given
-              </p>
-              <p className="text-3xl font-extrabold text-blue-600">{givenCount}</p>
-              <p className="text-xs text-slate-400">Reviews submitted for others</p>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <MessageSquare className="w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Right: Beautifully Styled Average Rating Badge */}
+      <div className="flex items-center gap-3.5 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-transparent border border-amber-200/80 p-3.5 px-4.5 rounded-xl shrink-0">
+        <div className="w-11 h-11 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
+          <Star className="w-6 h-6 fill-white text-white" />
+        </div>
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
+            </span>
+            <span className="text-xs font-bold text-amber-600">out of 5.0</span>
+          </div>
+          <p className="text-[11px] font-medium text-slate-500">
+            {receivedCount > 0
+              ? `Based on ${receivedCount} verified ${receivedCount === 1 ? 'rating' : 'ratings'}`
+              : 'Average Rating'}
+          </p>
+        </div>
       </div>
     </div>
   );
