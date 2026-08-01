@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { ROUTES } from '@/config/routes';
-import { Users, Truck, CheckCircle2, Lock } from 'lucide-react';
 import { Button } from '../ui/button';
 import userGroup from '@/public/user-group.png';
 import truck from '@/public/truck.png';

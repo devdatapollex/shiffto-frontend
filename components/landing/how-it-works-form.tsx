@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 type QuickTab = 'shipment' | 'trip';
 
@@ -74,14 +75,14 @@ export function HowItWorksForm() {
   };
 
   return (
-    <div className="border rounded-xl p-6 flex flex-col gap-6 w-full">
+    <div className="bg-white border border-input rounded-2xl p-6 flex flex-col gap-5 w-full drop-shadow-md">
       {/* Form Tabs Header */}
-      <div className="flex border-b pb-4 gap-6">
+      <div className="flex pb-4 gap-3">
         <button
           type="button"
           onClick={() => setActiveTab('shipment')}
-          className={`flex items-center gap-2 font-medium pb-2 border-b-2 cursor-pointer ${
-            activeTab === 'shipment' ? 'border-primary' : 'border-transparent text-muted-foreground'
+          className={`flex w-71.5 justify-center items-center gap-2 font-medium pb-2 border-b-2 cursor-pointer ${
+            activeTab === 'shipment' ? 'border-foreground' : 'border-transparent text-foreground'
           }`}
         >
           <Package className="h-4 w-4" />
@@ -91,8 +92,8 @@ export function HowItWorksForm() {
         <button
           type="button"
           onClick={() => setActiveTab('trip')}
-          className={`flex items-center gap-2 font-medium pb-2 border-b-2 cursor-pointer ${
-            activeTab === 'trip' ? 'border-primary' : 'border-transparent text-muted-foreground'
+          className={`flex w-71.5 justify-center items-center gap-2 font-medium px-3 py-2 border-b-2 cursor-pointer ${
+            activeTab === 'trip' ? 'border-foreground' : 'border-transparent text-foreground'
           }`}
         >
           <PlaneTakeoff className="h-4 w-4" />
@@ -127,9 +128,9 @@ export function HowItWorksForm() {
                 type="button"
                 onClick={handleSwapShipmentCountries}
                 title="Swap countries"
-                className="p-2 border rounded-full cursor-pointer hover:bg-slate-100 transition-colors"
+                className="p-2 border rounded-full cursor-pointer bg-[#FFF0E7] hover:bg-slate-100 transition-colors"
               >
-                <ArrowLeftRight className="h-4 w-4" />
+                <ArrowLeftRight className="h-4 w-4 text-primary" />
               </button>
             </div>
 
@@ -166,13 +167,13 @@ export function HowItWorksForm() {
             </Select>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full py-3 font-semibold rounded-md border mt-2 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full px-5 py-3 text-sm font-medium rounded-md border mt-2 flex items-center justify-center gap-2 bg-foreground"
           >
             <span>Continue</span>
             <ChevronRight className="h-4 w-4" />
-          </button>
+          </Button>
         </form>
       ) : (
         /* Tab 2: Trip Form */
