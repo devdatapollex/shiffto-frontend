@@ -6,6 +6,7 @@ import { ROUTES } from '@/config/routes';
 import { useSession } from '@/lib/auth-client';
 import logo from '@/public/shiffto-icon.png';
 import name from '@/public/shiffto-name.png';
+import logoWithName from '@/public/logo-with-name.png';
 
 export function LandingHeader() {
   const { data: session } = useSession();
@@ -13,11 +14,10 @@ export function LandingHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Left: Logo Icon and Logo Name Image */}
-        <Link href={ROUTES.HOME} className="flex items-center gap-3">
-          <Image src={logo} alt="SHIFFTO Icon" width={36} height={36} className="h-9 w-auto" />
-          <Image src={name} alt="SHIFFTO" width={100} height={20} className="h-5 w-auto" />
+        <Link href={ROUTES.HOME} className="flex items-center">
+          <Image src={logoWithName} alt="SHIFFTO Icon" height={40} className="h-10" />
         </Link>
 
         {/* Right Aligned: Navigation Links & Login Button */}

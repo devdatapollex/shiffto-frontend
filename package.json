@@ -33,6 +33,7 @@
     "country-flag-icons": "^1.6.20",
     "country-list-with-dial-code-and-flag": "^5.1.1",
     "date-fns": "^4.4.0",
+    "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.563.0",
     "motion": "^12.30.0",
