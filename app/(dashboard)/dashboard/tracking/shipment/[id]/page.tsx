@@ -12,7 +12,7 @@ import { CountryFlag } from '@/components/shipments/create/country-flag';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
-import { ChevronLeft, Package, User, Plane, Eye, MessageSquare } from 'lucide-react';
+import { ChevronLeft, Package, User, Plane, Eye, MessageSquare, RotateCcw, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -139,6 +139,46 @@ export default function ShipmentDetailsPage() {
 
       {/* Shipment Review Card for DELIVERED status */}
       <ShipmentReviewCard shipment={shipment} currentUser={user} isAdmin={isAdmin} />
+
+      {/* Canceled Shipment Refund Status Card */}
+      {shipment.status === 'CANCELED' && (
+        <div className="bg-rose-50/80 border border-rose-200/80 rounded-xl p-5 shadow-xs space-y-3">
+          <div className="flex items-center gap-2 font-bold text-rose-900 text-sm">
+            <RotateCcw className="h-5 w-5 text-rose-600" />
+            <span>Shipment Canceled</span>
+          </div>
+          {shipment.paymentTransaction?.status === 'PENDING_REFUND' && (
+            <div className="bg-white/90 border border-rose-200 p-3.5 rounded-lg text-xs space-y-1">
+              <div className="flex items-center justify-between font-bold text-rose-900">
+                <span>Refund Status:</span>
+                <span className="text-rose-700 font-extrabold uppercase tracking-wide">Refund Pending</span>
+              </div>
+              <p className="text-slate-600 mt-1">
+                Your payment of <span className="font-semibold text-slate-900">${(shipment.paymentTransaction.grossAmount || 0).toFixed(2)}</span> has been queued for a manual refund payout. An admin will process your payout off-platform (bKash, Bank, Nagad, etc.) shortly.
+              </p>
+            </div>
+          )}
+          {shipment.paymentTransaction?.status === 'REFUNDED' && (
+            <div className="bg-white/90 border border-purple-200 p-3.5 rounded-lg text-xs space-y-1">
+              <div className="flex items-center justify-between font-bold text-purple-900">
+                <span>Refund Status:</span>
+                <span className="text-purple-700 font-extrabold uppercase tracking-wide">Refund Processed</span>
+              </div>
+              <p className="text-slate-600 mt-1">
+                Your refund of <span className="font-semibold text-slate-900">${(shipment.paymentTransaction.grossAmount || 0).toFixed(2)}</span> has been successfully processed by the admin.
+              </p>
+              {shipment.paymentTransaction.refundTxnId && (
+                <div className="flex items-center gap-1.5 text-[11px] font-mono text-purple-800 pt-1 border-t border-purple-100 mt-2">
+                  <span>Reference Transaction ID:</span>
+                  <span className="font-bold bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                    {shipment.paymentTransaction.refundTxnId}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Progress Timeline Tracker Card */}
       <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 overflow-hidden">

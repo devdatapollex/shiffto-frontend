@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Clock,
@@ -18,9 +18,12 @@ import {
   Package,
   ChevronsLeft,
   ChevronsRight,
+  RotateCcw,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getShipments, type Shipment } from '@/services/shipment.service';
+import { getShipments, cancelShipment, type Shipment } from '@/services/shipment.service';
 import { useRole } from '@/hooks/use-role';
 import {
   useReceivedOffers,
@@ -28,6 +31,14 @@ import {
   useRejectOffer,
   useCancelCheckout,
 } from '@/hooks/use-offers';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { OffersReceivedSection } from '@/components/shipments/offers-received-section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -172,6 +183,23 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 export default function MyShipmentsPage() {
   const router = useRouter();
   const { isAdmin } = useRole();
+  const queryClient = useQueryClient();
+
+  const [shipmentToCancel, setShipmentToCancel] = useState<Shipment | null>(null);
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => cancelShipment(id),
+    onSuccess: () => {
+      toast.success('Shipment canceled successfully');
+      queryClient.invalidateQueries({ queryKey: ['shipments'] });
+      setShipmentToCancel(null);
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message || 'Failed to cancel shipment';
+      toast.error(message);
+    },
+  });
 
   // --- Backend-driven state ---
   const [filters, dispatch] = useReducer(filtersReducer, {
@@ -407,11 +435,29 @@ export default function MyShipmentsPage() {
                         </div>
                       </td>
                       <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}
-                        >
-                          {displayStatus}
-                        </span>
+                        <div className="flex flex-col items-start gap-1">
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}
+                          >
+                            {displayStatus}
+                          </span>
+                          {item.status === 'CANCELED' && item.paymentTransaction && (
+                            <>
+                              {item.paymentTransaction.status === 'PENDING_REFUND' && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                                  <RotateCcw className="h-3 w-3 animate-spin text-rose-600" />
+                                  Refund Pending
+                                </span>
+                              )}
+                              {item.paymentTransaction.status === 'REFUNDED' && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full">
+                                  <CheckCircle2 className="h-3 w-3 text-purple-600" />
+                                  Refunded {item.paymentTransaction.refundTxnId ? `(#${item.paymentTransaction.refundTxnId})` : ''}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4">
                         <span className="text-muted-foreground font-light">{route}</span>
@@ -444,8 +490,14 @@ export default function MyShipmentsPage() {
                               >
                                 View details
                               </DropdownMenuItem>
-                              {item.status === 'AWAITING_MATCH' && (
-                                <DropdownMenuItem className="text-destructive">
+                              {(item.status === 'AWAITING_MATCH' || item.status === 'ACTIVE') && (
+                                <DropdownMenuItem
+                                  className="text-destructive font-medium focus:bg-primary focus:text-white cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShipmentToCancel(item);
+                                  }}
+                                >
                                   Cancel shipment
                                 </DropdownMenuItem>
                               )}
@@ -582,6 +634,39 @@ export default function MyShipmentsPage() {
           </div>
         )}
       </div>
+
+      {/* Cancel Shipment Confirmation Dialog */}
+      <Dialog open={!!shipmentToCancel} onOpenChange={(open) => !open && setShipmentToCancel(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-destructive font-semibold text-lg">Cancel Shipment</DialogTitle>
+            <DialogDescription className="text-sm text-slate-600 mt-1">
+              Are you sure you want to cancel &quot;<span className="font-semibold text-slate-900">{shipmentToCancel?.itemName}</span>&quot;?
+              {shipmentToCancel?.status === 'ACTIVE' && (
+                <span className="block mt-2 font-medium text-slate-700 bg-amber-50 p-2.5 rounded-md border border-amber-200/60 text-xs">
+                  Since this shipment is active, any payment held in escrow will automatically be queued for a refund payout by the admin.
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3 sm:gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShipmentToCancel(null)}
+              disabled={cancelMutation.isPending}
+            >
+              Keep Shipment
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => shipmentToCancel && cancelMutation.mutate(shipmentToCancel.id)}
+              disabled={cancelMutation.isPending}
+            >
+              {cancelMutation.isPending ? 'Canceling...' : 'Confirm Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

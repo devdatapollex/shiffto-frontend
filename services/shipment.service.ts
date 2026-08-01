@@ -69,6 +69,9 @@ export interface PaymentTransactionDetails {
   gatewayTxnId?: string | null;
   proofPhotoUrl?: string | null;
   releasedAt?: string | null;
+  refundTxnId?: string | null;
+  refundReason?: string | null;
+  refundMethodDetails?: Record<string, any> | null;
   createdAt: string;
 }
 
@@ -233,4 +236,8 @@ export async function confirmDelivery(
     payload
   );
   return data.data;
+}
+
+export async function cancelShipment(shipmentId: string): Promise<void> {
+  await apiClient.post(`/shipments/${shipmentId}/cancel`);
 }

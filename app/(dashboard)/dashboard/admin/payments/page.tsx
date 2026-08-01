@@ -21,6 +21,8 @@ import {
   MoreHorizontal,
   ChevronsLeft,
   ChevronsRight,
+  RotateCcw,
+  CreditCard,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -35,6 +37,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -61,15 +64,18 @@ import {
 import { RoleGuard } from '@/components/auth/role-guard';
 import {
   getAdminPayments,
+  processAdminRefund,
   type AdminPaymentTransaction,
   type AdminPaymentsResponse,
 } from '@/services/payment.service';
 import { toRelativeImageUrl } from '@/lib/image-utils';
+import { useAdminSidebarCounts } from '@/hooks/use-admin-counts';
 
 const STATUS_TABS = [
   { label: 'All', value: 'ALL' },
   { label: 'Escrowed', value: 'ESCROWED' },
   { label: 'Pending Release', value: 'PENDING_RELEASE' },
+  { label: 'Pending Refund', value: 'PENDING_REFUND' },
   { label: 'Released', value: 'RELEASED' },
   { label: 'Refunded', value: 'REFUNDED' },
   { label: 'Failed', value: 'FAILED' },
@@ -79,6 +85,7 @@ const STATUS_TABS = [
 const STATUS_DISPLAY_MAP: Record<string, string> = {
   ESCROWED: 'Escrowed',
   PENDING_RELEASE: 'Pending Release',
+  PENDING_REFUND: 'Pending Refund',
   RELEASED: 'Released',
   REFUNDED: 'Refunded',
   FAILED: 'Failed',
@@ -88,9 +95,10 @@ const STATUS_DISPLAY_MAP: Record<string, string> = {
 const STATUS_BADGE_CLASS: Record<string, string> = {
   ESCROWED: 'bg-amber-50 text-amber-700 border-amber-200',
   PENDING_RELEASE: 'bg-blue-50 text-blue-700 border-blue-200',
+  PENDING_REFUND: 'bg-rose-50 text-rose-700 border-rose-200 font-semibold animate-pulse',
   RELEASED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   REFUNDED: 'bg-purple-50 text-purple-700 border-purple-200',
-  FAILED: 'bg-rose-50 text-rose-700 border-rose-200',
+  FAILED: 'bg-slate-100 text-slate-600 border-slate-200',
   PENDING_PAYMENT: 'bg-slate-50 text-slate-600 border-slate-200',
 };
 
@@ -111,6 +119,9 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 }
 
 export default function AdminPaymentsPage() {
+  const { data: adminCounts } = useAdminSidebarCounts();
+  const pendingRefundsCount = adminCounts?.pendingRefundsCount ?? 0;
+
   const [data, setData] = useState<AdminPaymentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -126,6 +137,36 @@ export default function AdminPaymentsPage() {
   // Selected Transaction for Drawer/Modal
   const [selectedTx, setSelectedTx] = useState<AdminPaymentTransaction | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Refund Modal State
+  const [processingRefundTx, setProcessingRefundTx] = useState<AdminPaymentTransaction | null>(null);
+  const [refundTxnIdInput, setRefundTxnIdInput] = useState('');
+  const [adminNotesInput, setAdminNotesInput] = useState('');
+  const [isSubmittingRefund, setIsSubmittingRefund] = useState(false);
+
+  const handleProcessRefundSubmit = async () => {
+    if (!processingRefundTx || !refundTxnIdInput.trim()) {
+      toast.error('Refund Transaction Reference ID is required');
+      return;
+    }
+    setIsSubmittingRefund(true);
+    try {
+      await processAdminRefund(processingRefundTx.transactionId, {
+        refundTxnId: refundTxnIdInput.trim(),
+        adminNotes: adminNotesInput.trim() || undefined,
+      });
+      toast.success('Refund processed and marked as REFUNDED');
+      setProcessingRefundTx(null);
+      setRefundTxnIdInput('');
+      setAdminNotesInput('');
+      setSelectedTx(null);
+      fetchPayments();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to process refund');
+    } finally {
+      setIsSubmittingRefund(false);
+    }
+  };
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
@@ -206,19 +247,19 @@ export default function AdminPaymentsPage() {
           </p>
         </div>
 
-        {/* Top 5 KPI Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Top 6 KPI Summary Cards (2 Rows of 3 Cards) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Card 1: Platform Revenue (Main) & Gross Volume (Subtext) */}
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
+          <Card className="py-0 border border-border/60 shadow-xs bg-card">
+            <CardContent className="py-4 px-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
                   Platform Revenue
                 </p>
                 {loading ? (
-                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                  <div className="h-8 w-32 bg-slate-200/80 rounded-md animate-pulse mt-1" />
                 ) : (
-                  <h3 className="text-xl font-bold text-purple-600 mt-1">
+                  <h3 className="text-2xl font-black text-purple-600 tracking-tight mt-1">
                     $
                     {(
                       data?.stats.totalPlatformRevenue ??
@@ -231,9 +272,9 @@ export default function AdminPaymentsPage() {
                   </h3>
                 )}
                 {loading ? (
-                  <div className="h-3 w-28 bg-slate-200/60 rounded-md animate-pulse mt-1.5" />
+                  <div className="h-4 w-36 bg-slate-200/60 rounded-md animate-pulse mt-1.5" />
                 ) : (
-                  <p className="text-[11px] font-medium text-slate-500 mt-1">
+                  <p className="text-xs font-semibold text-slate-500 mt-1">
                     Gross Vol: $
                     {(data?.stats.totalGrossVolume ?? 0).toLocaleString('en-US', {
                       minimumFractionDigits: 2,
@@ -242,23 +283,23 @@ export default function AdminPaymentsPage() {
                   </p>
                 )}
               </div>
-              <div className="h-10 w-10 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
-                <TrendingUp className="h-5 w-5" />
+              <div className="h-11 w-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
+                <TrendingUp className="h-6 w-6" />
               </div>
             </CardContent>
           </Card>
 
           {/* Card 2: Funds in Escrow */}
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
+          <Card className="py-0 border border-border/60 shadow-xs bg-card">
+            <CardContent className="py-4 px-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
                   Funds in Escrow
                 </p>
                 {loading ? (
-                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                  <div className="h-8 w-32 bg-slate-200/80 rounded-md animate-pulse mt-1" />
                 ) : (
-                  <h3 className="text-xl font-bold text-amber-600 mt-1">
+                  <h3 className="text-2xl font-black text-amber-600 tracking-tight mt-1">
                     $
                     {(data?.stats.totalEscrowed ?? 0).toLocaleString('en-US', {
                       minimumFractionDigits: 2,
@@ -266,25 +307,25 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-[11px] text-muted-foreground mt-1">Held until delivery</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">Held until delivery</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                <ShieldCheck className="h-5 w-5" />
+              <div className="h-11 w-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                <ShieldCheck className="h-6 w-6" />
               </div>
             </CardContent>
           </Card>
 
           {/* Card 3: Pending Release */}
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
+          <Card className="py-0 border border-border/60 shadow-xs bg-card">
+            <CardContent className="py-4 px-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
                   Pending Release
                 </p>
                 {loading ? (
-                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                  <div className="h-8 w-32 bg-slate-200/80 rounded-md animate-pulse mt-1" />
                 ) : (
-                  <h3 className="text-xl font-bold text-sky-600 mt-1">
+                  <h3 className="text-2xl font-black text-sky-600 tracking-tight mt-1">
                     $
                     {(data?.stats.totalPendingRelease ?? 0).toLocaleString('en-US', {
                       minimumFractionDigits: 2,
@@ -292,25 +333,25 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-[11px] text-muted-foreground mt-1">Delivered, awaiting payout</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">Delivered, awaiting payout</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
-                <Clock className="h-5 w-5" />
+              <div className="h-11 w-11 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
+                <Clock className="h-6 w-6" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Card 4: Released Earnings (Traveler Cut) */}
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
+          {/* Card 4: Released Earnings */}
+          <Card className="py-0 border border-border/60 shadow-xs bg-card">
+            <CardContent className="py-4 px-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
                   Released Earnings
                 </p>
                 {loading ? (
-                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                  <div className="h-8 w-32 bg-slate-200/80 rounded-md animate-pulse mt-1" />
                 ) : (
-                  <h3 className="text-xl font-bold text-blue-600 mt-1">
+                  <h3 className="text-2xl font-black text-blue-600 tracking-tight mt-1">
                     $
                     {(data?.stats.totalReleased ?? 0).toLocaleString('en-US', {
                       minimumFractionDigits: 2,
@@ -318,25 +359,51 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-[11px] text-muted-foreground mt-1">Traveler net payouts</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">Traveler net payouts</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
-                <CheckCircle2 className="h-5 w-5" />
+              <div className="h-11 w-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                <CheckCircle2 className="h-6 w-6" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Card 5: Refunds & Failed (as is) */}
-          <Card className="border border-border/60 shadow-xs bg-card">
-            <CardContent className="p-4 flex items-center justify-between">
+          {/* Card 5: Pending Refunds */}
+          <Card className="py-0 border border-border/60 shadow-xs bg-card">
+            <CardContent className="py-4 px-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Refunds & Failed
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                  Pending Refunds
                 </p>
                 {loading ? (
-                  <div className="h-7 w-24 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                  <div className="h-8 w-32 bg-slate-200/80 rounded-md animate-pulse mt-1" />
                 ) : (
-                  <h3 className="text-xl font-bold text-rose-600 mt-1">
+                  <h3 className="text-2xl font-black text-rose-600 tracking-tight mt-1">
+                    $
+                    {(data?.stats.totalPendingRefund ?? 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h3>
+                )}
+                <p className="text-xs font-semibold text-muted-foreground mt-1">Awaiting off-platform payout</p>
+              </div>
+              <div className="h-11 w-11 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                <RotateCcw className="h-6 w-6 animate-pulse" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 6: Refunds (Processed) */}
+          <Card className="py-0 border border-border/60 shadow-xs bg-card">
+            <CardContent className="py-4 px-5 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                  Refunds
+                </p>
+                {loading ? (
+                  <div className="h-8 w-32 bg-slate-200/80 rounded-md animate-pulse mt-1" />
+                ) : (
+                  <h3 className="text-2xl font-black text-purple-700 tracking-tight mt-1">
                     $
                     {(data?.stats.totalRefunded ?? 0).toLocaleString('en-US', {
                       minimumFractionDigits: 2,
@@ -344,10 +411,10 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-[11px] text-muted-foreground mt-1">Disputed / Canceled</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">Processed payouts</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
-                <AlertTriangle className="h-5 w-5" />
+              <div className="h-11 w-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 shrink-0">
+                <RotateCcw className="h-6 w-6" />
               </div>
             </CardContent>
           </Card>
@@ -415,6 +482,10 @@ export default function AdminPaymentsPage() {
           <div className="flex items-center gap-2 border-b border-slate-100 pb-2 overflow-x-auto scrollbar-none">
             {STATUS_TABS.map((tab) => {
               const isActive = status === tab.value;
+              const isPendingRefundTab = tab.value === 'PENDING_REFUND';
+              const hasPendingRefunds = pendingRefundsCount > 0 || (data?.stats.totalPendingRefund ?? 0) > 0;
+              const isHighlightUnselectedRefund = isPendingRefundTab && !isActive && hasPendingRefunds;
+
               return (
                 <button
                   key={tab.value}
@@ -422,13 +493,26 @@ export default function AdminPaymentsPage() {
                     setStatus(tab.value);
                     setPage(1);
                   }}
-                  className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-all whitespace-nowrap ${
+                  className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     isActive
                       ? 'bg-[#0D307A]/10 text-[#0D307A] border-transparent'
-                      : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                      : isHighlightUnselectedRefund
+                        ? 'bg-white text-primary border-primary/10 hover:bg-primary/5 shadow-xs'
+                        : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
+                  {isPendingRefundTab && pendingRefundsCount > 0 && (
+                    <span
+                      className={`flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[9px] font-bold ${
+                        isActive
+                          ? 'bg-[#0D307A] text-white'
+                          : 'bg-primary text-white'
+                      }`}
+                    >
+                      {pendingRefundsCount}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -835,12 +919,46 @@ export default function AdminPaymentsPage() {
                   )}
                 </div>
 
+                {/* Pending Refund Action Banner if PENDING_REFUND */}
+                {selectedTx.status === 'PENDING_REFUND' && (
+                  <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-rose-900 text-xs flex items-center gap-1.5">
+                        <RotateCcw className="h-4 w-4 text-rose-600" />
+                        Pending Refund Action Required
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="text-xs h-7 px-3 font-semibold"
+                        onClick={() => {
+                          setProcessingRefundTx(selectedTx);
+                          setRefundTxnIdInput('');
+                          setAdminNotesInput('');
+                        }}
+                      >
+                        Process Payout
+                      </Button>
+                    </div>
+                    {selectedTx.refundReason && (
+                      <p className="text-[11px] text-rose-700">
+                        Reason: {selectedTx.refundReason}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Timeline */}
                 <div className="text-[11px] text-muted-foreground space-y-1 bg-muted/20 p-2.5 rounded-lg border border-border/50">
                   <p>Created Date: {new Date(selectedTx.createdAt).toLocaleString()}</p>
                   {selectedTx.releasedAt && (
                     <p className="text-emerald-700 font-medium">
                       Released Date: {new Date(selectedTx.releasedAt).toLocaleString()}
+                    </p>
+                  )}
+                  {selectedTx.refundedAt && (
+                    <p className="text-purple-700 font-medium">
+                      Refunded Date: {new Date(selectedTx.refundedAt).toLocaleString()} (Ref: {selectedTx.refundTxnId})
                     </p>
                   )}
                 </div>
@@ -884,6 +1002,127 @@ export default function AdminPaymentsPage() {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Process Refund Modal */}
+        <Dialog open={!!processingRefundTx} onOpenChange={(open) => !open && setProcessingRefundTx(null)}>
+          <DialogContent className="sm:max-w-[480px] p-6">
+            <DialogHeader>
+              <DialogTitle className="text-destructive font-bold text-lg flex items-center gap-2">
+                <RotateCcw className="h-5 w-5 text-destructive" />
+                Process Off-Platform Refund
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-1">
+                Manually process the refund off-platform (bKash, Bank, Nagad, etc.) to the sender and enter the reference transaction ID below.
+              </DialogDescription>
+            </DialogHeader>
+
+            {processingRefundTx && (
+              <div className="space-y-4 py-2 text-xs">
+                {/* Refund Details Overview */}
+                <div className="bg-rose-50/70 p-3.5 rounded-xl border border-rose-200 space-y-2 text-rose-900">
+                  <div className="flex justify-between items-center font-bold">
+                    <span>Gross Amount to Refund:</span>
+                    <span className="text-base text-rose-700 font-extrabold">
+                      ${processingRefundTx.grossAmount.toFixed(2)} {processingRefundTx.currency}
+                    </span>
+                  </div>
+                  {processingRefundTx.refundReason && (
+                    <p className="text-[11px] text-rose-800">
+                      <span className="font-semibold">Reason:</span> {processingRefundTx.refundReason}
+                    </p>
+                  )}
+                </div>
+
+                {/* Sender Payout Method Snapshot */}
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-foreground border-b border-border pb-1.5">
+                    <CreditCard className="h-4 w-4 text-primary" />
+                    <span>Sender Payout Method Details</span>
+                  </div>
+                  {processingRefundTx.refundMethodDetails ? (
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-foreground">
+                      <div>
+                        <span className="text-muted-foreground block">Type:</span>
+                        <span className="font-semibold">{processingRefundTx.refundMethodDetails.type || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block">Account Number:</span>
+                        <span className="font-mono font-semibold">{processingRefundTx.refundMethodDetails.accountNumber || 'N/A'}</span>
+                      </div>
+                      {processingRefundTx.refundMethodDetails.accountName && (
+                        <div>
+                          <span className="text-muted-foreground block">Account Name:</span>
+                          <span className="font-semibold">{processingRefundTx.refundMethodDetails.accountName}</span>
+                        </div>
+                      )}
+                      {processingRefundTx.refundMethodDetails.bankName && (
+                        <div>
+                          <span className="text-muted-foreground block">Bank Name:</span>
+                          <span className="font-semibold">{processingRefundTx.refundMethodDetails.bankName}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200">
+                      No saved payout method snapshot found on file. Please confirm payout details directly with the sender.
+                    </p>
+                  )}
+                </div>
+
+                {/* Form Inputs */}
+                <div className="space-y-3 pt-1">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block mb-1">
+                      Refund Transaction Reference ID <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      placeholder="e.g. BKASH-987263154 or BANK-TXN-4029"
+                      value={refundTxnIdInput}
+                      onChange={(e) => setRefundTxnIdInput(e.target.value)}
+                      className="text-xs h-9"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block mb-1">
+                      Admin Notes (Optional)
+                    </label>
+                    <textarea
+                      placeholder="Add optional notes for audit or internal record..."
+                      value={adminNotesInput}
+                      onChange={(e) => setAdminNotesInput(e.target.value)}
+                      className="w-full text-xs p-2.5 rounded-md border border-input bg-background focus:outline-hidden focus:ring-1 focus:ring-primary min-h-[70px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="gap-3 sm:gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setProcessingRefundTx(null)}
+                disabled={isSubmittingRefund}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleProcessRefundSubmit}
+                disabled={isSubmittingRefund || !refundTxnIdInput.trim()}
+              >
+                {isSubmittingRefund ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Confirm Off-Platform Payout'
+                )}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

@@ -47,6 +47,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const openTicketsCount = adminCounts?.openTicketsCount ?? 0;
   const pendingWithdrawalsCount = adminCounts?.pendingWithdrawalsCount ?? 0;
   const pendingShipmentsCount = adminCounts?.pendingShipmentsCount ?? 0;
+  const pendingRefundsCount = adminCounts?.pendingRefundsCount ?? 0;
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -237,6 +238,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                       else if (item.label === 'Trips') count = pendingTripsCount;
                       else if (item.label === 'Support Tickets') count = openTicketsCount;
                       else if (item.label === 'Withdrawals') count = pendingWithdrawalsCount;
+                      else if (item.label === 'Payments') count = pendingRefundsCount;
 
                       if (count <= 0) return null;
 

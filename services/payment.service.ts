@@ -14,9 +14,15 @@ export interface PaymentTransaction {
   currency: string;
   paymentGateway: string;
   gatewayTxnId: string | null;
-  status: 'PENDING_PAYMENT' | 'ESCROWED' | 'PENDING_RELEASE' | 'RELEASED' | 'REFUNDED' | 'FAILED';
+  status: 'PENDING_PAYMENT' | 'ESCROWED' | 'PENDING_RELEASE' | 'PENDING_REFUND' | 'RELEASED' | 'REFUNDED' | 'FAILED';
   proofPhotoUrl: string | null;
   releasedAt: string | null;
+  refundTxnId?: string | null;
+  refundReason?: string | null;
+  refundMethodDetails?: Record<string, any> | null;
+  refundedAt?: string | null;
+  refundedBy?: string | null;
+  adminRefundNotes?: string | null;
   createdAt: string;
   shipment?: {
     id: string;
@@ -29,6 +35,7 @@ export interface SenderSummaryResponse {
   stats: {
     totalSpent: number;
     pendingAmount: number;
+    pendingRefundAmount?: number;
     refundedAmount: number;
     disputeMoney: number;
   };
@@ -106,10 +113,16 @@ export interface AdminPaymentTransaction {
   currency: string;
   paymentGateway: string;
   gatewayTxnId?: string | null;
-  status: 'PENDING_PAYMENT' | 'ESCROWED' | 'PENDING_RELEASE' | 'RELEASED' | 'REFUNDED' | 'FAILED';
+  status: 'PENDING_PAYMENT' | 'ESCROWED' | 'PENDING_RELEASE' | 'PENDING_REFUND' | 'RELEASED' | 'REFUNDED' | 'FAILED';
   proofPhotoUrl?: string | null;
   releasedAt?: string | null;
   releasedBy?: string | null;
+  refundTxnId?: string | null;
+  refundReason?: string | null;
+  refundMethodDetails?: Record<string, any> | null;
+  refundedAt?: string | null;
+  refundedBy?: string | null;
+  adminRefundNotes?: string | null;
   createdAt: string;
   updatedAt: string;
   commissionAmount: number;
@@ -137,6 +150,7 @@ export interface AdminPaymentTransaction {
     email: string;
     phone?: string;
     image?: string;
+    paymentMethods?: any[];
   };
   traveller: {
     id: string;
@@ -153,6 +167,7 @@ export interface AdminPaymentsResponse {
     totalGrossVolume: number;
     totalEscrowed: number;
     totalPendingRelease: number;
+    totalPendingRefund?: number;
     totalReleased: number;
     totalRefunded: number;
     estimatedCommission: number;
@@ -177,5 +192,16 @@ export async function getAdminPayments(params?: {
   const { data } = await apiClient.get<{ data: AdminPaymentsResponse }>('/payments/admin', {
     params,
   });
+  return data.data;
+}
+
+export async function processAdminRefund(
+  transactionId: string,
+  payload: { refundTxnId: string; adminNotes?: string; proofPhotoUrl?: string }
+): Promise<AdminPaymentTransaction> {
+  const { data } = await apiClient.post<{ data: AdminPaymentTransaction }>(
+    `/payments/admin/refunds/${transactionId}/process`,
+    payload
+  );
   return data.data;
 }
