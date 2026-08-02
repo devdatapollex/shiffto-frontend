@@ -22,12 +22,12 @@ export function AppDownloadSection() {
           />
         </div>
 
-        {/* Wave 2 (In front of Wave 1 - Orange Glow: Scaled down with natural unclipped top edge) */}
+        {/* Wave 2 (In front of Wave 1 - Orange Glow: Full horizontal width, vertically scaled down) */}
         <div className="absolute bottom-0 inset-x-0 w-full h-full flex items-end justify-center z-10">
           <Image
             src={wave2}
             alt=""
-            className="w-full h-full object-cover object-bottom scale-y-[0.6] scale-x-[0.85] origin-bottom opacity-90"
+            className="w-full h-full object-cover object-bottom scale-y-[0.6] scale-x-105 origin-bottom opacity-90"
             priority
           />
         </div>
