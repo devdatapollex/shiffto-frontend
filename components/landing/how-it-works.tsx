@@ -2,13 +2,13 @@ import { HowItWorksForm } from './how-it-works-form';
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="container mx-auto px-4 py-12 max-w-7xl">
+    <section id="how-it-works" className="container mx-auto px-16 pt-25 pb-50 max-w-7xl">
       {/* Top Header */}
       <div className="flex flex-col gap-2 mb-12">
         <span className="text-[11px] font-bold tracking-[2.5px] uppercase text-accent-foreground">
           SIMPLE PROCESS
         </span>
-        <h2 className="text-6xl tracking-[-2px]  font-semibold sm:text-4xl">
+        <h2 className="text-[40px] tracking-[-2px]  font-semibold">
           How <span className="text-accent-foreground">Shiffto</span> Works
         </h2>
         <p className="text-[15px] max-w-lg font-normal text-[#6B7280]">

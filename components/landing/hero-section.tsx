@@ -14,7 +14,7 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         {/* Left Column: Headline, Subtitle, and Call to Actions */}
         <div className="flex flex-col gap-6">
-          <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
+          <h1 className="text-[52px] font-bold leading-tight">
             <span className="block">Send Anything.</span>
             <span className="block">Across Borders.</span>
             <span className="block text-accent-foreground">Through People.</span>
