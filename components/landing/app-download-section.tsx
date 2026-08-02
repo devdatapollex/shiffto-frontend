@@ -11,23 +11,23 @@ export function AppDownloadSection() {
   return (
     <section className="relative w-full bg-white px-6 py-16 lg:px-[128px] lg:pt-[128px] lg:pb-0  flex flex-col items-center gap-[22px] overflow-hidden">
       {/* Background Gradient Waves */}
-      <div className="absolute inset-x-0 bottom-0 pointer-events-none z-0 w-full h-full flex items-end justify-center overflow-hidden">
-        {/* Wave 1 (Behind - Pink Glow: MUCH BIGGER) */}
-        <div className="absolute bottom-0 inset-x-0 w-full h-[85%] sm:h-[90%] flex items-end justify-center z-0">
+      <div className="absolute inset-0 pointer-events-none z-0 w-full h-full flex items-end justify-center overflow-hidden">
+        {/* Wave 1 (Behind - Pink Glow: Large Scale) */}
+        <div className="absolute bottom-0 inset-x-0 w-full h-full flex items-end justify-center z-0">
           <Image
             src={wave1}
             alt=""
-            className="w-full h-full object-cover object-bottom scale-110 opacity-90"
+            className="w-full h-full object-cover object-bottom scale-110 origin-bottom opacity-90"
             priority
           />
         </div>
 
-        {/* Wave 2 (In front of Wave 1 - Orange Glow: SMALLER) */}
-        <div className="absolute bottom-0 inset-x-0 w-full h-[50%] sm:h-[55%] flex items-end justify-center z-10">
+        {/* Wave 2 (In front of Wave 1 - Orange Glow: Scaled down with natural unclipped top edge) */}
+        <div className="absolute bottom-0 inset-x-0 w-full h-full flex items-end justify-center z-10">
           <Image
             src={wave2}
             alt=""
-            className="w-full h-full object-cover object-bottom opacity-90"
+            className="w-full h-full object-cover object-bottom scale-y-[0.6] scale-x-[0.85] origin-bottom opacity-90"
             priority
           />
         </div>
