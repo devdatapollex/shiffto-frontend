@@ -12,12 +12,12 @@ export function AppDownloadSection() {
     <section className="relative w-full bg-white px-6 py-16 lg:px-[128px] lg:pt-[128px] lg:pb-0  flex flex-col items-center gap-[22px] overflow-hidden">
       {/* Background Gradient Waves */}
       <div className="absolute inset-0 pointer-events-none z-0 w-full h-full flex items-end justify-center overflow-hidden">
-        {/* Wave 1 (Behind - Pink Glow: Large Scale) */}
+        {/* Wave 1 (Behind - Pink Glow: Slightly reduced height) */}
         <div className="absolute bottom-0 inset-x-0 w-full h-full flex items-end justify-center z-0">
           <Image
             src={wave1}
             alt=""
-            className="w-full h-full object-cover object-bottom scale-110 origin-bottom opacity-90"
+            className="w-full h-full object-cover object-bottom scale-y-[0.85] scale-x-110 origin-bottom opacity-90"
             priority
           />
         </div>
