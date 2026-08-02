@@ -55,17 +55,19 @@ export function AppDownloadSection() {
             alt="Shiftto Laptop App Dashboard"
             className="w-full h-auto object-contain"
             priority
+            unoptimized
           />
         </div>
 
         {/* iPhone Mock (Overlapping Laptop Bottom-Left) */}
-        <div className="absolute left-[12%] sm:left-[14%] -bottom-[4%] sm:-bottom-[5%] w-[22%] sm:w-[19%] max-w-[180px] z-20">
+        <div className="absolute left-[14%] md:left-[0%] -bottom-[4%] sm:-bottom-[5%] w-[22%] sm:w-[19%] max-w-[180px] z-20">
           <Image
             src={iphoneMock}
             alt="Shiftto Mobile App"
             width={180}
             height={360}
             className="w-full h-auto object-contain drop-shadow-2xl"
+            unoptimized
           />
         </div>
 
@@ -77,6 +79,7 @@ export function AppDownloadSection() {
             width={410}
             height={310}
             className="w-full h-auto object-contain drop-shadow-2xl"
+            unoptimized
           />
         </div>
       </div>
