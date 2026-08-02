@@ -1,52 +1,79 @@
-import { Smartphone, Monitor, Tablet } from 'lucide-react';
+import Image from 'next/image';
+import playStoreIcon from '@/public/play-store icon.png';
+import appStoreIcon from '@/public/app-store icon.png';
+import iphoneMock from '@/public/iphone mock.png';
+import laptopMock from '@/public/laptop mock.png';
+import tabletMock from '@/public/tablet mock.png';
 
 export function AppDownloadSection() {
   return (
-    <section className="container mx-auto px-4 py-12 max-w-7xl flex flex-col items-center text-center gap-8">
-      {/* Header Content */}
-      <div className="flex flex-col gap-3 max-w-2xl">
-        <h2 className="text-3xl font-bold tracking-tight">Available on all your devices</h2>
-        <p className="text-base text-muted-foreground">
+    <section className="w-full bg-white px-6 py-16 lg:p-[128px] flex flex-col items-center gap-[22px]">
+      {/* Text Section */}
+      <div className="flex flex-col items-center gap-6 max-w-3xl text-center">
+        <h2 className="font-medium text-4xl sm:text-5xl lg:text-[60px] leading-tight lg:leading-[72px] tracking-tight text-foreground">
+          Available on all your devices
+        </h2>
+        <p className="font-normal text-base leading-[24px] tracking-normal text-foreground">
           Experience Shiftto from anywhere, anytime. Shiftto is available across laptop, tablet and
           mobile phones
         </p>
       </div>
 
-      {/* App Store / Play Store Badges / Buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-4">
-        {/* Google Play Button */}
-        <button className="border rounded-xl px-5 py-2.5 flex items-center gap-3 bg-background hover:bg-accent transition-colors">
-          <div className="text-left leading-tight">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-              GET IT ON
-            </div>
-            <div className="text-sm font-semibold">Google Play</div>
-          </div>
-        </button>
+      {/* Store Icons Section */}
+      <div className="flex flex-wrap items-center justify-center gap-6 my-2">
+        <a
+          href="#"
+          className="inline-block transition-transform hover:scale-105 active:scale-95"
+          aria-label="Get it on Google Play"
+        >
+          <Image
+            src={playStoreIcon}
+            alt="Get it on Google Play"
+            className="h-12 w-auto object-contain"
+          />
+        </a>
 
-        {/* App Store Button */}
-        <button className="border rounded-xl px-5 py-2.5 flex items-center gap-3 bg-background hover:bg-accent transition-colors">
-          <div className="text-left leading-tight">
-            <div className="text-[10px] tracking-wider text-muted-foreground font-medium">
-              Download on the
-            </div>
-            <div className="text-sm font-semibold">App Store</div>
-          </div>
-        </button>
+        <a
+          href="#"
+          className="inline-block transition-transform hover:scale-105 active:scale-95"
+          aria-label="Download on the App Store"
+        >
+          <Image
+            src={appStoreIcon}
+            alt="Download on the App Store"
+            className="h-12 w-auto object-contain"
+          />
+        </a>
       </div>
 
-      {/* Device Screens Mockup Placeholder Container */}
-      <div className="w-full max-w-5xl mt-4">
-        <div className="w-full h-80 sm:h-[420px] border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6 text-center">
-          <div className="flex items-center gap-4 mb-3 opacity-50">
-            <Smartphone className="h-10 w-10" />
-            <Monitor className="h-14 w-14" />
-            <Tablet className="h-12 w-12" />
-          </div>
-          <span className="text-base font-medium">Device Mockups Placeholder</span>
-          <span className="text-xs text-muted-foreground mt-1 max-w-sm">
-            Responsive app screens across Laptop, Tablet, and Mobile phone devices
-          </span>
+      {/* Mocks Section */}
+      <div className="w-full max-w-[1020px] relative mt-4 flex justify-center items-center">
+        {/* Laptop Mock (Center Anchor) */}
+        <div className="w-[88%] sm:w-[85%] max-w-[840px] z-0">
+          <Image
+            src={laptopMock}
+            alt="Shiftto Laptop App Dashboard"
+            className="w-full h-auto object-contain"
+            priority
+          />
+        </div>
+
+        {/* iPhone Mock (Bottom Left Overlay) */}
+        <div className="absolute left-[0%] sm:left-[3%] -bottom-[4%] sm:-bottom-[6%] w-[26%] sm:w-[22%] max-w-[210px] z-20">
+          <Image
+            src={iphoneMock}
+            alt="Shiftto Mobile App"
+            className="w-full h-auto object-contain drop-shadow-xl"
+          />
+        </div>
+
+        {/* Tablet Mock (Bottom Right Overlay) */}
+        <div className="absolute right-[0%] sm:right-[1%] -bottom-[3%] sm:-bottom-[5%] w-[48%] sm:w-[44%] max-w-[420px] z-10">
+          <Image
+            src={tabletMock}
+            alt="Shiftto Tablet App"
+            className="w-full h-auto object-contain drop-shadow-xl"
+          />
         </div>
       </div>
     </section>
