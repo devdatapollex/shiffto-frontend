@@ -55,7 +55,6 @@ export function AppDownloadSection() {
             alt="Shiftto Laptop App Dashboard"
             className="w-full h-auto object-contain"
             priority
-            unoptimized
           />
         </div>
 
@@ -67,7 +66,6 @@ export function AppDownloadSection() {
             width={180}
             height={360}
             className="w-full h-auto object-contain drop-shadow-2xl"
-            unoptimized
           />
         </div>
 
@@ -79,7 +77,6 @@ export function AppDownloadSection() {
             width={410}
             height={310}
             className="w-full h-auto object-contain drop-shadow-2xl"
-            unoptimized
           />
         </div>
       </div>
