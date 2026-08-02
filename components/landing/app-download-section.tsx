@@ -58,12 +58,12 @@ export function AppDownloadSection() {
           />
         </div>
 
-        {/* iPhone Mock (Bottom Left Overlay) */}
-        <div className="absolute left-[0%] sm:left-[3%] -bottom-[4%] sm:-bottom-[6%] w-[26%] sm:w-[22%] max-w-[210px] z-20">
+        {/* iPhone Mock (Bottom Left Overlay - Native resolution is 109px x 220px) */}
+        <div className="absolute left-[0%] sm:left-[2%] -bottom-[4%] sm:-bottom-[6%] w-[18%] sm:w-[14%] max-w-[125px] z-20">
           <Image
             src={iphoneMock}
             alt="Shiftto Mobile App"
-            className="w-full h-auto object-contain drop-shadow-xl"
+            className="w-full h-auto object-contain drop-shadow-2xl"
           />
         </div>
 
