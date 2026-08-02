@@ -47,9 +47,9 @@ export function AppDownloadSection() {
       </div>
 
       {/* Mocks Section */}
-      <div className="w-full max-w-[1020px] relative mt-4 flex justify-center items-center">
-        {/* Laptop Mock (Center Anchor) */}
-        <div className="w-[88%] sm:w-[85%] max-w-[840px] z-0">
+      <div className="w-full max-w-[880px] relative mt-4 flex justify-center items-center">
+        {/* Laptop Mock (Center Backdrop Anchor) */}
+        <div className="w-full z-0">
           <Image
             src={laptopMock}
             alt="Shiftto Laptop App Dashboard"
@@ -58,21 +58,25 @@ export function AppDownloadSection() {
           />
         </div>
 
-        {/* iPhone Mock (Bottom Left Overlay - Native resolution is 109px x 220px) */}
-        <div className="absolute left-[0%] sm:left-[2%] -bottom-[4%] sm:-bottom-[6%] w-[18%] sm:w-[14%] max-w-[125px] z-20">
+        {/* iPhone Mock (Overlapping Laptop Bottom-Left) */}
+        <div className="absolute left-[12%] sm:left-[14%] -bottom-[4%] sm:-bottom-[5%] w-[22%] sm:w-[19%] max-w-[180px] z-20">
           <Image
             src={iphoneMock}
             alt="Shiftto Mobile App"
+            width={180}
+            height={360}
             className="w-full h-auto object-contain drop-shadow-2xl"
           />
         </div>
 
-        {/* Tablet Mock (Bottom Right Overlay) */}
-        <div className="absolute right-[0%] sm:right-[1%] -bottom-[3%] sm:-bottom-[5%] w-[48%] sm:w-[44%] max-w-[420px] z-10">
+        {/* Tablet Mock (Overlapping Laptop Bottom-Right) */}
+        <div className="absolute right-[1%] sm:right-[3%] -bottom-[4%] sm:-bottom-[5%] w-[46%] sm:w-[43%] max-w-[410px] z-10">
           <Image
             src={tabletMock}
             alt="Shiftto Tablet App"
-            className="w-full h-auto object-contain drop-shadow-xl"
+            width={410}
+            height={310}
+            className="w-full h-auto object-contain drop-shadow-2xl"
           />
         </div>
       </div>
