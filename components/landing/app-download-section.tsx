@@ -9,24 +9,25 @@ import tabletMock from '@/public/tablet mock.png';
 
 export function AppDownloadSection() {
   return (
-    <section className="relative w-full bg-white px-6 py-16 lg:p-[128px] flex flex-col items-center gap-[22px] overflow-hidden">
+    <section className="relative w-full bg-white px-6 py-16 lg:px-[128px] lg:pt-[128px] lg:pb-0  flex flex-col items-center gap-[22px] overflow-hidden">
       {/* Background Gradient Waves */}
-      <div className="absolute bottom-0 inset-x-0 pointer-events-none z-0 w-full h-[55%] max-h-[460px] flex items-end justify-center overflow-hidden">
-        {/* Wave 1 (Behind - Pink Glow) */}
-        <div className="absolute bottom-0 inset-x-0 w-full h-full flex items-end justify-center z-0">
+      <div className="absolute inset-x-0 bottom-0 pointer-events-none z-0 w-full h-full flex items-end justify-center overflow-hidden">
+        {/* Wave 1 (Behind - Pink Glow: MUCH BIGGER) */}
+        <div className="absolute bottom-0 inset-x-0 w-full h-[85%] sm:h-[90%] flex items-end justify-center z-0">
           <Image
             src={wave1}
             alt=""
-            className="w-full h-full object-fill object-bottom opacity-85"
+            className="w-full h-full object-cover object-bottom scale-110 opacity-90"
             priority
           />
         </div>
-        {/* Wave 2 (In front of Wave 1 - Orange Glow) */}
-        <div className="absolute bottom-0 inset-x-0 w-full h-full flex items-end justify-center z-10">
+
+        {/* Wave 2 (In front of Wave 1 - Orange Glow: SMALLER) */}
+        <div className="absolute bottom-0 inset-x-0 w-full h-[50%] sm:h-[55%] flex items-end justify-center z-10">
           <Image
             src={wave2}
             alt=""
-            className="w-full h-full object-fill object-bottom opacity-85"
+            className="w-full h-full object-cover object-bottom opacity-90"
             priority
           />
         </div>
@@ -36,10 +37,10 @@ export function AppDownloadSection() {
       <div className="relative z-10 flex flex-col items-center gap-[22px] w-full max-w-7xl">
         {/* Text Section */}
         <div className="flex flex-col items-center gap-6 max-w-3xl text-center">
-          <h2 className="font-medium text-4xl sm:text-5xl lg:text-[60px] leading-tight lg:leading-[72px] tracking-tight text-foreground">
+          <h2 className="font-medium text-[40px] sm:text-5xl lg:text-[60px] leading-tight lg:leading-[72px] tracking-tight text-foreground lg:text-nowrap">
             Available on all your devices
           </h2>
-          <p className="font-normal text-base leading-[24px] tracking-normal text-foreground">
+          <p className="font-normal text-base leading-[24px] tracking-normal text-foreground lg:text-nowrap">
             Experience Shiftto from anywhere, anytime. Shiftto is available across laptop, tablet
             and mobile phones
           </p>
@@ -85,7 +86,7 @@ export function AppDownloadSection() {
           </div>
 
           {/* iPhone Mock (Overlapping Laptop Bottom-Left) */}
-          <div className="absolute left-[14%] md:left-[0%] -bottom-[4%] sm:-bottom-[5%] w-[22%] sm:w-[19%] max-w-[180px] z-20">
+          <div className="absolute left-[14%] md:left-[0%] md:bottom-[0%] -bottom-[5%] md:w-[22%] w-[19%] max-w-[180px] z-20">
             <Image
               src={iphoneMock}
               alt="Shiftto Mobile App"
@@ -96,7 +97,7 @@ export function AppDownloadSection() {
           </div>
 
           {/* Tablet Mock (Overlapping Laptop Bottom-Right) */}
-          <div className="absolute right-[1%] sm:right-[3%] -bottom-[4%] sm:-bottom-[5%] w-[46%] sm:w-[43%] max-w-[410px] z-10">
+          <div className="absolute md:right-[1%] right-[3%] md:bottom-[0%] -bottom-[5%] md:w-[46%] w-[43%] max-w-[410px] z-10">
             <Image
               src={tabletMock}
               alt="Shiftto Tablet App"
