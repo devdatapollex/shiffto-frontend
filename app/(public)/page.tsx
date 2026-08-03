@@ -9,7 +9,7 @@ import { CTASection } from '@/components/landing/cta-section';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col pb-16 bg-secondary">
+    <div className="flex flex-col bg-secondary">
       <HeroSection />
       <HowItWorksSection />
       <FeaturesSection />
