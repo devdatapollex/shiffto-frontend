@@ -6,6 +6,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Package,
   Search,
@@ -23,9 +30,12 @@ import {
   Eye,
   Hourglass,
   ShieldAlert,
+  MoreVertical,
+  AlertTriangle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { getShipments, type Shipment, type ShipmentCategory } from '@/services/shipment.service';
+import { AdminCancelShipmentModal } from '@/components/admin/admin-cancel-shipment-modal';
 import { getStepDefinitions, type StepDefinition } from '@/services/step-definition.service';
 import {
   useAdminCategories,
@@ -52,12 +62,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import {
   Pagination,
   PaginationContent,
@@ -90,7 +95,12 @@ import { RoleGuard } from '@/components/auth/role-guard';
 
 // --- Tabs ---
 
-type TabValue = 'pending-release' | 'shipments' | 'categories' | 'step-definitions' | 'restricted-items';
+type TabValue =
+  | 'pending-release'
+  | 'shipments'
+  | 'categories'
+  | 'step-definitions'
+  | 'restricted-items';
 
 const MAIN_TABS: { label: string; value: TabValue; icon: React.ElementType }[] = [
   { label: 'Pending Release', value: 'pending-release', icon: Hourglass },
@@ -269,6 +279,8 @@ interface CategoryPayload {
 // ============================================
 
 function PendingReleaseTab() {
+  const router = useRouter();
+  const [shipmentToCancelForAdmin, setShipmentToCancelForAdmin] = useState<Shipment | null>(null);
   const [filters, dispatch] = useReducer(filtersReducer, {
     page: 1,
     search: '',
@@ -447,7 +459,11 @@ function PendingReleaseTab() {
                 const senderName = item.user?.name || item.user?.email || 'N/A';
 
                 return (
-                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                  <tr
+                    key={item.id}
+                    onClick={() => router.push(`/dashboard/admin/shipments/${item.id}`)}
+                    className="hover:bg-slate-50/80 cursor-pointer transition-colors duration-150"
+                  >
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
@@ -509,20 +525,35 @@ function PendingReleaseTab() {
                           : 'N/A'}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-right">
-                      <Link href={`/dashboard/admin/shipments/${item.id}`} passHref legacyBehavior>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg cursor-pointer"
-                        >
-                          <a>
-                            <Eye className="mr-1.5 h-3.5 w-3.5" />
-                            See Details
-                          </a>
-                        </Button>
-                      </Link>
+                    <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-slate-100 rounded-lg text-slate-500 cursor-pointer"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/dashboard/admin/shipments/${item.id}`)}
+                          >
+                            <Eye className="mr-2 h-4 w-4 text-slate-500" />
+                            View Details
+                          </DropdownMenuItem>
+                          {item.status !== 'CANCELED' && item.status !== 'DELIVERED' && (
+                            <DropdownMenuItem
+                              onClick={() => setShipmentToCancelForAdmin(item)}
+                              className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                            >
+                              <AlertTriangle className="mr-2 h-4 w-4" />
+                              Cancel Shipment
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 );
@@ -648,6 +679,12 @@ function PendingReleaseTab() {
           </Pagination>
         </div>
       )}
+      <AdminCancelShipmentModal
+        isOpen={!!shipmentToCancelForAdmin}
+        onClose={() => setShipmentToCancelForAdmin(null)}
+        shipment={shipmentToCancelForAdmin}
+        onSuccess={() => window.location.reload()}
+      />
     </div>
   );
 }
@@ -657,6 +694,8 @@ function PendingReleaseTab() {
 // ============================================
 
 function ShipmentsTab() {
+  const router = useRouter();
+  const [shipmentToCancelForAdmin, setShipmentToCancelForAdmin] = useState<Shipment | null>(null);
   const [filters, dispatch] = useReducer(filtersReducer, {
     page: 1,
     search: '',
@@ -849,7 +888,11 @@ function ShipmentsTab() {
                 const amount = item.pricePerKg * item.weight;
 
                 return (
-                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                  <tr
+                    key={item.id}
+                    onClick={() => router.push(`/dashboard/admin/shipments/${item.id}`)}
+                    className="hover:bg-slate-50/80 cursor-pointer transition-colors duration-150"
+                  >
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
@@ -906,20 +949,35 @@ function ShipmentsTab() {
                           : 'N/A'}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-right">
-                      <Link href={`/dashboard/admin/shipments/${item.id}`} passHref legacyBehavior>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="h-8 text-xs font-semibold text-[#0D307A] border-[#0D307A]/20 bg-[#0D307A]/5 hover:bg-[#0D307A]/10 rounded-lg cursor-pointer"
-                        >
-                          <a>
-                            <Eye className="mr-1.5 h-3.5 w-3.5" />
-                            See Details
-                          </a>
-                        </Button>
-                      </Link>
+                    <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-slate-100 rounded-lg text-slate-500 cursor-pointer"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/dashboard/admin/shipments/${item.id}`)}
+                          >
+                            <Eye className="mr-2 h-4 w-4 text-slate-500" />
+                            View Details
+                          </DropdownMenuItem>
+                          {item.status !== 'CANCELED' && item.status !== 'DELIVERED' && (
+                            <DropdownMenuItem
+                              onClick={() => setShipmentToCancelForAdmin(item)}
+                              className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                            >
+                              <AlertTriangle className="mr-2 h-4 w-4" />
+                              Cancel Shipment
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 );
@@ -1045,6 +1103,12 @@ function ShipmentsTab() {
           </Pagination>
         </div>
       )}
+      <AdminCancelShipmentModal
+        isOpen={!!shipmentToCancelForAdmin}
+        onClose={() => setShipmentToCancelForAdmin(null)}
+        shipment={shipmentToCancelForAdmin}
+        onSuccess={() => window.location.reload()}
+      />
     </div>
   );
 }
@@ -1710,7 +1774,11 @@ function RestrictedItemsTab() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<RestrictedItem | null>(null);
 
-  const { data: response, isLoading } = useRestrictedItems({ page, limit, search: debouncedSearch });
+  const { data: response, isLoading } = useRestrictedItems({
+    page,
+    limit,
+    search: debouncedSearch,
+  });
   const createMutation = useCreateRestrictedItem();
   const updateMutation = useUpdateRestrictedItem();
   const deleteMutation = useDeleteRestrictedItem();
@@ -1789,8 +1857,12 @@ function RestrictedItemsTab() {
     <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-sm space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
-          <h3 className="text-xl font-semibold text-slate-800 tracking-tight">Restricted Items List</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Manage prohibited items that users cannot carry or ship.</p>
+          <h3 className="text-xl font-semibold text-slate-800 tracking-tight">
+            Restricted Items List
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Manage prohibited items that users cannot carry or ship.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative w-64">
@@ -1837,7 +1909,9 @@ function RestrictedItemsTab() {
         <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
           <ShieldAlert className="h-12 w-12 text-slate-200 mb-3" />
           <p className="text-sm font-medium text-slate-500">No restricted items found</p>
-          <p className="text-xs text-slate-400 mt-1">Add items to restrict them in shipment creation.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Add items to restrict them in shipment creation.
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-slate-100">
@@ -1855,7 +1929,9 @@ function RestrictedItemsTab() {
                 <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
                   <TableCell className="font-medium text-slate-900">{item.name}</TableCell>
                   <TableCell className="text-slate-600 text-sm">
-                    {item.description || <span className="text-slate-400 italic">No description</span>}
+                    {item.description || (
+                      <span className="text-slate-400 italic">No description</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <span
@@ -1936,9 +2012,7 @@ function RestrictedItemsTab() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Restricted Item</DialogTitle>
-            <DialogDescription>
-              Add a new prohibited item to the system.
-            </DialogDescription>
+            <DialogDescription>Add a new prohibited item to the system.</DialogDescription>
           </DialogHeader>
           <form onSubmit={createForm.handleSubmit(handleCreate)} className="space-y-4 py-2">
             <div className="space-y-2">
@@ -1998,9 +2072,7 @@ function RestrictedItemsTab() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Restricted Item</DialogTitle>
-            <DialogDescription>
-              Update details for this restricted item.
-            </DialogDescription>
+            <DialogDescription>Update details for this restricted item.</DialogDescription>
           </DialogHeader>
           <form onSubmit={editForm.handleSubmit(handleEdit)} className="space-y-4 py-2">
             <div className="space-y-2">
@@ -2061,7 +2133,9 @@ function RestrictedItemsTab() {
           <DialogHeader>
             <DialogTitle>Delete Restricted Item</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-slate-800">{selectedItem?.name}</span>? This action cannot be undone.
+              Are you sure you want to delete{' '}
+              <span className="font-semibold text-slate-800">{selectedItem?.name}</span>? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="pt-4">
