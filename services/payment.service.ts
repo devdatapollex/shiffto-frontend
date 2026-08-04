@@ -145,6 +145,7 @@ export interface AdminPaymentTransaction {
   adminRefundNotes?: string | null;
   createdAt: string;
   updatedAt: string;
+  commissionRate?: number;
   commissionAmount: number;
   netAmount: number;
   shipment: {

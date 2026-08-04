@@ -1098,36 +1098,38 @@ export default function AdminPaymentsPage() {
                     <span>Sender Payout Method Details</span>
                   </div>
                   {processingRefundTx.refundMethodDetails ? (
-                    <div className="grid grid-cols-2 gap-2 text-[11px] text-foreground">
-                      <div>
-                        <span className="text-muted-foreground block">Type:</span>
-                        <span className="font-semibold">
-                          {processingRefundTx.refundMethodDetails.type || 'N/A'}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground block">Account Number:</span>
-                        <span className="font-mono font-semibold">
-                          {processingRefundTx.refundMethodDetails.accountNumber || 'N/A'}
-                        </span>
-                      </div>
-                      {processingRefundTx.refundMethodDetails.accountName && (
-                        <div>
-                          <span className="text-muted-foreground block">Account Name:</span>
-                          <span className="font-semibold">
-                            {processingRefundTx.refundMethodDetails.accountName}
-                          </span>
+                    (() => {
+                      const details = processingRefundTx.refundMethodDetails as Record<
+                        string,
+                        string
+                      >;
+                      return (
+                        <div className="grid grid-cols-2 gap-2 text-[11px] text-foreground">
+                          <div>
+                            <span className="text-muted-foreground block">Type:</span>
+                            <span className="font-semibold">{details.type || 'N/A'}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground block">Account Number:</span>
+                            <span className="font-mono font-semibold">
+                              {details.accountNumber || 'N/A'}
+                            </span>
+                          </div>
+                          {details.accountName && (
+                            <div>
+                              <span className="text-muted-foreground block">Account Name:</span>
+                              <span className="font-semibold">{details.accountName}</span>
+                            </div>
+                          )}
+                          {details.bankName && (
+                            <div>
+                              <span className="text-muted-foreground block">Bank Name:</span>
+                              <span className="font-semibold">{details.bankName}</span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                      {processingRefundTx.refundMethodDetails.bankName && (
-                        <div>
-                          <span className="text-muted-foreground block">Bank Name:</span>
-                          <span className="font-semibold">
-                            {processingRefundTx.refundMethodDetails.bankName}
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                      );
+                    })()
                   ) : (
                     <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200">
                       No saved payout method snapshot found on file. Please confirm payout details
