@@ -19,6 +19,7 @@ import {
   FileText,
   Plane,
   Eye,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,6 +37,17 @@ import { toRelativeImageUrl } from '@/lib/image-utils';
 import { getCountryByCode } from '@/lib/constants/countries';
 import Image from 'next/image';
 import { useState } from 'react';
+import { AdminCancelShipmentModal } from '@/components/admin/admin-cancel-shipment-modal';
+interface PaymentTxInfo {
+  status?: string;
+  grossAmount?: number;
+  transactionId?: string;
+  proofPhotoUrl?: string;
+}
+
+interface TripInfo {
+  ticketPhoto?: string;
+}
 
 function formatDate(dateStr: string): string {
   try {
@@ -83,12 +95,14 @@ export default function AdminShipmentDetailsPage() {
   const shipmentId = params?.id as string;
 
   const { user } = useRole();
-  const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
+  const { data: shipment, isLoading, error, refetch } = useShipmentDetails(shipmentId, !!shipmentId);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; title: string } | null>(null);
   const [isReleasing, setIsReleasing] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const handleReleasePayment = async () => {
-    const txId = (shipment as any)?.paymentTransaction?.transactionId;
+    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })
+      ?.paymentTransaction?.transactionId;
     if (!txId) {
       toast.error('No payment transaction ID found for this shipment');
       return;
@@ -98,8 +112,11 @@ export default function AdminShipmentDetailsPage() {
       await releasePayment(txId);
       toast.success('Payment successfully released to traveler!');
       window.location.reload();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to release payment');
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Failed to release payment';
+      toast.error(errorMsg);
     } finally {
       setIsReleasing(false);
     }
@@ -167,7 +184,7 @@ export default function AdminShipmentDetailsPage() {
           <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
           <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
           <p className="text-sm text-slate-500 mt-2 max-w-md">
-            We couldn't retrieve details for this shipment. It may have been deleted, or you might
+            We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you might
             not have authorization to view it.
           </p>
           <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
@@ -212,91 +229,108 @@ export default function AdminShipmentDetailsPage() {
               <span className="text-slate-800 font-bold">Shipment: #{shortShipmentId}</span>
             </div>
           </div>
+          {shipment.status !== 'CANCELED' && shipment.status !== 'DELIVERED' && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setIsCancelModalOpen(true)}
+              className="h-9 px-4 font-semibold text-xs rounded-lg cursor-pointer"
+            >
+              <AlertTriangle className="mr-1.5 h-4 w-4" />
+              Cancel Shipment
+            </Button>
+          )}
         </div>
 
         {/* Payment Verification & Release Card for Admin */}
-        {(shipment as any)?.paymentTransaction && (
-          <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Escrow Payment Verification & Release
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Verify proof of delivery uploaded by traveler and release escrowed funds.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-500 font-medium">Status:</span>
-                <span
-                  className={`px-3 py-1 rounded-full font-bold text-xs ${
-                    (shipment as any).paymentTransaction.status === 'RELEASED'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : (shipment as any).paymentTransaction.status === 'PENDING_RELEASE'
-                        ? 'bg-amber-100 text-amber-800 animate-pulse'
-                        : 'bg-blue-100 text-blue-800'
-                  }`}
-                >
-                  {(shipment as any).paymentTransaction.status}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
-              <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
-                <p className="text-2xl font-extrabold text-slate-900">
-                  ${(shipment as any).paymentTransaction.grossAmount?.toFixed(2)}
-                </p>
-                <p className="text-[11px] text-slate-400 font-mono">
-                  Txn ID: #{(shipment as any).paymentTransaction.transactionId}
-                </p>
-              </div>
-
-              {(shipment as any).paymentTransaction.proofPhotoUrl && (
-                <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 relative rounded-lg border border-slate-200 overflow-hidden bg-white">
-                    <Image
-                      src={toRelativeImageUrl((shipment as any).paymentTransaction.proofPhotoUrl)}
-                      alt="Delivery proof"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      setSelectedPhoto({
-                        url: (shipment as any).paymentTransaction.proofPhotoUrl,
-                        title: 'Delivery Proof',
-                      })
-                    }
-                    className="text-xs text-slate-700 font-semibold"
-                  >
-                    View Proof
-                  </Button>
+        {(() => {
+          const paymentTx = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })?.paymentTransaction;
+          if (!paymentTx) return null;
+          return (
+            <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    Escrow Payment Verification & Release
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Verify proof of delivery uploaded by traveler and release escrowed funds.
+                  </p>
                 </div>
-              )}
 
-              {(shipment as any).paymentTransaction.status !== 'RELEASED' ? (
-                <Button
-                  onClick={handleReleasePayment}
-                  disabled={isReleasing}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-5 text-sm shadow-md"
-                >
-                  {isReleasing ? 'Releasing...' : 'Release Payment to Traveler'}
-                </Button>
-              ) : (
-                <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4" /> Released to Traveler
-                </span>
-              )}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-500 font-medium">Status:</span>
+                  <span
+                    className={`px-3 py-1 rounded-full font-bold text-xs ${
+                      paymentTx.status === 'RELEASED'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : paymentTx.status === 'PENDING_RELEASE'
+                          ? 'bg-amber-100 text-amber-800 animate-pulse'
+                          : 'bg-blue-100 text-blue-800'
+                    }`}
+                  >
+                    {paymentTx.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
+                  <p className="text-2xl font-extrabold text-slate-900">
+                    ${paymentTx.grossAmount?.toFixed(2)}
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    Txn ID: #{paymentTx.transactionId}
+                  </p>
+                </div>
+
+                {paymentTx.proofPhotoUrl && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 relative rounded-lg border border-slate-200 overflow-hidden bg-white">
+                      <Image
+                        src={toRelativeImageUrl(paymentTx.proofPhotoUrl)}
+                        alt="Delivery proof"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setSelectedPhoto({
+                          url: paymentTx.proofPhotoUrl!,
+                          title: 'Delivery Proof',
+                        })
+                      }
+                      className="text-xs text-slate-700 font-semibold"
+                    >
+                      View Proof
+                    </Button>
+                  </div>
+                )}
+
+                {paymentTx.status !== 'RELEASED' ? (
+                  <Button
+                    onClick={handleReleasePayment}
+                    disabled={isReleasing}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-5 h-10 rounded-lg gap-2 cursor-pointer transition-colors shadow-sm"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {isReleasing ? 'Releasing...' : 'Release Payment to Traveler'}
+                  </Button>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    Payment Released
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Progress Timeline Tracker Card */}
         <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 overflow-hidden">
@@ -419,13 +453,10 @@ export default function AdminShipmentDetailsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        if (
-                          shipment.trip &&
-                          (shipment.trip as any).ticketPhoto &&
-                          (shipment.trip as any).ticketPhoto !== 'pending'
-                        ) {
+                        const ticketPhoto = (shipment.trip as unknown as TripInfo)?.ticketPhoto;
+                        if (shipment.trip && ticketPhoto && ticketPhoto !== 'pending') {
                           setSelectedPhoto({
-                            url: (shipment.trip as any).ticketPhoto,
+                            url: ticketPhoto,
                             title: 'Flight Ticket Scan',
                           });
                         } else if (shipment.trip) {
@@ -588,7 +619,7 @@ export default function AdminShipmentDetailsPage() {
                 </div>
                 <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
                 <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                  This shipment is currently awaiting a traveler. Once matched, the traveler's
+                  This shipment is currently awaiting a traveler. Once matched, the traveler&apos;s
                   flight details, bag capacity, and contact info will appear here.
                 </p>
               </div>
@@ -716,6 +747,12 @@ export default function AdminShipmentDetailsPage() {
             )}
           </DialogContent>
         </Dialog>
+        <AdminCancelShipmentModal
+          isOpen={isCancelModalOpen}
+          onClose={() => setIsCancelModalOpen(false)}
+          shipment={shipment}
+          onSuccess={() => refetch()}
+        />
       </div>
     </RoleGuard>
   );
