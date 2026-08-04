@@ -64,6 +64,9 @@ export interface PaymentTransactionDetails {
   id: string;
   transactionId: string;
   grossAmount: number;
+  refundableAmount?: number;
+  cancellationFeeAmount?: number;
+  refundInitiator?: string | null;
   currency: string;
   status: string;
   gatewayTxnId?: string | null;
@@ -71,7 +74,7 @@ export interface PaymentTransactionDetails {
   releasedAt?: string | null;
   refundTxnId?: string | null;
   refundReason?: string | null;
-  refundMethodDetails?: Record<string, any> | null;
+  refundMethodDetails?: Record<string, unknown> | null;
   createdAt: string;
 }
 
