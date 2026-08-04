@@ -196,7 +196,10 @@ export default function MyShipmentsPage() {
     },
     onError: (error: any) => {
       const message =
-        error?.response?.data?.message || 'Failed to cancel shipment';
+        error?.message ||
+        error?.data?.message ||
+        error?.response?.data?.message ||
+        'Failed to cancel shipment';
       toast.error(message);
     },
   });
@@ -642,13 +645,42 @@ export default function MyShipmentsPage() {
             <DialogTitle className="text-destructive font-semibold text-lg">Cancel Shipment</DialogTitle>
             <DialogDescription className="text-sm text-slate-600 mt-1">
               Are you sure you want to cancel &quot;<span className="font-semibold text-slate-900">{shipmentToCancel?.itemName}</span>&quot;?
-              {shipmentToCancel?.status === 'ACTIVE' && (
-                <span className="block mt-2 font-medium text-slate-700 bg-amber-50 p-2.5 rounded-md border border-amber-200/60 text-xs">
-                  Since this shipment is active, any payment held in escrow will automatically be queued for a refund payout by the admin.
-                </span>
-              )}
             </DialogDescription>
           </DialogHeader>
+
+          {shipmentToCancel?.status === 'ACTIVE' && (() => {
+            const gross =
+              shipmentToCancel.paymentTransaction?.grossAmount ??
+              shipmentToCancel.pricePerKg * shipmentToCancel.weight;
+            const fee = gross * 0.3;
+            const netRefund = gross - fee;
+            return (
+              <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
+                <div className="flex items-center justify-between text-slate-600 font-medium">
+                  <span>Original Amount Paid</span>
+                  <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between text-rose-600 font-medium">
+                  <span>Cancellation Fee (30%)</span>
+                  <span className="font-semibold">-${fee.toFixed(2)}</span>
+                </div>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
+                  <span>Net Refund Amount</span>
+                  <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
+                </div>
+                <p className="text-[11px] text-slate-500 pt-1 leading-normal">
+                  As per policy, sender-initiated cancellations incur a 30% cancellation fee. The net refund will be queued for admin processing.
+                </p>
+              </div>
+            );
+          })()}
+
+          {shipmentToCancel?.status === 'AWAITING_MATCH' && (
+            <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-md border border-slate-200 my-2">
+              No payment has been processed for this shipment because no offer was accepted yet.
+            </p>
+          )}
+
           <DialogFooter className="gap-3 sm:gap-3 mt-4">
             <Button
               variant="outline"
