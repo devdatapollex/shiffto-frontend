@@ -14,12 +14,22 @@ export interface PaymentTransaction {
   currency: string;
   paymentGateway: string;
   gatewayTxnId: string | null;
-  status: 'PENDING_PAYMENT' | 'ESCROWED' | 'PENDING_RELEASE' | 'PENDING_REFUND' | 'RELEASED' | 'REFUNDED' | 'FAILED';
+  status:
+    | 'PENDING_PAYMENT'
+    | 'ESCROWED'
+    | 'PENDING_RELEASE'
+    | 'PENDING_REFUND'
+    | 'RELEASED'
+    | 'REFUNDED'
+    | 'FAILED';
   proofPhotoUrl: string | null;
   releasedAt: string | null;
   refundTxnId?: string | null;
   refundReason?: string | null;
-  refundMethodDetails?: Record<string, any> | null;
+  refundInitiator?: 'SENDER' | 'TRAVELLER' | 'ADMIN' | null;
+  refundableAmount?: number;
+  cancellationFeeAmount?: number;
+  refundMethodDetails?: Record<string, unknown> | null;
   refundedAt?: string | null;
   refundedBy?: string | null;
   adminRefundNotes?: string | null;
@@ -113,13 +123,23 @@ export interface AdminPaymentTransaction {
   currency: string;
   paymentGateway: string;
   gatewayTxnId?: string | null;
-  status: 'PENDING_PAYMENT' | 'ESCROWED' | 'PENDING_RELEASE' | 'PENDING_REFUND' | 'RELEASED' | 'REFUNDED' | 'FAILED';
+  status:
+    | 'PENDING_PAYMENT'
+    | 'ESCROWED'
+    | 'PENDING_RELEASE'
+    | 'PENDING_REFUND'
+    | 'RELEASED'
+    | 'REFUNDED'
+    | 'FAILED';
   proofPhotoUrl?: string | null;
   releasedAt?: string | null;
   releasedBy?: string | null;
   refundTxnId?: string | null;
   refundReason?: string | null;
-  refundMethodDetails?: Record<string, any> | null;
+  refundInitiator?: 'SENDER' | 'TRAVELLER' | 'ADMIN' | null;
+  refundableAmount?: number;
+  cancellationFeeAmount?: number;
+  refundMethodDetails?: Record<string, unknown> | null;
   refundedAt?: string | null;
   refundedBy?: string | null;
   adminRefundNotes?: string | null;
@@ -150,7 +170,7 @@ export interface AdminPaymentTransaction {
     email: string;
     phone?: string;
     image?: string;
-    paymentMethods?: any[];
+    paymentMethods?: Record<string, unknown>[];
   };
   traveller: {
     id: string;
@@ -201,6 +221,21 @@ export async function processAdminRefund(
 ): Promise<AdminPaymentTransaction> {
   const { data } = await apiClient.post<{ data: AdminPaymentTransaction }>(
     `/payments/admin/refunds/${transactionId}/process`,
+    payload
+  );
+  return data.data;
+}
+
+export async function adminCancelShipment(
+  shipmentId: string,
+  payload: {
+    reason: string;
+    feeType?: 'COMMISSION' | 'PERCENT' | 'FLAT' | 'NONE';
+    feeValue?: number;
+  }
+): Promise<AdminPaymentTransaction> {
+  const { data } = await apiClient.post<{ data: AdminPaymentTransaction }>(
+    `/payments/admin/shipments/${shipmentId}/cancel`,
     payload
   );
   return data.data;

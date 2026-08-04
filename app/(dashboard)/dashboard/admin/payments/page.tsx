@@ -139,7 +139,9 @@ export default function AdminPaymentsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Refund Modal State
-  const [processingRefundTx, setProcessingRefundTx] = useState<AdminPaymentTransaction | null>(null);
+  const [processingRefundTx, setProcessingRefundTx] = useState<AdminPaymentTransaction | null>(
+    null
+  );
   const [refundTxnIdInput, setRefundTxnIdInput] = useState('');
   const [adminNotesInput, setAdminNotesInput] = useState('');
   const [isSubmittingRefund, setIsSubmittingRefund] = useState(false);
@@ -161,8 +163,11 @@ export default function AdminPaymentsPage() {
       setAdminNotesInput('');
       setSelectedTx(null);
       fetchPayments();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to process refund');
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Failed to process refund';
+      toast.error(errorMsg);
     } finally {
       setIsSubmittingRefund(false);
     }
@@ -307,7 +312,9 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-xs font-semibold text-muted-foreground mt-1">Held until delivery</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">
+                  Held until delivery
+                </p>
               </div>
               <div className="h-11 w-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
                 <ShieldCheck className="h-6 w-6" />
@@ -333,7 +340,9 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-xs font-semibold text-muted-foreground mt-1">Delivered, awaiting payout</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">
+                  Delivered, awaiting payout
+                </p>
               </div>
               <div className="h-11 w-11 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
                 <Clock className="h-6 w-6" />
@@ -359,7 +368,9 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-xs font-semibold text-muted-foreground mt-1">Traveler net payouts</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">
+                  Traveler net payouts
+                </p>
               </div>
               <div className="h-11 w-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
                 <CheckCircle2 className="h-6 w-6" />
@@ -385,7 +396,9 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-xs font-semibold text-muted-foreground mt-1">Awaiting off-platform payout</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">
+                  Awaiting off-platform payout
+                </p>
               </div>
               <div className="h-11 w-11 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
                 <RotateCcw className="h-6 w-6 animate-pulse" />
@@ -411,7 +424,9 @@ export default function AdminPaymentsPage() {
                     })}
                   </h3>
                 )}
-                <p className="text-xs font-semibold text-muted-foreground mt-1">Processed payouts</p>
+                <p className="text-xs font-semibold text-muted-foreground mt-1">
+                  Processed payouts
+                </p>
               </div>
               <div className="h-11 w-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 shrink-0">
                 <RotateCcw className="h-6 w-6" />
@@ -483,8 +498,10 @@ export default function AdminPaymentsPage() {
             {STATUS_TABS.map((tab) => {
               const isActive = status === tab.value;
               const isPendingRefundTab = tab.value === 'PENDING_REFUND';
-              const hasPendingRefunds = pendingRefundsCount > 0 || (data?.stats.totalPendingRefund ?? 0) > 0;
-              const isHighlightUnselectedRefund = isPendingRefundTab && !isActive && hasPendingRefunds;
+              const hasPendingRefunds =
+                pendingRefundsCount > 0 || (data?.stats.totalPendingRefund ?? 0) > 0;
+              const isHighlightUnselectedRefund =
+                isPendingRefundTab && !isActive && hasPendingRefunds;
 
               return (
                 <button
@@ -505,9 +522,7 @@ export default function AdminPaymentsPage() {
                   {isPendingRefundTab && pendingRefundsCount > 0 && (
                     <span
                       className={`flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[9px] font-bold ${
-                        isActive
-                          ? 'bg-[#0D307A] text-white'
-                          : 'bg-primary text-white'
+                        isActive ? 'bg-[#0D307A] text-white' : 'bg-primary text-white'
                       }`}
                     >
                       {pendingRefundsCount}
@@ -843,18 +858,48 @@ export default function AdminPaymentsPage() {
                       ${selectedTx.grossAmount.toFixed(2)} {selectedTx.currency}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center text-muted-foreground">
-                    <span>Platform Commission (30%):</span>
-                    <span className="font-medium text-purple-600">
-                      -${selectedTx.commissionAmount.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-muted-foreground">
-                    <span>Net Traveler Earnings:</span>
-                    <span className="font-semibold text-emerald-700">
-                      ${selectedTx.netAmount.toFixed(2)}
-                    </span>
-                  </div>
+                  {selectedTx.status === 'PENDING_REFUND' || selectedTx.status === 'REFUNDED' ? (
+                    <>
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>Cancellation Fee Retained:</span>
+                        <span className="font-medium text-purple-600">
+                          -${(selectedTx.cancellationFeeAmount || 0).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>Net Refund Payout Target:</span>
+                        <span className="font-semibold text-rose-700">
+                          ${(selectedTx.refundableAmount ?? selectedTx.grossAmount).toFixed(2)}
+                        </span>
+                      </div>
+                      {selectedTx.refundInitiator && (
+                        <div className="flex justify-between items-center text-muted-foreground">
+                          <span>Cancellation Initiator:</span>
+                          <span className="font-semibold text-slate-700">
+                            {selectedTx.refundInitiator}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>
+                          Platform Commission (
+                          {((selectedTx.commissionRate || 0.3) * 100).toFixed(0)}%):
+                        </span>
+                        <span className="font-medium text-purple-600">
+                          -${selectedTx.commissionAmount.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>Net Traveler Earnings:</span>
+                        <span className="font-semibold text-emerald-700">
+                          ${selectedTx.netAmount.toFixed(2)}
+                        </span>
+                      </div>
+                    </>
+                  )}
                   {selectedTx.gatewayTxnId && (
                     <div className="flex justify-between items-center pt-1 text-[11px] text-muted-foreground">
                       <span>Stripe Payment Intent ID:</span>
@@ -941,10 +986,15 @@ export default function AdminPaymentsPage() {
                       </Button>
                     </div>
                     {selectedTx.refundReason && (
-                      <p className="text-[11px] text-rose-700">
-                        Reason: {selectedTx.refundReason}
-                      </p>
+                      <p className="text-[11px] text-rose-700">Reason: {selectedTx.refundReason}</p>
                     )}
+                    <p className="text-[11px] text-rose-800 font-medium pt-0.5">
+                      Net Payout Target: $
+                      {(selectedTx.refundableAmount ?? selectedTx.grossAmount).toFixed(2)}
+                      {selectedTx.cancellationFeeAmount
+                        ? ` (Fee Retained: $${selectedTx.cancellationFeeAmount.toFixed(2)})`
+                        : ''}
+                    </p>
                   </div>
                 )}
 
@@ -958,7 +1008,8 @@ export default function AdminPaymentsPage() {
                   )}
                   {selectedTx.refundedAt && (
                     <p className="text-purple-700 font-medium">
-                      Refunded Date: {new Date(selectedTx.refundedAt).toLocaleString()} (Ref: {selectedTx.refundTxnId})
+                      Refunded Date: {new Date(selectedTx.refundedAt).toLocaleString()} (Ref:{' '}
+                      {selectedTx.refundTxnId})
                     </p>
                   )}
                 </div>
@@ -1006,7 +1057,10 @@ export default function AdminPaymentsPage() {
         </Dialog>
 
         {/* Process Refund Modal */}
-        <Dialog open={!!processingRefundTx} onOpenChange={(open) => !open && setProcessingRefundTx(null)}>
+        <Dialog
+          open={!!processingRefundTx}
+          onOpenChange={(open) => !open && setProcessingRefundTx(null)}
+        >
           <DialogContent className="sm:max-w-[480px] p-6">
             <DialogHeader>
               <DialogTitle className="text-destructive font-bold text-lg flex items-center gap-2">
@@ -1014,7 +1068,8 @@ export default function AdminPaymentsPage() {
                 Process Off-Platform Refund
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-1">
-                Manually process the refund off-platform (bKash, Bank, Nagad, etc.) to the sender and enter the reference transaction ID below.
+                Manually process the refund off-platform (bKash, Bank, Nagad, etc.) to the sender
+                and enter the reference transaction ID below.
               </DialogDescription>
             </DialogHeader>
 
@@ -1030,7 +1085,8 @@ export default function AdminPaymentsPage() {
                   </div>
                   {processingRefundTx.refundReason && (
                     <p className="text-[11px] text-rose-800">
-                      <span className="font-semibold">Reason:</span> {processingRefundTx.refundReason}
+                      <span className="font-semibold">Reason:</span>{' '}
+                      {processingRefundTx.refundReason}
                     </p>
                   )}
                 </div>
@@ -1045,28 +1101,37 @@ export default function AdminPaymentsPage() {
                     <div className="grid grid-cols-2 gap-2 text-[11px] text-foreground">
                       <div>
                         <span className="text-muted-foreground block">Type:</span>
-                        <span className="font-semibold">{processingRefundTx.refundMethodDetails.type || 'N/A'}</span>
+                        <span className="font-semibold">
+                          {processingRefundTx.refundMethodDetails.type || 'N/A'}
+                        </span>
                       </div>
                       <div>
                         <span className="text-muted-foreground block">Account Number:</span>
-                        <span className="font-mono font-semibold">{processingRefundTx.refundMethodDetails.accountNumber || 'N/A'}</span>
+                        <span className="font-mono font-semibold">
+                          {processingRefundTx.refundMethodDetails.accountNumber || 'N/A'}
+                        </span>
                       </div>
                       {processingRefundTx.refundMethodDetails.accountName && (
                         <div>
                           <span className="text-muted-foreground block">Account Name:</span>
-                          <span className="font-semibold">{processingRefundTx.refundMethodDetails.accountName}</span>
+                          <span className="font-semibold">
+                            {processingRefundTx.refundMethodDetails.accountName}
+                          </span>
                         </div>
                       )}
                       {processingRefundTx.refundMethodDetails.bankName && (
                         <div>
                           <span className="text-muted-foreground block">Bank Name:</span>
-                          <span className="font-semibold">{processingRefundTx.refundMethodDetails.bankName}</span>
+                          <span className="font-semibold">
+                            {processingRefundTx.refundMethodDetails.bankName}
+                          </span>
                         </div>
                       )}
                     </div>
                   ) : (
                     <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200">
-                      No saved payout method snapshot found on file. Please confirm payout details directly with the sender.
+                      No saved payout method snapshot found on file. Please confirm payout details
+                      directly with the sender.
                     </p>
                   )}
                 </div>
