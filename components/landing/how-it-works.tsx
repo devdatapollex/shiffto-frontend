@@ -2,7 +2,10 @@ import { HowItWorksForm } from './how-it-works-form';
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="container mx-auto px-16 pt-25 pb-50 max-w-7xl">
+    <section
+      id="how-it-works"
+      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-16 pt-12 md:pt-20 lg:pt-25 pb-16 md:pb-32 lg:pb-50 max-w-7xl"
+    >
       {/* Top Header */}
       <div className="flex flex-col gap-2 mb-12">
         <span className="text-[11px] font-bold tracking-[2.5px] uppercase text-accent-foreground">
