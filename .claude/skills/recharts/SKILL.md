@@ -20,7 +20,16 @@ npm install recharts
 All Recharts charts follow the same pattern:
 
 ```jsx
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 const data = [
   { name: 'Jan', sales: 4000, profit: 2400 },
@@ -38,7 +47,7 @@ const data = [
     <Line type="monotone" dataKey="sales" stroke="#8884d8" />
     <Line type="monotone" dataKey="profit" stroke="#82ca9d" />
   </LineChart>
-</ResponsiveContainer>
+</ResponsiveContainer>;
 ```
 
 ## Core Concepts
@@ -55,6 +64,7 @@ const data = [
 ```
 
 Use `dataKey` props to map object properties to chart components:
+
 - `dataKey="revenue"` - maps to the revenue property
 - `dataKey={(entry) => entry.revenue - entry.expenses}` - function for computed values
 
@@ -65,6 +75,7 @@ Charts are built by nesting specialized components:
 **Sizing**: Use the `responsive` prop (v3.3+), `ResponsiveContainer` wrapper, or set `width`/`height` directly
 
 **Chart types** (choose one):
+
 - `LineChart` - Line and area visualizations
 - `BarChart` - Bar and column charts
 - `AreaChart` - Stacked and filled area charts
@@ -75,6 +86,7 @@ Charts are built by nesting specialized components:
 - `RadialBarChart` - Circular bar charts
 
 **Common child components**:
+
 - `XAxis` / `YAxis` - Axis configuration
 - `CartesianGrid` - Grid lines
 - `Tooltip` - Hover information
@@ -97,6 +109,7 @@ Charts are built by nesting specialized components:
 ```
 
 **Key props**:
+
 - `type`: "monotone" (smooth), "linear", "step", "natural"
 - `stroke`: line color
 - `strokeWidth`: line thickness
@@ -110,8 +123,8 @@ Charts are built by nesting specialized components:
 <AreaChart data={data}>
   <defs>
     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-      <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+      <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
     </linearGradient>
   </defs>
   <XAxis dataKey="name" />
@@ -123,6 +136,7 @@ Charts are built by nesting specialized components:
 ```
 
 **Stacked areas**:
+
 ```jsx
 <Area type="monotone" dataKey="sales" stackId="1" stroke="#8884d8" fill="#8884d8" />
 <Area type="monotone" dataKey="profit" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
@@ -143,6 +157,7 @@ Charts are built by nesting specialized components:
 ```
 
 **Key props**:
+
 - `fill`: bar color
 - `radius`: rounded corners [topLeft, topRight, bottomRight, bottomLeft] or single number for all corners
 - `barSize`: fixed bar width
@@ -150,12 +165,14 @@ Charts are built by nesting specialized components:
 - `shape`: custom bar shape (function or element)
 
 **Stacked bars**:
+
 ```jsx
 <Bar dataKey="sales" stackId="a" fill="#8884d8" />
 <Bar dataKey="profit" stackId="a" fill="#82ca9d" />
 ```
 
 **Rounded stacked bars** (use `BarStack` to round the whole stack):
+
 ```jsx
 import { BarStack } from 'recharts';
 
@@ -164,7 +181,7 @@ import { BarStack } from 'recharts';
     <Bar dataKey="sales" fill="#8884d8" />
     <Bar dataKey="profit" fill="#82ca9d" />
   </BarStack>
-</BarChart>
+</BarChart>;
 ```
 
 ### Pie Charts
@@ -186,10 +203,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
   />
   <Tooltip />
   <Legend />
-</PieChart>
+</PieChart>;
 ```
 
 **Key props**:
+
 - `innerRadius`: creates donut chart when > 0
 - `outerRadius`: pie size
 - `paddingAngle`: gap between slices
@@ -252,9 +270,7 @@ For Recharts < 3.3, wrap chart in `ResponsiveContainer`:
 
 ```jsx
 <ResponsiveContainer width="100%" height={300}>
-  <LineChart data={data}>
-    {/* chart components */}
-  </LineChart>
+  <LineChart data={data}>{/* chart components */}</LineChart>
 </ResponsiveContainer>
 ```
 
@@ -275,15 +291,15 @@ Set `width` and `height` directly as pixels or percentages:
 ### XAxis / YAxis Props
 
 ```jsx
-<XAxis 
-  dataKey="name"           // property to display
-  type="category"          // "category" or "number"
-  domain={[0, 'dataMax']}    // axis range
-  tick={{ fill: '#666' }}    // tick styling
-  tickFormatter={(value) => `$${value}`}  // format labels
-  angle={-45}               // rotate labels
-  textAnchor="end"         // text alignment
-  height={60}              // extra space for labels
+<XAxis
+  dataKey="name" // property to display
+  type="category" // "category" or "number"
+  domain={[0, 'dataMax']} // axis range
+  tick={{ fill: '#666' }} // tick styling
+  tickFormatter={(value) => `$${value}`} // format labels
+  angle={-45} // rotate labels
+  textAnchor="end" // text alignment
+  height={60} // extra space for labels
 />
 ```
 
@@ -328,7 +344,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-<Tooltip content={<CustomTooltip />} />
+<Tooltip content={<CustomTooltip />} />;
 ```
 
 ### Custom Legend
@@ -344,12 +360,13 @@ const CustomLegend = ({ payload }) => (
   </ul>
 );
 
-<Legend content={<CustomLegend />} />
+<Legend content={<CustomLegend />} />;
 ```
 
 ### Custom Shapes
 
 **Custom bar shape**:
+
 ```jsx
 const CustomBar = (props) => {
   const { x, y, width, height, fill } = props;
@@ -364,14 +381,14 @@ const CustomBar = (props) => {
 ### Custom Labels
 
 ```jsx
-<Line 
-  dataKey="sales" 
+<Line
+  dataKey="sales"
   label={{ position: 'top', fill: '#666', fontSize: 12 }}
 />
 
 // Custom label component
-<Line 
-  dataKey="sales" 
+<Line
+  dataKey="sales"
   label={<CustomLabel />}
 />
 ```
@@ -379,13 +396,15 @@ const CustomBar = (props) => {
 ### Styling
 
 **Chart styles**:
+
 ```jsx
 <LineChart style={{ backgroundColor: '#f5f5f5' }}>
 ```
 
 **Axis styling**:
+
 ```jsx
-<XAxis 
+<XAxis
   axisLine={{ stroke: '#666' }}
   tickLine={{ stroke: '#666' }}
   tick={{ fill: '#666', fontSize: 12 }}
@@ -393,6 +412,7 @@ const CustomBar = (props) => {
 ```
 
 **Grid styling**:
+
 ```jsx
 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
 ```
@@ -404,6 +424,7 @@ const CustomBar = (props) => {
 The `Tooltip` component controls active element highlighting. Do not use `activeIndex` prop (removed in v3).
 
 **Tooltip interaction props**:
+
 - `defaultIndex`: Sets initial highlighted item on render
 - `active`: If true, tooltip remains active after interaction ends
 - `trigger`: `"hover"` (default) or `"click"` for click-based interaction
@@ -411,21 +432,22 @@ The `Tooltip` component controls active element highlighting. Do not use `active
 - `cursor`: Visual cursor in plot area, set to `false` to hide
 
 ```jsx
-{/* Click-based interaction with hidden tooltip text */}
-<Tooltip trigger="click" content={() => null} cursor={false} />
+{
+  /* Click-based interaction with hidden tooltip text */
+}
+<Tooltip trigger="click" content={() => null} cursor={false} />;
 
-{/* Default highlighted item on render */}
-<Tooltip defaultIndex={2} />
+{
+  /* Default highlighted item on render */
+}
+<Tooltip defaultIndex={2} />;
 ```
 
 ### Click Events
 
 ```jsx
 <LineChart onClick={(e) => console.log(e)}>
-  <Bar 
-    dataKey="sales" 
-    onClick={(data, index) => console.log('Bar clicked:', data)}
-  />
+  <Bar dataKey="sales" onClick={(data, index) => console.log('Bar clicked:', data)} />
 </LineChart>
 ```
 
@@ -460,20 +482,18 @@ Use `useMemo` and `useCallback` for props:
 
 ```jsx
 // BAD - new function on every render
-<Line dataKey={(entry) => entry.sales * 2} />
+<Line dataKey={(entry) => entry.sales * 2} />;
 
 // GOOD - stable reference
 const dataKey = useCallback((entry) => entry.sales * 2, []);
-<Line dataKey={dataKey} />
+<Line dataKey={dataKey} />;
 ```
 
 ### 2. Memoize Components
 
 ```jsx
 const MemoizedChart = React.memo(({ data }) => (
-  <LineChart data={data}>
-    {/* components */}
-  </LineChart>
+  <LineChart data={data}>{/* components */}</LineChart>
 ));
 ```
 
@@ -484,12 +504,12 @@ Separate frequently updating components:
 ```jsx
 const Chart = () => {
   const [hoveredData, setHoveredData] = useState(null);
-  
+
   return (
     <LineChart>
       {/* Static components */}
       <Line dataKey="sales" />
-      
+
       {/* Dynamic overlay */}
       <ReferenceLine x={hoveredData?.x} stroke="red" />
     </LineChart>
@@ -516,7 +536,7 @@ For large datasets, consider aggregation:
 ```jsx
 // Bin data before rendering
 const binnedData = useMemo(() => {
-  return d3.bin().value(d => d.x)(rawData);
+  return d3.bin().value((d) => d.x)(rawData);
 }, [rawData]);
 ```
 
@@ -533,6 +553,7 @@ Recharts includes built-in accessibility support:
 **Accessibility is enabled by default**. The chart is keyboard navigable and screen reader compatible.
 
 **ARIA props**:
+
 ```jsx
 <LineChart role="img" aria-label="Sales chart showing monthly revenue">
 ```
@@ -577,7 +598,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
     dataKey="value"
     shape={(props) => <Sector {...props} fill={COLORS[props.index % COLORS.length]} />}
   />
-</PieChart>
+</PieChart>;
 ```
 
 > **Note**: `Cell` component is deprecated and will be removed in Recharts 4.0. Use the `shape` prop on `Bar`, `Pie`, `Scatter`, etc. instead.
@@ -610,13 +631,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 ```jsx
 const SalesChart = () => {
   const [timeRange, setTimeRange] = useState('month');
-  const data = useSelector(state => selectSalesData(state, timeRange));
-  
+  const data = useSelector((state) => selectSalesData(state, timeRange));
+
   return (
     <ResponsiveContainer>
-      <LineChart data={data}>
-        {/* components */}
-      </LineChart>
+      <LineChart data={data}>{/* components */}</LineChart>
     </ResponsiveContainer>
   );
 };
@@ -627,14 +646,14 @@ const SalesChart = () => {
 ```jsx
 const RealtimeChart = () => {
   const [data, setData] = useState([]);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setData(prev => [...prev.slice(-20), newDataPoint]);
+      setData((prev) => [...prev.slice(-20), newDataPoint]);
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-  
+
   return (
     <LineChart data={data}>
       <XAxis dataKey="time" />
@@ -650,7 +669,7 @@ const RealtimeChart = () => {
 Components render in a default order (grid < axes < chart elements < tooltip/legend). Override with `zIndex` prop:
 
 ```jsx
-<Line dataKey="sales" zIndex={10} />  // Render on top
+<Line dataKey="sales" zIndex={10} /> // Render on top
 ```
 
 For components without direct `zIndex` support, wrap in `ZIndexLayer`:
@@ -660,7 +679,7 @@ import { ZIndexLayer } from 'recharts';
 
 <ZIndexLayer zIndex={5}>
   <CustomAnnotation />
-</ZIndexLayer>
+</ZIndexLayer>;
 ```
 
 ## Coordinate Systems
@@ -672,6 +691,7 @@ Recharts has three coordinate systems:
 3. **Mouse event coordinates** - Browser viewport coordinates. Convert with `getRelativeCoordinate(event, element)`.
 
 **Converting between systems**:
+
 - Data to pixels: `useXAxisScale()`, `useYAxisScale()`
 - Pixels to data: `useXAxisInverseScale()`, `useYAxisInverseScale()`
 
