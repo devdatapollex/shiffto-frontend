@@ -150,8 +150,6 @@ export default function AdminTicketsPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };

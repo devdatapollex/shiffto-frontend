@@ -51,7 +51,8 @@ export function AdminCancelShipmentModal({
   const commissionRate = shipment.paymentTransaction?.commissionRate ?? 0.3;
   const maxCommissionPercent = Math.round(commissionRate * 100);
   const maxCommissionAmount =
-    shipment.paymentTransaction?.commissionAmount && shipment.paymentTransaction.commissionAmount > 0
+    shipment.paymentTransaction?.commissionAmount &&
+    shipment.paymentTransaction.commissionAmount > 0
       ? shipment.paymentTransaction.commissionAmount
       : grossAmount * commissionRate;
 
@@ -119,7 +120,13 @@ export function AdminCancelShipmentModal({
       onClose();
     } catch (err: unknown) {
       const errorMsg =
-        (err as { message?: string; data?: { message?: string }; response?: { data?: { message?: string } } })?.message ||
+        (
+          err as {
+            message?: string;
+            data?: { message?: string };
+            response?: { data?: { message?: string } };
+          }
+        )?.message ||
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
         'Failed to cancel shipment';
       toast.error(errorMsg);
@@ -156,7 +163,9 @@ export function AdminCancelShipmentModal({
               onChange={(e) => setReason(e.target.value)}
               onBlur={() => setReasonTouched(true)}
               className={`text-xs min-h-[80px] ${
-                reasonError ? 'border-destructive focus-visible:ring-destructive text-destructive' : ''
+                reasonError
+                  ? 'border-destructive focus-visible:ring-destructive text-destructive'
+                  : ''
               }`}
             />
             {reasonError && (
@@ -211,7 +220,9 @@ export function AdminCancelShipmentModal({
                   type="button"
                   onClick={() => {
                     setFeeType('FLAT');
-                    setFeeValue(String(Math.max(1, Math.min(10, Number(maxCommissionAmount.toFixed(2))))));
+                    setFeeValue(
+                      String(Math.max(1, Math.min(10, Number(maxCommissionAmount.toFixed(2)))))
+                    );
                   }}
                   className={`p-2.5 rounded-lg border text-left font-medium transition ${
                     feeType === 'FLAT'
@@ -226,7 +237,10 @@ export function AdminCancelShipmentModal({
               {(feeType === 'PERCENT' || feeType === 'FLAT') && (
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="custom-fee-val" className="text-xs font-semibold text-slate-700">
+                    <Label
+                      htmlFor="custom-fee-val"
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       {feeType === 'PERCENT' ? 'Fee Percentage (%)' : 'Flat Fee Amount ($)'}
                     </Label>
                     <span className="text-[11px] text-slate-500 font-medium">
@@ -244,13 +258,13 @@ export function AdminCancelShipmentModal({
                     value={feeValue}
                     onChange={(e) => setFeeValue(e.target.value)}
                     className={`text-xs h-8 ${
-                      feeValueError ? 'border-destructive focus-visible:ring-destructive text-destructive' : ''
+                      feeValueError
+                        ? 'border-destructive focus-visible:ring-destructive text-destructive'
+                        : ''
                     }`}
                   />
                   {feeValueError ? (
-                    <p className="text-[11px] font-medium text-destructive mt-1">
-                      {feeValueError}
-                    </p>
+                    <p className="text-[11px] font-medium text-destructive mt-1">{feeValueError}</p>
                   ) : (
                     <p className="text-[11px] text-slate-500">
                       {feeType === 'PERCENT'

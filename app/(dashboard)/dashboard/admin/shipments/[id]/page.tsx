@@ -125,7 +125,12 @@ export default function AdminShipmentDetailsPage() {
   const shipmentId = params?.id as string;
 
   const { user } = useRole();
-  const { data: shipment, isLoading, error, refetch } = useShipmentDetails(shipmentId, !!shipmentId);
+  const {
+    data: shipment,
+    isLoading,
+    error,
+    refetch,
+  } = useShipmentDetails(shipmentId, !!shipmentId);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; title: string } | null>(null);
   const [isReleasing, setIsReleasing] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -135,8 +140,8 @@ export default function AdminShipmentDetailsPage() {
   const [isSubmittingRefund, setIsSubmittingRefund] = useState(false);
 
   const handleProcessRefundSubmit = async () => {
-    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })
-      ?.paymentTransaction?.transactionId;
+    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })?.paymentTransaction
+      ?.transactionId;
     if (!txId || !refundTxnIdInput.trim()) {
       toast.error('Refund Reference Transaction ID is required');
       return;
@@ -164,8 +169,8 @@ export default function AdminShipmentDetailsPage() {
   };
 
   const handleReleasePayment = async () => {
-    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })
-      ?.paymentTransaction?.transactionId;
+    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })?.paymentTransaction
+      ?.transactionId;
     if (!txId) {
       toast.error('No payment transaction ID found for this shipment');
       return;
@@ -247,8 +252,8 @@ export default function AdminShipmentDetailsPage() {
           <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
           <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
           <p className="text-sm text-slate-500 mt-2 max-w-md">
-            We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you might
-            not have authorization to view it.
+            We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you
+            might not have authorization to view it.
           </p>
           <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
             <Link href="/dashboard/admin/shipments">Back to Shipments</Link>
@@ -307,7 +312,8 @@ export default function AdminShipmentDetailsPage() {
 
         {/* Payment Verification & Release / Refund Card for Admin */}
         {(() => {
-          const paymentTx = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })?.paymentTransaction;
+          const paymentTx = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })
+            ?.paymentTransaction;
           if (!paymentTx) return null;
 
           const isCanceled = shipment.status === 'CANCELED';
@@ -337,7 +343,8 @@ export default function AdminShipmentDetailsPage() {
                         Shipment Canceled — Refund Pending
                       </h2>
                       <p className="text-xs text-rose-600 mt-0.5">
-                        This shipment has been canceled. Review calculated refund amounts and process payout to sender.
+                        This shipment has been canceled. Review calculated refund amounts and
+                        process payout to sender.
                       </p>
                     </div>
 
@@ -358,14 +365,18 @@ export default function AdminShipmentDetailsPage() {
                     </div>
 
                     <div className="space-y-1">
-                      <p className="text-xs text-slate-500 font-medium">Retained Cancellation Fee:</p>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Retained Cancellation Fee:
+                      </p>
                       <p className="text-xl font-extrabold text-amber-700">
                         -${(paymentTx.cancellationFeeAmount || 0).toFixed(2)}
                       </p>
                     </div>
 
                     <div className="space-y-1">
-                      <p className="text-xs text-slate-500 font-medium">Net Refundable to Sender:</p>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Net Refundable to Sender:
+                      </p>
                       <p className="text-xl font-extrabold text-emerald-700">
                         ${(paymentTx.refundableAmount ?? paymentTx.grossAmount ?? 0).toFixed(2)}
                       </p>
@@ -388,7 +399,9 @@ export default function AdminShipmentDetailsPage() {
                       {method && (
                         <p className="text-slate-500 font-mono">
                           <span className="font-semibold font-sans">Payout Method:</span>{' '}
-                          {method.type || 'ACCOUNT'} {method.accountNumber ? `(${method.accountNumber})` : ''} {method.bankName ? `- ${method.bankName}` : ''}
+                          {method.type || 'ACCOUNT'}{' '}
+                          {method.accountNumber ? `(${method.accountNumber})` : ''}{' '}
+                          {method.bankName ? `- ${method.bankName}` : ''}
                         </p>
                       )}
                     </div>
@@ -453,7 +466,8 @@ export default function AdminShipmentDetailsPage() {
 
                   {paymentTx.adminRefundNotes && (
                     <p className="text-xs text-slate-600 italic border-t border-purple-100 pt-2">
-                      <span className="font-semibold not-italic text-slate-700">Admin Notes:</span> {paymentTx.adminRefundNotes}
+                      <span className="font-semibold not-italic text-slate-700">Admin Notes:</span>{' '}
+                      {paymentTx.adminRefundNotes}
                     </p>
                   )}
                 </div>
@@ -474,7 +488,8 @@ export default function AdminShipmentDetailsPage() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-600">
-                    Escrowed funds of <strong>${(paymentTx.grossAmount || 0).toFixed(2)}</strong> were released to traveler prior to shipment cancellation.
+                    Escrowed funds of <strong>${(paymentTx.grossAmount || 0).toFixed(2)}</strong>{' '}
+                    were released to traveler prior to shipment cancellation.
                   </p>
                 </div>
               );
@@ -493,7 +508,8 @@ export default function AdminShipmentDetailsPage() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  This shipment was canceled without captured escrow funds. No refund action is required.
+                  This shipment was canceled without captured escrow funds. No refund action is
+                  required.
                 </p>
               </div>
             );
@@ -836,13 +852,15 @@ export default function AdminShipmentDetailsPage() {
                       <div className="flex justify-between items-center text-xs md:text-sm">
                         <span className="text-slate-500 font-medium">Cabin Avail</span>
                         <span className="font-semibold text-[#0D307A]">
-                          {shipment.trip.remainingCabinCapacity ?? 0} / {shipment.trip.cabinBagCapacity ?? 0} KG
+                          {shipment.trip.remainingCabinCapacity ?? 0} /{' '}
+                          {shipment.trip.cabinBagCapacity ?? 0} KG
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-xs md:text-sm">
                         <span className="text-slate-500 font-medium">Check-in Avail</span>
                         <span className="font-semibold text-[#0D307A]">
-                          {shipment.trip.remainingCheckInCapacity ?? 0} / {shipment.trip.checkInBagCapacity ?? 0} KG
+                          {shipment.trip.remainingCheckInCapacity ?? 0} /{' '}
+                          {shipment.trip.checkInBagCapacity ?? 0} KG
                         </span>
                       </div>
                     </>
@@ -1054,7 +1072,10 @@ export default function AdminShipmentDetailsPage() {
         />
 
         {/* Process Refund Modal */}
-        <Dialog open={isProcessRefundModalOpen} onOpenChange={(o) => !o && setIsProcessRefundModalOpen(false)}>
+        <Dialog
+          open={isProcessRefundModalOpen}
+          onOpenChange={(o) => !o && setIsProcessRefundModalOpen(false)}
+        >
           <DialogContent className="max-w-md rounded-lg p-6 bg-white">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
