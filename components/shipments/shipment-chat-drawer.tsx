@@ -16,9 +16,7 @@ export function ShipmentChatDrawer({ isOpen, onClose, shipmentId }: ShipmentChat
         <SheetTitle className="sr-only">Shipment Chat Drawer</SheetTitle>
 
         {/* Decoupled lazy rendering: Chat UI is mounted ONLY when drawer is active */}
-        {isOpen && shipmentId ? (
-          <ShipmentChatContent shipmentId={shipmentId} />
-        ) : null}
+        {isOpen && shipmentId ? <ShipmentChatContent shipmentId={shipmentId} /> : null}
       </SheetContent>
     </Sheet>
   );

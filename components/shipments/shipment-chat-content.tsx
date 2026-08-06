@@ -13,7 +13,18 @@ import { uploadPhotos } from '@/services/upload.service';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
 import { toast } from 'sonner';
-import { Send, Loader2, MessageSquare, CheckCheck, Paperclip, FileText, X, Download, Eye, Play } from 'lucide-react';
+import {
+  Send,
+  Loader2,
+  MessageSquare,
+  CheckCheck,
+  Paperclip,
+  FileText,
+  X,
+  Download,
+  Eye,
+  Play,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -132,7 +143,10 @@ function formatMessageDateHeader(dateStr: string): string {
   }
 }
 
-function groupMessages(messages: ShipmentMessage[], currentUserId?: string): GroupedMessageCluster[] {
+function groupMessages(
+  messages: ShipmentMessage[],
+  currentUserId?: string
+): GroupedMessageCluster[] {
   if (!messages || messages.length === 0) return [];
 
   const clusters: GroupedMessageCluster[] = [];
@@ -235,15 +249,18 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
     joinShipmentChat(shipmentId);
 
     const handleNewMessage = (newMsg: ShipmentMessage) => {
-      queryClient.setQueryData<ShipmentMessagesResponse>(['shipment-messages', shipmentId], (old) => {
-        if (!old) return old;
-        const exists = old.messages.some((m: ShipmentMessage) => m.id === newMsg.id);
-        if (exists) return old;
-        return {
-          ...old,
-          messages: [...old.messages, newMsg],
-        };
-      });
+      queryClient.setQueryData<ShipmentMessagesResponse>(
+        ['shipment-messages', shipmentId],
+        (old) => {
+          if (!old) return old;
+          const exists = old.messages.some((m: ShipmentMessage) => m.id === newMsg.id);
+          if (exists) return old;
+          return {
+            ...old,
+            messages: [...old.messages, newMsg],
+          };
+        }
+      );
 
       setIsCounterpartyTyping(false);
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
@@ -287,7 +304,15 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       if (selfTypingTimerRef.current) clearTimeout(selfTypingTimerRef.current);
     };
-  }, [shipmentId, socket, joinShipmentChat, leaveShipmentChat, currentUserId, queryClient, counterpartyId]);
+  }, [
+    shipmentId,
+    socket,
+    joinShipmentChat,
+    leaveShipmentChat,
+    currentUserId,
+    queryClient,
+    counterpartyId,
+  ]);
 
   // Send message mutation
   const sendMessageMutation = useMutation({
@@ -295,15 +320,18 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
       shipmentMessageService.sendMessage(shipmentId, msgText, attachmentUrls),
     onSuccess: (newMsg) => {
       setInputMessage('');
-      queryClient.setQueryData<ShipmentMessagesResponse>(['shipment-messages', shipmentId], (old) => {
-        if (!old) return old;
-        const exists = old.messages.some((m: ShipmentMessage) => m.id === newMsg.id);
-        if (exists) return old;
-        return {
-          ...old,
-          messages: [...old.messages, newMsg],
-        };
-      });
+      queryClient.setQueryData<ShipmentMessagesResponse>(
+        ['shipment-messages', shipmentId],
+        (old) => {
+          if (!old) return old;
+          const exists = old.messages.some((m: ShipmentMessage) => m.id === newMsg.id);
+          if (exists) return old;
+          return {
+            ...old,
+            messages: [...old.messages, newMsg],
+          };
+        }
+      );
       if (socket) {
         socket.emit('shipment-chat:typing', { shipmentId, isTyping: false });
       }
@@ -453,7 +481,9 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
 
               <span
                 className={`absolute bottom-0 right-0 size-3 rounded-full border-2 border-white ${
-                  isCounterpartyOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/20' : 'bg-slate-300'
+                  isCounterpartyOnline
+                    ? 'bg-emerald-500 ring-2 ring-emerald-500/20'
+                    : 'bg-slate-300'
                 }`}
               />
             </div>
@@ -501,7 +531,10 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                   <React.Fragment key={cluster.id}>
                     {cluster.showDateHeader && (
                       <MessageScrollerItem messageId={`date-${cluster.id}`}>
-                        <Marker variant="separator" className="my-2 text-[10px] uppercase font-bold tracking-widest text-slate-400">
+                        <Marker
+                          variant="separator"
+                          className="my-2 text-[10px] uppercase font-bold tracking-widest text-slate-400"
+                        >
                           <MarkerContent>{cluster.dateHeaderLabel}</MarkerContent>
                         </Marker>
                       </MessageScrollerItem>
@@ -521,7 +554,9 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                               />
                             ) : (
                               <div className="size-8 rounded-full bg-[#0D307A]/10 border border-[#0D307A]/20 flex items-center justify-center text-xs font-bold text-[#0D307A]">
-                                {counterparty?.name ? counterparty.name.charAt(0).toUpperCase() : 'U'}
+                                {counterparty?.name
+                                  ? counterparty.name.charAt(0).toUpperCase()
+                                  : 'U'}
                               </div>
                             )}
                           </MessageAvatar>
@@ -532,13 +567,21 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                             {cluster.messages.map((msg, msgIdx) => {
                               const isLastInGroup = msgIdx === cluster.messages.length - 1;
                               const hasAttachments = msg.attachments && msg.attachments.length > 0;
-                              const hasCustomText = Boolean(msg.message && msg.message !== 'Attachment');
+                              const hasCustomText = Boolean(
+                                msg.message && msg.message !== 'Attachment'
+                              );
 
                               return (
-                                <div key={msg.id} className={`w-full flex flex-col ${cluster.isMe ? 'items-end' : 'items-start'}`}>
+                                <div
+                                  key={msg.id}
+                                  className={`w-full flex flex-col ${cluster.isMe ? 'items-end' : 'items-start'}`}
+                                >
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <Bubble variant={cluster.isMe ? 'default' : 'outline'} align={cluster.isMe ? 'end' : 'start'}>
+                                      <Bubble
+                                        variant={cluster.isMe ? 'default' : 'outline'}
+                                        align={cluster.isMe ? 'end' : 'start'}
+                                      >
                                         <BubbleContent
                                           className={
                                             cluster.isMe
@@ -549,14 +592,18 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                                           }
                                         >
                                           {hasCustomText && (
-                                            <p className={`whitespace-pre-wrap break-words text-sm leading-relaxed px-1.5 py-1 ${cluster.isMe && hasAttachments ? 'text-slate-600 font-normal' : ''}`}>
+                                            <p
+                                              className={`whitespace-pre-wrap break-words text-sm leading-relaxed px-1.5 py-1 ${cluster.isMe && hasAttachments ? 'text-slate-600 font-normal' : ''}`}
+                                            >
                                               {msg.message}
                                             </p>
                                           )}
 
                                           {/* Render attachments directly inline */}
                                           {hasAttachments && (
-                                            <div className={`flex flex-col gap-2 ${hasCustomText ? 'mt-1' : ''}`}>
+                                            <div
+                                              className={`flex flex-col gap-2 ${hasCustomText ? 'mt-1' : ''}`}
+                                            >
                                               {msg.attachments.map((url, aIdx) => {
                                                 const isImg =
                                                   /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(url) ||
@@ -565,7 +612,8 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                                                   /\.(mp4|webm|mov|ogg)$/i.test(url) ||
                                                   url.startsWith('data:video/');
                                                 const fileName =
-                                                  url.split('/').pop()?.split('?')[0] || `Attachment ${aIdx + 1}`;
+                                                  url.split('/').pop()?.split('?')[0] ||
+                                                  `Attachment ${aIdx + 1}`;
 
                                                 if (isImg) {
                                                   return (
@@ -604,7 +652,9 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                                                   );
                                                 }
 
-                                                {/* Non-media files (PDF, DOCX): Direct download link without lightbox modal */}
+                                                {
+                                                  /* Non-media files (PDF, DOCX): Direct download link without lightbox modal */
+                                                }
                                                 return (
                                                   <a
                                                     key={aIdx}
@@ -655,8 +705,12 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
 
                                   {/* Show timestamp footer ONLY for the last message in a group */}
                                   {isLastInGroup && (
-                                    <MessageFooter className={`gap-1.5 text-[10px] whitespace-nowrap leading-none mt-1 ${cluster.isMe ? 'text-slate-400 justify-end' : 'text-slate-400'}`}>
-                                      <span className="whitespace-nowrap inline-block">{formatMessageTime(msg.createdAt)}</span>
+                                    <MessageFooter
+                                      className={`gap-1.5 text-[10px] whitespace-nowrap leading-none mt-1 ${cluster.isMe ? 'text-slate-400 justify-end' : 'text-slate-400'}`}
+                                    >
+                                      <span className="whitespace-nowrap inline-block">
+                                        {formatMessageTime(msg.createdAt)}
+                                      </span>
                                       {cluster.isMe && <CheckCheck className="size-3 shrink-0" />}
                                     </MessageFooter>
                                   )}
@@ -693,9 +747,18 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
                     <MessageContent>
                       <div className="flex items-center gap-2 text-slate-400 text-xs py-1 animate-in fade-in duration-200">
                         <div className="bg-white border border-slate-200 px-3.5 py-2 rounded-2xl rounded-bl-xs shadow-xs flex items-center gap-1.5">
-                          <span className="size-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="size-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="size-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <span
+                            className="size-1.5 rounded-full bg-slate-400 animate-bounce"
+                            style={{ animationDelay: '0ms' }}
+                          />
+                          <span
+                            className="size-1.5 rounded-full bg-slate-400 animate-bounce"
+                            style={{ animationDelay: '150ms' }}
+                          />
+                          <span
+                            className="size-1.5 rounded-full bg-slate-400 animate-bounce"
+                            style={{ animationDelay: '300ms' }}
+                          />
                         </div>
                         <span className="text-[11px] font-medium text-slate-400">
                           {counterparty?.name || 'Counterparty'} is typing...
@@ -724,14 +787,20 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
               >
                 <AttachmentMedia variant={att.type.startsWith('image/') ? 'image' : 'icon'}>
                   {att.type.startsWith('image/') ? (
-                    <img src={att.previewUrl} alt={att.name} className="size-full object-cover rounded-md" />
+                    <img
+                      src={att.previewUrl}
+                      alt={att.name}
+                      className="size-full object-cover rounded-md"
+                    />
                   ) : (
                     <FileText className="size-4 text-slate-600" />
                   )}
                 </AttachmentMedia>
                 <AttachmentContent>
                   <AttachmentTitle>{att.name}</AttachmentTitle>
-                  <AttachmentDescription>{(att.size / (1024 * 1024)).toFixed(1)} MB</AttachmentDescription>
+                  <AttachmentDescription>
+                    {(att.size / (1024 * 1024)).toFixed(1)} MB
+                  </AttachmentDescription>
                 </AttachmentContent>
                 <AttachmentActions>
                   {!isUploading && (
@@ -802,7 +871,8 @@ export function ShipmentChatContent({ shipmentId }: ShipmentChatContentProps) {
           <DialogTitle className="sr-only">Media Preview</DialogTitle>
           {previewMediaUrl && (
             <div className="relative size-full flex flex-col items-center justify-center overflow-hidden">
-              {/\.(mp4|webm|mov|ogg)$/i.test(previewMediaUrl) || previewMediaUrl.startsWith('data:video/') ? (
+              {/\.(mp4|webm|mov|ogg)$/i.test(previewMediaUrl) ||
+              previewMediaUrl.startsWith('data:video/') ? (
                 <div className="relative size-full flex items-center justify-center p-2">
                   <video
                     controls
