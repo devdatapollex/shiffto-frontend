@@ -32,14 +32,16 @@ export async function getMyPaymentMethods(): Promise<PaymentMethod[]> {
   return data.data;
 }
 
-export async function addPaymentMethod(payload: CreatePaymentMethodPayload): Promise<PaymentMethod> {
+export async function addPaymentMethod(
+  payload: CreatePaymentMethodPayload
+): Promise<PaymentMethod> {
   const { data } = await apiClient.post<{ data: PaymentMethod }>('/wallet', payload);
   return data.data;
 }
 
 export async function updatePaymentMethod(
   id: string,
-  payload: Partial<CreatePaymentMethodPayload>,
+  payload: Partial<CreatePaymentMethodPayload>
 ): Promise<PaymentMethod> {
   const { data } = await apiClient.put<{ data: PaymentMethod }>(`/wallet/${id}`, payload);
   return data.data;

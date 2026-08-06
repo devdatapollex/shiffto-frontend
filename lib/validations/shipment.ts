@@ -17,7 +17,9 @@ export const shipmentSchema = z
       .array(z.string())
       .max(5, 'Maximum 5 photos')
       // REVERT_MARKER: Remove this dev workaround when shipment item photos are required.
-      .transform((val) => val.length === 0 ? ['https://placehold.co/600x400?text=Item+Photo+Placeholder'] : val),
+      .transform((val) =>
+        val.length === 0 ? ['https://placehold.co/600x400?text=Item+Photo+Placeholder'] : val
+      ),
     instructions: z.string().max(500, 'Instructions are too long'),
 
     fromCountry: z.string().min(1, 'Select origin country'),

@@ -122,7 +122,10 @@ const createTicket = async (data: CreateTicketData): Promise<Ticket> => {
 const getMyTickets = async (page: number = 1, status?: string): Promise<PaginatedTickets> => {
   const params: Record<string, string | number> = { page };
   if (status) params.status = status;
-  const { data } = await apiClient.get<{ data: Ticket[]; meta: PaginatedTickets['meta'] }>('/tickets', { params });
+  const { data } = await apiClient.get<{ data: Ticket[]; meta: PaginatedTickets['meta'] }>(
+    '/tickets',
+    { params }
+  );
   return {
     tickets: data.data,
     meta: data.meta,
@@ -130,7 +133,9 @@ const getMyTickets = async (page: number = 1, status?: string): Promise<Paginate
 };
 
 const getTicketDetails = async (id: string): Promise<Ticket & { comments: TicketComment[] }> => {
-  const { data } = await apiClient.get<{ data: Ticket & { comments: TicketComment[] } }>(`/tickets/${id}`);
+  const { data } = await apiClient.get<{ data: Ticket & { comments: TicketComment[] } }>(
+    `/tickets/${id}`
+  );
   return data.data;
 };
 
@@ -155,9 +160,12 @@ const closeTicket = async (id: string): Promise<Ticket> => {
 
 // Admin services
 const getAllTickets = async (filters: AdminFilters = {}): Promise<PaginatedTickets> => {
-  const { data } = await apiClient.get<{ data: Ticket[]; meta: PaginatedTickets['meta'] }>('/tickets/admin/list', {
-    params: filters,
-  });
+  const { data } = await apiClient.get<{ data: Ticket[]; meta: PaginatedTickets['meta'] }>(
+    '/tickets/admin/list',
+    {
+      params: filters,
+    }
+  );
   return {
     tickets: data.data,
     meta: data.meta,
@@ -186,7 +194,9 @@ const updateTicketPriority = async (ticketId: string, priority: string): Promise
 };
 
 const getAssignees = async (): Promise<Array<{ id: string; name: string; email: string }>> => {
-  const { data } = await apiClient.get<{ data: Array<{ id: string; name: string; email: string }> }>('/tickets/admin/assignees');
+  const { data } = await apiClient.get<{
+    data: Array<{ id: string; name: string; email: string }>;
+  }>('/tickets/admin/assignees');
   return data.data;
 };
 

@@ -184,7 +184,6 @@ function VerifyEmailContent() {
             {isResending ? 'Sending...' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
           </button>
         </p>
-
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground flex flex-wrap items-center justify-center gap-2 text-center">

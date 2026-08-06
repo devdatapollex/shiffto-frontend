@@ -26,9 +26,7 @@ export function useSendOtp({ email, type, autoSend = false }: UseSendOtpParams) 
 
   const sentRef = useRef(false);
 
-  const storageKey = email
-    ? `otp_sent_${encodeURIComponent(email.toLowerCase())}_${type}`
-    : null;
+  const storageKey = email ? `otp_sent_${encodeURIComponent(email.toLowerCase())}_${type}` : null;
 
   const sendOtp = useCallback(
     async (showToast = true): Promise<boolean> => {
