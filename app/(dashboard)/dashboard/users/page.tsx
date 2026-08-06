@@ -390,7 +390,10 @@ export default function AdminUsersPage() {
                           <div className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
                             <span>
-                              Joined: <strong className="text-foreground">{new Date(user.createdAt).toLocaleDateString()}</strong>
+                              Joined:{' '}
+                              <strong className="text-foreground">
+                                {new Date(user.createdAt).toLocaleDateString()}
+                              </strong>
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5 justify-end">
@@ -418,7 +421,8 @@ export default function AdminUsersPage() {
                       {/* View details footer button inside main card section */}
                       <div className="border-t border-primary/5 pt-0 mt-2 flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">
-                          Commission: <strong className="text-foreground">{user.commissionRate}%</strong>
+                          Commission:{' '}
+                          <strong className="text-foreground">{user.commissionRate}%</strong>
                         </span>
                         <Button
                           asChild

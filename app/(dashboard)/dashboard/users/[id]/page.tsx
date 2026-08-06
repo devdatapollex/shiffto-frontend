@@ -392,10 +392,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                           {kyc.documentType === DocumentType.PASSPORT
                             ? 'Passport'
                             : kyc.documentType === DocumentType.DRIVING_LICENSE
-                            ? 'Driving License'
-                            : kyc.documentType === DocumentType.NID
-                            ? 'National ID (NID)'
-                            : String(kyc.documentType).replace('_', ' ')}
+                              ? 'Driving License'
+                              : kyc.documentType === DocumentType.NID
+                                ? 'National ID (NID)'
+                                : String(kyc.documentType).replace('_', ' ')}
                         </strong>
                       </div>
                       <div className="p-3 bg-muted/30 border border-primary/5 rounded-lg">
@@ -659,217 +659,257 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
                 {/* Reviews List */}
                 <div className="space-y-4">
-                  {reviewSubTab === 'received' ? (
-                    (() => {
-                      const list = receivedReviewsData?.data || reviews.received;
-                      const meta = receivedReviewsData?.meta;
-                      const isLoadingList = isReceivedLoading;
+                  {reviewSubTab === 'received'
+                    ? (() => {
+                        const list = receivedReviewsData?.data || reviews.received;
+                        const meta = receivedReviewsData?.meta;
+                        const isLoadingList = isReceivedLoading;
 
-                      if (isLoadingList) {
-                        return <p className="text-xs text-muted-foreground italic py-4 text-center">Loading reviews...</p>;
-                      }
+                        if (isLoadingList) {
+                          return (
+                            <p className="text-xs text-muted-foreground italic py-4 text-center">
+                              Loading reviews...
+                            </p>
+                          );
+                        }
 
-                      if (!list || list.length === 0) {
-                        return <p className="text-xs text-muted-foreground italic py-4 text-center">No reviews received yet.</p>;
-                      }
+                        if (!list || list.length === 0) {
+                          return (
+                            <p className="text-xs text-muted-foreground italic py-4 text-center">
+                              No reviews received yet.
+                            </p>
+                          );
+                        }
 
-                      return (
-                        <div className="space-y-3">
-                          {list.map((rev: any) => {
-                            const targetShipmentId = rev.shipmentId || rev.shipment?.id;
-                            return (
-                              <div
-                                key={rev.id}
-                                onClick={() => {
-                                  if (targetShipmentId) {
-                                    router.push(`/dashboard/tracking/shipment/${targetShipmentId}`);
-                                  }
-                                }}
-                                className={`p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2 transition-all ${
-                                  targetShipmentId ? 'cursor-pointer hover:border-primary/30 hover:bg-slate-50/80 shadow-2xs' : ''
-                                }`}
-                              >
-                                <div className="flex justify-between items-start gap-3">
-                                  <div className="flex items-center gap-2.5">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
-                                      {rev.reviewer?.image ? (
-                                        <img src={rev.reviewer.image} alt={rev.reviewer.name} className="h-full w-full object-cover" />
-                                      ) : (
-                                        rev.reviewer?.name?.charAt(0).toUpperCase() || 'U'
+                        return (
+                          <div className="space-y-3">
+                            {list.map((rev: any) => {
+                              const targetShipmentId = rev.shipmentId || rev.shipment?.id;
+                              return (
+                                <div
+                                  key={rev.id}
+                                  onClick={() => {
+                                    if (targetShipmentId) {
+                                      router.push(
+                                        `/dashboard/tracking/shipment/${targetShipmentId}`
+                                      );
+                                    }
+                                  }}
+                                  className={`p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2 transition-all ${
+                                    targetShipmentId
+                                      ? 'cursor-pointer hover:border-primary/30 hover:bg-slate-50/80 shadow-2xs'
+                                      : ''
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start gap-3">
+                                    <div className="flex items-center gap-2.5">
+                                      <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
+                                        {rev.reviewer?.image ? (
+                                          <img
+                                            src={rev.reviewer.image}
+                                            alt={rev.reviewer.name}
+                                            className="h-full w-full object-cover"
+                                          />
+                                        ) : (
+                                          rev.reviewer?.name?.charAt(0).toUpperCase() || 'U'
+                                        )}
+                                      </div>
+                                      <div>
+                                        <span className="text-xs font-bold text-foreground block">
+                                          {rev.reviewer?.name || 'User'}
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground block">
+                                          {new Date(rev.createdAt).toLocaleString()}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5">
+                                      {rev.shipment?.itemName && (
+                                        <Badge
+                                          variant="outline"
+                                          className="text-[9px] font-medium py-0 px-1.5 gap-1 hover:bg-primary/5"
+                                        >
+                                          Shipment: {rev.shipment.itemName}
+                                          <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />
+                                        </Badge>
                                       )}
-                                    </div>
-                                    <div>
-                                      <span className="text-xs font-bold text-foreground block">
-                                        {rev.reviewer?.name || 'User'}
-                                      </span>
-                                      <span className="text-[10px] text-muted-foreground block">
-                                        {new Date(rev.createdAt).toLocaleString()}
-                                      </span>
+                                      <div className="flex gap-0.5">
+                                        {Array.from({ length: 5 }).map((_, idx) => (
+                                          <Star
+                                            key={idx}
+                                            className={`h-3.5 w-3.5 ${
+                                              idx < rev.rating
+                                                ? 'fill-amber-500 text-amber-500'
+                                                : 'text-slate-200'
+                                            }`}
+                                          />
+                                        ))}
+                                      </div>
                                     </div>
                                   </div>
 
-                                  <div className="flex items-center gap-1.5">
-                                    {rev.shipment?.itemName && (
-                                      <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5 gap-1 hover:bg-primary/5">
-                                        Shipment: {rev.shipment.itemName}
-                                        <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />
-                                      </Badge>
-                                    )}
-                                    <div className="flex gap-0.5">
-                                      {Array.from({ length: 5 }).map((_, idx) => (
-                                        <Star
-                                          key={idx}
-                                          className={`h-3.5 w-3.5 ${
-                                            idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
-                                          }`}
-                                        />
-                                      ))}
-                                    </div>
-                                  </div>
+                                  {rev.comment && (
+                                    <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
+                                      "{rev.comment}"
+                                    </p>
+                                  )}
                                 </div>
+                              );
+                            })}
 
-                                {rev.comment && (
-                                  <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
-                                    "{rev.comment}"
-                                  </p>
-                                )}
+                            {/* Pagination Controls */}
+                            {meta && meta.totalPages > 1 && (
+                              <div className="flex items-center justify-between pt-2 text-xs">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={receivedPage <= 1}
+                                  onClick={() => setReceivedPage((p) => Math.max(1, p - 1))}
+                                >
+                                  Previous
+                                </Button>
+                                <span className="text-muted-foreground">
+                                  Page {meta.page} of {meta.totalPages}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={receivedPage >= meta.totalPages}
+                                  onClick={() => setReceivedPage((p) => p + 1)}
+                                >
+                                  Next
+                                </Button>
                               </div>
-                            );
-                          })}
+                            )}
+                          </div>
+                        );
+                      })()
+                    : (() => {
+                        const list = givenReviewsData?.data || reviews.given;
+                        const meta = givenReviewsData?.meta;
+                        const isLoadingList = isGivenLoading;
 
-                          {/* Pagination Controls */}
-                          {meta && meta.totalPages > 1 && (
-                            <div className="flex items-center justify-between pt-2 text-xs">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={receivedPage <= 1}
-                                onClick={() => setReceivedPage((p) => Math.max(1, p - 1))}
-                              >
-                                Previous
-                              </Button>
-                              <span className="text-muted-foreground">
-                                Page {meta.page} of {meta.totalPages}
-                              </span>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={receivedPage >= meta.totalPages}
-                                onClick={() => setReceivedPage((p) => p + 1)}
-                              >
-                                Next
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()
-                  ) : (
-                    (() => {
-                      const list = givenReviewsData?.data || reviews.given;
-                      const meta = givenReviewsData?.meta;
-                      const isLoadingList = isGivenLoading;
+                        if (isLoadingList) {
+                          return (
+                            <p className="text-xs text-muted-foreground italic py-4 text-center">
+                              Loading reviews...
+                            </p>
+                          );
+                        }
 
-                      if (isLoadingList) {
-                        return <p className="text-xs text-muted-foreground italic py-4 text-center">Loading reviews...</p>;
-                      }
+                        if (!list || list.length === 0) {
+                          return (
+                            <p className="text-xs text-muted-foreground italic py-4 text-center">
+                              No reviews given yet.
+                            </p>
+                          );
+                        }
 
-                      if (!list || list.length === 0) {
-                        return <p className="text-xs text-muted-foreground italic py-4 text-center">No reviews given yet.</p>;
-                      }
+                        return (
+                          <div className="space-y-3">
+                            {list.map((rev: any) => {
+                              const targetShipmentId = rev.shipmentId || rev.shipment?.id;
+                              return (
+                                <div
+                                  key={rev.id}
+                                  onClick={() => {
+                                    if (targetShipmentId) {
+                                      router.push(
+                                        `/dashboard/tracking/shipment/${targetShipmentId}`
+                                      );
+                                    }
+                                  }}
+                                  className={`p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2 transition-all ${
+                                    targetShipmentId
+                                      ? 'cursor-pointer hover:border-primary/30 hover:bg-slate-50/80 shadow-2xs'
+                                      : ''
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start gap-3">
+                                    <div className="flex items-center gap-2.5">
+                                      <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
+                                        {rev.reviewee?.image ? (
+                                          <img
+                                            src={rev.reviewee.image}
+                                            alt={rev.reviewee.name}
+                                            className="h-full w-full object-cover"
+                                          />
+                                        ) : (
+                                          rev.reviewee?.name?.charAt(0).toUpperCase() || 'U'
+                                        )}
+                                      </div>
+                                      <div>
+                                        <span className="text-xs font-bold text-foreground block">
+                                          {rev.reviewee?.name || 'User'}
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground block">
+                                          {new Date(rev.createdAt).toLocaleString()}
+                                        </span>
+                                      </div>
+                                    </div>
 
-                      return (
-                        <div className="space-y-3">
-                          {list.map((rev: any) => {
-                            const targetShipmentId = rev.shipmentId || rev.shipment?.id;
-                            return (
-                              <div
-                                key={rev.id}
-                                onClick={() => {
-                                  if (targetShipmentId) {
-                                    router.push(`/dashboard/tracking/shipment/${targetShipmentId}`);
-                                  }
-                                }}
-                                className={`p-3 border border-primary/5 rounded-lg bg-card/50 space-y-2 transition-all ${
-                                  targetShipmentId ? 'cursor-pointer hover:border-primary/30 hover:bg-slate-50/80 shadow-2xs' : ''
-                                }`}
-                              >
-                                <div className="flex justify-between items-start gap-3">
-                                  <div className="flex items-center gap-2.5">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0 overflow-hidden">
-                                      {rev.reviewee?.image ? (
-                                        <img src={rev.reviewee.image} alt={rev.reviewee.name} className="h-full w-full object-cover" />
-                                      ) : (
-                                        rev.reviewee?.name?.charAt(0).toUpperCase() || 'U'
+                                    <div className="flex items-center gap-1.5">
+                                      {rev.shipment?.itemName && (
+                                        <Badge
+                                          variant="outline"
+                                          className="text-[9px] font-medium py-0 px-1.5 gap-1 hover:bg-primary/5"
+                                        >
+                                          Shipment: {rev.shipment.itemName}
+                                          <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />
+                                        </Badge>
                                       )}
-                                    </div>
-                                    <div>
-                                      <span className="text-xs font-bold text-foreground block">
-                                        {rev.reviewee?.name || 'User'}
-                                      </span>
-                                      <span className="text-[10px] text-muted-foreground block">
-                                        {new Date(rev.createdAt).toLocaleString()}
-                                      </span>
+                                      <div className="flex gap-0.5">
+                                        {Array.from({ length: 5 }).map((_, idx) => (
+                                          <Star
+                                            key={idx}
+                                            className={`h-3.5 w-3.5 ${
+                                              idx < rev.rating
+                                                ? 'fill-amber-500 text-amber-500'
+                                                : 'text-slate-200'
+                                            }`}
+                                          />
+                                        ))}
+                                      </div>
                                     </div>
                                   </div>
 
-                                  <div className="flex items-center gap-1.5">
-                                    {rev.shipment?.itemName && (
-                                      <Badge variant="outline" className="text-[9px] font-medium py-0 px-1.5 gap-1 hover:bg-primary/5">
-                                        Shipment: {rev.shipment.itemName}
-                                        <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />
-                                      </Badge>
-                                    )}
-                                    <div className="flex gap-0.5">
-                                      {Array.from({ length: 5 }).map((_, idx) => (
-                                        <Star
-                                          key={idx}
-                                          className={`h-3.5 w-3.5 ${
-                                            idx < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-slate-200'
-                                          }`}
-                                        />
-                                      ))}
-                                    </div>
-                                  </div>
+                                  {rev.comment && (
+                                    <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
+                                      "{rev.comment}"
+                                    </p>
+                                  )}
                                 </div>
+                              );
+                            })}
 
-                                {rev.comment && (
-                                  <p className="text-xs text-muted-foreground leading-relaxed pl-10 italic">
-                                    "{rev.comment}"
-                                  </p>
-                                )}
+                            {/* Pagination Controls */}
+                            {meta && meta.totalPages > 1 && (
+                              <div className="flex items-center justify-between pt-2 text-xs">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={givenPage <= 1}
+                                  onClick={() => setGivenPage((p) => Math.max(1, p - 1))}
+                                >
+                                  Previous
+                                </Button>
+                                <span className="text-muted-foreground">
+                                  Page {meta.page} of {meta.totalPages}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={givenPage >= meta.totalPages}
+                                  onClick={() => setGivenPage((p) => p + 1)}
+                                >
+                                  Next
+                                </Button>
                               </div>
-                            );
-                          })}
-
-                          {/* Pagination Controls */}
-                          {meta && meta.totalPages > 1 && (
-                            <div className="flex items-center justify-between pt-2 text-xs">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={givenPage <= 1}
-                                onClick={() => setGivenPage((p) => Math.max(1, p - 1))}
-                              >
-                                Previous
-                              </Button>
-                              <span className="text-muted-foreground">
-                                Page {meta.page} of {meta.totalPages}
-                              </span>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={givenPage >= meta.totalPages}
-                                onClick={() => setGivenPage((p) => p + 1)}
-                              >
-                                Next
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()
-                  )}
+                            )}
+                          </div>
+                        );
+                      })()}
                 </div>
               </div>
             )}

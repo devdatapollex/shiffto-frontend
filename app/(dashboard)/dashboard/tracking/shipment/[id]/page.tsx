@@ -76,7 +76,12 @@ export default function ShipmentDetailsPage() {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const { user, isAdmin } = useRole();
-  const { data: shipment, isLoading, error, refetch } = useShipmentDetails(shipmentId, !!shipmentId);
+  const {
+    data: shipment,
+    isLoading,
+    error,
+    refetch,
+  } = useShipmentDetails(shipmentId, !!shipmentId);
 
   const cancelMutation = useMutation({
     mutationFn: (id: string) => cancelShipment(id),
@@ -211,54 +216,65 @@ export default function ShipmentDetailsPage() {
             </p>
           ) : (
             <>
-              {shipment.paymentTransaction?.status === 'PENDING_REFUND' && (() => {
-                const refundable =
-                  shipment.paymentTransaction.refundableAmount ??
-                  shipment.paymentTransaction.grossAmount ??
-                  0;
-                const cancellationFee = shipment.paymentTransaction.cancellationFeeAmount ?? 0;
-                const hasFee = cancellationFee > 0;
-                return (
-                  <div className="bg-white/90 border border-rose-200 p-3.5 rounded-lg text-xs space-y-1">
-                    <div className="flex items-center justify-between font-bold text-rose-900">
-                      <span>Refund Status:</span>
-                      <span className="text-rose-700 font-extrabold uppercase tracking-wide">Refund Pending</span>
-                    </div>
-                    <p className="text-slate-600 mt-1">
-                      A net refund of <span className="font-bold text-slate-900">${refundable.toFixed(2)}</span>{' '}
-                      {hasFee ? '(after cancellation fee applied) ' : ''}has been queued for a manual refund payout. An admin will process your payout off-platform (bKash, Bank, Nagad, etc.) shortly.
-                    </p>
-                  </div>
-                );
-              })()}
-              {shipment.paymentTransaction?.status === 'REFUNDED' && (() => {
-                const refundable =
-                  shipment.paymentTransaction.refundableAmount ??
-                  shipment.paymentTransaction.grossAmount ??
-                  0;
-                const cancellationFee = shipment.paymentTransaction.cancellationFeeAmount ?? 0;
-                const hasFee = cancellationFee > 0;
-                return (
-                  <div className="bg-white/90 border border-purple-200 p-3.5 rounded-lg text-xs space-y-1">
-                    <div className="flex items-center justify-between font-bold text-purple-900">
-                      <span>Refund Status:</span>
-                      <span className="text-purple-700 font-extrabold uppercase tracking-wide">Refund Processed</span>
-                    </div>
-                    <p className="text-slate-600 mt-1">
-                      Your net refund of <span className="font-bold text-slate-900">${refundable.toFixed(2)}</span>{' '}
-                      {hasFee ? '(after cancellation fee applied) ' : ''}has been successfully processed by the admin.
-                    </p>
-                    {shipment.paymentTransaction.refundTxnId && (
-                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-purple-800 pt-1 border-t border-purple-100 mt-2">
-                        <span>Reference Transaction ID:</span>
-                        <span className="font-bold bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
-                          {shipment.paymentTransaction.refundTxnId}
+              {shipment.paymentTransaction?.status === 'PENDING_REFUND' &&
+                (() => {
+                  const refundable =
+                    shipment.paymentTransaction.refundableAmount ??
+                    shipment.paymentTransaction.grossAmount ??
+                    0;
+                  const cancellationFee = shipment.paymentTransaction.cancellationFeeAmount ?? 0;
+                  const hasFee = cancellationFee > 0;
+                  return (
+                    <div className="bg-white/90 border border-rose-200 p-3.5 rounded-lg text-xs space-y-1">
+                      <div className="flex items-center justify-between font-bold text-rose-900">
+                        <span>Refund Status:</span>
+                        <span className="text-rose-700 font-extrabold uppercase tracking-wide">
+                          Refund Pending
                         </span>
                       </div>
-                    )}
-                  </div>
-                );
-              })()}
+                      <p className="text-slate-600 mt-1">
+                        A net refund of{' '}
+                        <span className="font-bold text-slate-900">${refundable.toFixed(2)}</span>{' '}
+                        {hasFee ? '(after cancellation fee applied) ' : ''}has been queued for a
+                        manual refund payout. An admin will process your payout off-platform (bKash,
+                        Bank, Nagad, etc.) shortly.
+                      </p>
+                    </div>
+                  );
+                })()}
+              {shipment.paymentTransaction?.status === 'REFUNDED' &&
+                (() => {
+                  const refundable =
+                    shipment.paymentTransaction.refundableAmount ??
+                    shipment.paymentTransaction.grossAmount ??
+                    0;
+                  const cancellationFee = shipment.paymentTransaction.cancellationFeeAmount ?? 0;
+                  const hasFee = cancellationFee > 0;
+                  return (
+                    <div className="bg-white/90 border border-purple-200 p-3.5 rounded-lg text-xs space-y-1">
+                      <div className="flex items-center justify-between font-bold text-purple-900">
+                        <span>Refund Status:</span>
+                        <span className="text-purple-700 font-extrabold uppercase tracking-wide">
+                          Refund Processed
+                        </span>
+                      </div>
+                      <p className="text-slate-600 mt-1">
+                        Your net refund of{' '}
+                        <span className="font-bold text-slate-900">${refundable.toFixed(2)}</span>{' '}
+                        {hasFee ? '(after cancellation fee applied) ' : ''}has been successfully
+                        processed by the admin.
+                      </p>
+                      {shipment.paymentTransaction.refundTxnId && (
+                        <div className="flex items-center gap-1.5 text-[11px] font-mono text-purple-800 pt-1 border-t border-purple-100 mt-2">
+                          <span>Reference Transaction ID:</span>
+                          <span className="font-bold bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                            {shipment.paymentTransaction.refundTxnId}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
             </>
           )}
         </div>
@@ -559,38 +575,42 @@ export default function ShipmentDetailsPage() {
       <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="text-destructive font-semibold text-lg">Cancel Shipment</DialogTitle>
+            <DialogTitle className="text-destructive font-semibold text-lg">
+              Cancel Shipment
+            </DialogTitle>
             <DialogDescription className="text-sm text-slate-600 mt-1">
-              Are you sure you want to cancel &quot;<span className="font-semibold text-slate-900">{shipment.itemName}</span>&quot;?
+              Are you sure you want to cancel &quot;
+              <span className="font-semibold text-slate-900">{shipment.itemName}</span>&quot;?
             </DialogDescription>
           </DialogHeader>
 
-          {shipment.status === 'ACTIVE' && (() => {
-            const gross =
-              shipment.paymentTransaction?.grossAmount ??
-              shipment.pricePerKg * shipment.weight;
-            const fee = gross * 0.3;
-            const netRefund = gross - fee;
-            return (
-              <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
-                <div className="flex items-center justify-between text-slate-600 font-medium">
-                  <span>Original Amount Paid</span>
-                  <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+          {shipment.status === 'ACTIVE' &&
+            (() => {
+              const gross =
+                shipment.paymentTransaction?.grossAmount ?? shipment.pricePerKg * shipment.weight;
+              const fee = gross * 0.3;
+              const netRefund = gross - fee;
+              return (
+                <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
+                  <div className="flex items-center justify-between text-slate-600 font-medium">
+                    <span>Original Amount Paid</span>
+                    <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-rose-600 font-medium">
+                    <span>Cancellation Fee (30%)</span>
+                    <span className="font-semibold">-${fee.toFixed(2)}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
+                    <span>Net Refund Amount</span>
+                    <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 pt-1 leading-normal">
+                    As per policy, sender-initiated cancellations incur a 30% cancellation fee. The
+                    net refund will be queued for admin processing.
+                  </p>
                 </div>
-                <div className="flex items-center justify-between text-rose-600 font-medium">
-                  <span>Cancellation Fee (30%)</span>
-                  <span className="font-semibold">-${fee.toFixed(2)}</span>
-                </div>
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
-                  <span>Net Refund Amount</span>
-                  <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
-                </div>
-                <p className="text-[11px] text-slate-500 pt-1 leading-normal">
-                  As per policy, sender-initiated cancellations incur a 30% cancellation fee. The net refund will be queued for admin processing.
-                </p>
-              </div>
-            );
-          })()}
+              );
+            })()}
 
           {shipment.status === 'AWAITING_MATCH' && (
             <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-md border border-slate-200 my-2">

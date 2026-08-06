@@ -455,7 +455,10 @@ export default function MyShipmentsPage() {
                               {item.paymentTransaction.status === 'REFUNDED' && (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full">
                                   <CheckCircle2 className="h-3 w-3 text-purple-600" />
-                                  Refunded {item.paymentTransaction.refundTxnId ? `(#${item.paymentTransaction.refundTxnId})` : ''}
+                                  Refunded{' '}
+                                  {item.paymentTransaction.refundTxnId
+                                    ? `(#${item.paymentTransaction.refundTxnId})`
+                                    : ''}
                                 </span>
                               )}
                             </>
@@ -642,38 +645,44 @@ export default function MyShipmentsPage() {
       <Dialog open={!!shipmentToCancel} onOpenChange={(open) => !open && setShipmentToCancel(null)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="text-destructive font-semibold text-lg">Cancel Shipment</DialogTitle>
+            <DialogTitle className="text-destructive font-semibold text-lg">
+              Cancel Shipment
+            </DialogTitle>
             <DialogDescription className="text-sm text-slate-600 mt-1">
-              Are you sure you want to cancel &quot;<span className="font-semibold text-slate-900">{shipmentToCancel?.itemName}</span>&quot;?
+              Are you sure you want to cancel &quot;
+              <span className="font-semibold text-slate-900">{shipmentToCancel?.itemName}</span>
+              &quot;?
             </DialogDescription>
           </DialogHeader>
 
-          {shipmentToCancel?.status === 'ACTIVE' && (() => {
-            const gross =
-              shipmentToCancel.paymentTransaction?.grossAmount ??
-              shipmentToCancel.pricePerKg * shipmentToCancel.weight;
-            const fee = gross * 0.3;
-            const netRefund = gross - fee;
-            return (
-              <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
-                <div className="flex items-center justify-between text-slate-600 font-medium">
-                  <span>Original Amount Paid</span>
-                  <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+          {shipmentToCancel?.status === 'ACTIVE' &&
+            (() => {
+              const gross =
+                shipmentToCancel.paymentTransaction?.grossAmount ??
+                shipmentToCancel.pricePerKg * shipmentToCancel.weight;
+              const fee = gross * 0.3;
+              const netRefund = gross - fee;
+              return (
+                <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
+                  <div className="flex items-center justify-between text-slate-600 font-medium">
+                    <span>Original Amount Paid</span>
+                    <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-rose-600 font-medium">
+                    <span>Cancellation Fee (30%)</span>
+                    <span className="font-semibold">-${fee.toFixed(2)}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
+                    <span>Net Refund Amount</span>
+                    <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 pt-1 leading-normal">
+                    As per policy, sender-initiated cancellations incur a 30% cancellation fee. The
+                    net refund will be queued for admin processing.
+                  </p>
                 </div>
-                <div className="flex items-center justify-between text-rose-600 font-medium">
-                  <span>Cancellation Fee (30%)</span>
-                  <span className="font-semibold">-${fee.toFixed(2)}</span>
-                </div>
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
-                  <span>Net Refund Amount</span>
-                  <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
-                </div>
-                <p className="text-[11px] text-slate-500 pt-1 leading-normal">
-                  As per policy, sender-initiated cancellations incur a 30% cancellation fee. The net refund will be queued for admin processing.
-                </p>
-              </div>
-            );
-          })()}
+              );
+            })()}
 
           {shipmentToCancel?.status === 'AWAITING_MATCH' && (
             <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-md border border-slate-200 my-2">
