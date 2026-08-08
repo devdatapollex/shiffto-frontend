@@ -22,6 +22,7 @@ export function CTASection() {
               <AvatarImage
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
                 alt="User 1"
+                className="object-cover"
               />
               <AvatarFallback>U1</AvatarFallback>
             </Avatar>
@@ -29,6 +30,7 @@ export function CTASection() {
               <AvatarImage
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
                 alt="User 2"
+                className="object-cover"
               />
               <AvatarFallback>U2</AvatarFallback>
             </Avatar>
@@ -36,6 +38,7 @@ export function CTASection() {
               <AvatarImage
                 src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
                 alt="User 3"
+                className="object-cover"
               />
               <AvatarFallback>U3</AvatarFallback>
             </Avatar>
