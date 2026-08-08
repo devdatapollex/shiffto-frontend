@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Clock,
@@ -18,9 +18,12 @@ import {
   Package,
   ChevronsLeft,
   ChevronsRight,
+  RotateCcw,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getShipments, type Shipment } from '@/services/shipment.service';
+import { getShipments, cancelShipment, type Shipment } from '@/services/shipment.service';
 import { useRole } from '@/hooks/use-role';
 import {
   useReceivedOffers,
@@ -28,6 +31,14 @@ import {
   useRejectOffer,
   useCancelCheckout,
 } from '@/hooks/use-offers';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { OffersReceivedSection } from '@/components/shipments/offers-received-section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -172,6 +183,26 @@ function generatePageNumbers(currentPage: number, totalPages: number): (number |
 export default function MyShipmentsPage() {
   const router = useRouter();
   const { isAdmin } = useRole();
+  const queryClient = useQueryClient();
+
+  const [shipmentToCancel, setShipmentToCancel] = useState<Shipment | null>(null);
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => cancelShipment(id),
+    onSuccess: () => {
+      toast.success('Shipment canceled successfully');
+      queryClient.invalidateQueries({ queryKey: ['shipments'] });
+      setShipmentToCancel(null);
+    },
+    onError: (error: any) => {
+      const message =
+        error?.message ||
+        error?.data?.message ||
+        error?.response?.data?.message ||
+        'Failed to cancel shipment';
+      toast.error(message);
+    },
+  });
 
   // --- Backend-driven state ---
   const [filters, dispatch] = useReducer(filtersReducer, {
@@ -407,11 +438,32 @@ export default function MyShipmentsPage() {
                         </div>
                       </td>
                       <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}
-                        >
-                          {displayStatus}
-                        </span>
+                        <div className="flex flex-col items-start gap-1">
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}
+                          >
+                            {displayStatus}
+                          </span>
+                          {item.status === 'CANCELED' && item.paymentTransaction && (
+                            <>
+                              {item.paymentTransaction.status === 'PENDING_REFUND' && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                                  <RotateCcw className="h-3 w-3 animate-spin text-rose-600" />
+                                  Refund Pending
+                                </span>
+                              )}
+                              {item.paymentTransaction.status === 'REFUNDED' && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full">
+                                  <CheckCircle2 className="h-3 w-3 text-purple-600" />
+                                  Refunded{' '}
+                                  {item.paymentTransaction.refundTxnId
+                                    ? `(#${item.paymentTransaction.refundTxnId})`
+                                    : ''}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4">
                         <span className="text-muted-foreground font-light">{route}</span>
@@ -444,8 +496,14 @@ export default function MyShipmentsPage() {
                               >
                                 View details
                               </DropdownMenuItem>
-                              {item.status === 'AWAITING_MATCH' && (
-                                <DropdownMenuItem className="text-destructive">
+                              {(item.status === 'AWAITING_MATCH' || item.status === 'ACTIVE') && (
+                                <DropdownMenuItem
+                                  className="text-destructive font-medium focus:bg-primary focus:text-white cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShipmentToCancel(item);
+                                  }}
+                                >
                                   Cancel shipment
                                 </DropdownMenuItem>
                               )}
@@ -582,6 +640,74 @@ export default function MyShipmentsPage() {
           </div>
         )}
       </div>
+
+      {/* Cancel Shipment Confirmation Dialog */}
+      <Dialog open={!!shipmentToCancel} onOpenChange={(open) => !open && setShipmentToCancel(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-destructive font-semibold text-lg">
+              Cancel Shipment
+            </DialogTitle>
+            <DialogDescription className="text-sm text-slate-600 mt-1">
+              Are you sure you want to cancel &quot;
+              <span className="font-semibold text-slate-900">{shipmentToCancel?.itemName}</span>
+              &quot;?
+            </DialogDescription>
+          </DialogHeader>
+
+          {shipmentToCancel?.status === 'ACTIVE' &&
+            (() => {
+              const gross =
+                shipmentToCancel.paymentTransaction?.grossAmount ??
+                shipmentToCancel.pricePerKg * shipmentToCancel.weight;
+              const fee = gross * 0.3;
+              const netRefund = gross - fee;
+              return (
+                <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
+                  <div className="flex items-center justify-between text-slate-600 font-medium">
+                    <span>Original Amount Paid</span>
+                    <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-rose-600 font-medium">
+                    <span>Cancellation Fee (30%)</span>
+                    <span className="font-semibold">-${fee.toFixed(2)}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
+                    <span>Net Refund Amount</span>
+                    <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 pt-1 leading-normal">
+                    As per policy, sender-initiated cancellations incur a 30% cancellation fee. The
+                    net refund will be queued for admin processing.
+                  </p>
+                </div>
+              );
+            })()}
+
+          {shipmentToCancel?.status === 'AWAITING_MATCH' && (
+            <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-md border border-slate-200 my-2">
+              No payment has been processed for this shipment because no offer was accepted yet.
+            </p>
+          )}
+
+          <DialogFooter className="gap-3 sm:gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShipmentToCancel(null)}
+              disabled={cancelMutation.isPending}
+            >
+              Keep Shipment
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => shipmentToCancel && cancelMutation.mutate(shipmentToCancel.id)}
+              disabled={cancelMutation.isPending}
+            >
+              {cancelMutation.isPending ? 'Canceling...' : 'Confirm Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

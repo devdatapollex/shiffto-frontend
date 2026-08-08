@@ -56,6 +56,7 @@ Bar and column charts with stacking, grouping, and custom shapes.
 ```
 
 **Key props**:
+
 - `barCategoryGap`: Percentage or number for category spacing
 - `barGap`: Pixels between bars in same group
 - `barSize`: Fixed width/height (auto-calculated if not set)
@@ -78,24 +79,21 @@ Filled area charts with gradients and stacking.
 Pie and donut charts for proportional data.
 
 ```jsx
-<PieChart
-  width={number}
-  height={number}
->
+<PieChart width={number} height={number}>
   <Pie
     data={array}
-    dataKey="value"         // Required: numeric property
-    nameKey="name"          // Property for labels
-    cx="50%"               // Center X
-    cy="50%"               // Center Y
-    innerRadius={0}        // For donut chart
-    outerRadius={number}    // Pie radius
-    startAngle={0}         // Starting angle (degrees)
-    endAngle={360}         // Ending angle
-    minAngle={0}           // Minimum slice angle
-    paddingAngle={0}       // Gap between slices
-    label={false}          // Show labels
-    labelLine={true}       // Line connecting labels
+    dataKey="value" // Required: numeric property
+    nameKey="name" // Property for labels
+    cx="50%" // Center X
+    cy="50%" // Center Y
+    innerRadius={0} // For donut chart
+    outerRadius={number} // Pie radius
+    startAngle={0} // Starting angle (degrees)
+    endAngle={360} // Ending angle
+    minAngle={0} // Minimum slice angle
+    paddingAngle={0} // Gap between slices
+    label={false} // Show labels
+    labelLine={true} // Line connecting labels
     isAnimationActive={true}
   />
 </PieChart>
@@ -106,18 +104,14 @@ Pie and donut charts for proportional data.
 Scatter plots and bubble charts for correlated data.
 
 ```jsx
-<ScatterChart
-  width={number}
-  height={number}
-  margin={{ top, right, bottom, left }}
->
+<ScatterChart width={number} height={number} margin={{ top, right, bottom, left }}>
   <XAxis type="number" dataKey="x" />
   <YAxis type="number" dataKey="y" />
   <Scatter
     data={array}
     dataKey="y"
     fill="#8884d8"
-    shape="circle"         // "circle" | "cross" | "diamond" | "square" | "star" | "triangle" | "wye" | function
+    shape="circle" // "circle" | "cross" | "diamond" | "square" | "star" | "triangle" | "wye" | function
     legendType="circle"
   />
 </ScatterChart>
@@ -138,24 +132,11 @@ Mix multiple chart types (lines, bars, areas) in one chart.
 Radar/spider charts for multi-dimensional data.
 
 ```jsx
-<RadarChart
-  cx="50%"
-  cy="50%"
-  outerRadius={number}
-  width={number}
-  height={number}
-  data={array}
->
+<RadarChart cx="50%" cy="50%" outerRadius={number} width={number} height={number} data={array}>
   <PolarGrid />
   <PolarAngleAxis dataKey="subject" />
   <PolarRadiusAxis />
-  <Radar
-    name="Series"
-    dataKey="A"
-    stroke="#8884d8"
-    fill="#8884d8"
-    fillOpacity={0.6}
-  />
+  <Radar name="Series" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
 </RadarChart>
 ```
 
@@ -194,7 +175,7 @@ Hierarchical data visualization.
   stroke="#fff"
   fill="#8884d8"
   aspectRatio={number}
-  content={func}           // Custom render function
+  content={func} // Custom render function
 />
 ```
 
@@ -219,10 +200,7 @@ Flow diagram for visualizing flow between nodes.
 Radial hierarchy visualization.
 
 ```jsx
-<SunburstChart
-  data={hierarchicalData}
-  dataKey="value"
-/>
+<SunburstChart data={hierarchicalData} dataKey="value" />
 ```
 
 ## Cartesian Components
@@ -233,22 +211,22 @@ Configure axes for Cartesian charts.
 
 ```jsx
 <XAxis
-  dataKey="name"          // Property for tick labels
-  type="category"         // "category" | "number"
-  domain={['auto', 'auto']}  // [min, max]
-  range={array}          // Custom range
-  scale="auto"           // "auto" | "linear" | "pow" | "sqrt" | "log" | "identity" | "time" | "band" | "point" | "ordinal" | function
-  tick={object|element}   // Tick style or custom element
-  tickLine={true}        // Show tick lines
-  axisLine={true}        // Show axis line
-  tickFormatter={func}    // Format tick labels
-  ticks={array}          // Custom tick values
-  interval="preserveEnd"  // "preserveStart" | "preserveEnd" | "preserveStartEnd" | number
-  angle={0}              // Rotate labels
-  height={30}            // Reserved height
-  width={60}             // Reserved width
+  dataKey="name" // Property for tick labels
+  type="category" // "category" | "number"
+  domain={['auto', 'auto']} // [min, max]
+  range={array} // Custom range
+  scale="auto" // "auto" | "linear" | "pow" | "sqrt" | "log" | "identity" | "time" | "band" | "point" | "ordinal" | function
+  tick={object | element} // Tick style or custom element
+  tickLine={true} // Show tick lines
+  axisLine={true} // Show axis line
+  tickFormatter={func} // Format tick labels
+  ticks={array} // Custom tick values
+  interval="preserveEnd" // "preserveStart" | "preserveEnd" | "preserveStartEnd" | number
+  angle={0} // Rotate labels
+  height={30} // Reserved height
+  width={60} // Reserved width
   label={{ value: 'text', position: 'insideBottom', offset: -10 }}
-  orientation="bottom"    // "top" | "bottom" (XAxis) | "left" | "right" (YAxis)
+  orientation="bottom" // "top" | "bottom" (XAxis) | "left" | "right" (YAxis)
   allowDataOverflow={false}
   allowDecimals={true}
   allowDuplicatedCategory={true}
@@ -265,19 +243,19 @@ Line series for LineChart and ComposedChart.
 ```jsx
 <Pie
   data={array}
-  dataKey="value"         // Required: numeric property
-  nameKey="name"          // Property for labels
-  cx="50%"               // Center X
-  cy="50%"               // Center Y
-  innerRadius={0}        // For donut chart
-  outerRadius={number}    // Pie radius
-  startAngle={0}         // Starting angle (degrees)
-  endAngle={360}         // Ending angle
-  minAngle={0}           // Minimum slice angle
-  paddingAngle={0}       // Gap between slices
-  label={false}          // Show labels
-  labelLine={true}       // Line connecting labels
-  shape={element|func}   // Custom slice render; receives isActive prop for active/inactive styling (replaces deprecated Cell, activeShape, inactiveShape)
+  dataKey="value" // Required: numeric property
+  nameKey="name" // Property for labels
+  cx="50%" // Center X
+  cy="50%" // Center Y
+  innerRadius={0} // For donut chart
+  outerRadius={number} // Pie radius
+  startAngle={0} // Starting angle (degrees)
+  endAngle={360} // Ending angle
+  minAngle={0} // Minimum slice angle
+  paddingAngle={0} // Gap between slices
+  label={false} // Show labels
+  labelLine={true} // Line connecting labels
+  shape={element | func} // Custom slice render; receives isActive prop for active/inactive styling (replaces deprecated Cell, activeShape, inactiveShape)
   isAnimationActive={true}
 />
 ```
@@ -293,21 +271,21 @@ Bar series for BarChart and ComposedChart.
   xAxisId={0}
   yAxisId={0}
   legendType="rect"
-  stackId="a"           // Group into stacks
-  barSize={20}          // Fixed bar size
-  unit="k"              // Unit suffix
+  stackId="a" // Group into stacks
+  barSize={20} // Fixed bar size
+  unit="k" // Unit suffix
   fill="#8884d8"
   stroke="#8884d8"
   strokeWidth={1}
-  radius={[4, 4, 0, 0]}  // Corner radii [tl, tr, br, bl]
+  radius={[4, 4, 0, 0]} // Corner radii [tl, tr, br, bl]
   label={false}
   isAnimationActive={true}
   animationBegin={0}
   animationDuration={1500}
   animationEasing="ease"
   hide={false}
-  background={false}    // Show background bars
-  shape={element|func}  // Custom bar shape
+  background={false} // Show background bars
+  shape={element | func} // Custom bar shape
   onClick={func}
   onMouseEnter={func}
   onMouseLeave={func}
@@ -325,12 +303,12 @@ Area series for AreaChart and ComposedChart.
   name="Series Name"
   xAxisId={0}
   yAxisId={0}
-  stackId="a"           // Stack areas
+  stackId="a" // Stack areas
   unit="k"
   stroke="#8884d8"
   strokeWidth={1}
-  fill="#8884d8"        // Solid fill
-  fillOpacity={0.6}     // Opacity
+  fill="#8884d8" // Solid fill
+  fillOpacity={0.6} // Opacity
   fill="url(#gradient)" // Gradient fill
   dot={false}
   activeDot={{ r: 8 }}
@@ -341,7 +319,7 @@ Area series for AreaChart and ComposedChart.
   legendType="line"
   connectNulls={false}
   hide={false}
-  baseLine={number}     // Base value for fill
+  baseLine={number} // Base value for fill
   onClick={func}
   onMouseEnter={func}
 />
@@ -360,9 +338,9 @@ Scatter plot points.
   yAxisId={0}
   zAxisId={0}
   legendType="circle"
-  line={false}          // Connect points with line
-  lineType="joint"      // "joint" | "fitting"
-  shape="circle"        // Shape or custom function
+  line={false} // Connect points with line
+  lineType="joint" // "joint" | "fitting"
+  shape="circle" // Shape or custom function
   fill="#8884d8"
   stroke="#8884d8"
   isAnimationActive={true}
@@ -379,11 +357,11 @@ Grid lines for Cartesian charts.
 
 ```jsx
 <CartesianGrid
-  strokeDasharray="3 3"  // Line pattern
-  stroke="#ccc"         // Line color
-  fill="none"           // Grid fill
-  horizontal={true}     // Horizontal lines
-  vertical={true}       // Vertical lines
+  strokeDasharray="3 3" // Line pattern
+  stroke="#ccc" // Line color
+  fill="none" // Grid fill
+  horizontal={true} // Horizontal lines
+  vertical={true} // Vertical lines
   horizontalCoordinatesGenerator={func}
   verticalCoordinatesGenerator={func}
   x={number}
@@ -399,16 +377,16 @@ Horizontal or vertical reference line.
 
 ```jsx
 <ReferenceLine
-  x="value"             // X position for vertical line
-  y={5000}              // Y position for horizontal line
+  x="value" // X position for vertical line
+  y={5000} // Y position for horizontal line
   xAxisId={0}
   yAxisId={0}
   alwaysShow={false}
-  isFront={false}       // Render on top
+  isFront={false} // Render on top
   stroke="red"
   strokeWidth={1}
   strokeDasharray="3 3"
-  label={{ value: "Label", position: "center", fill: "red" }}
+  label={{ value: 'Label', position: 'center', fill: 'red' }}
 />
 ```
 
@@ -418,10 +396,10 @@ Highlighted rectangular region.
 
 ```jsx
 <ReferenceArea
-  x1="Jan"              // Start X
-  x2="Mar"              // End X
-  y1={0}                // Start Y
-  y2={100}              // End Y
+  x1="Jan" // Start X
+  x2="Mar" // End X
+  y1={0} // Start Y
+  y2={100} // End Y
   xAxisId={0}
   yAxisId={0}
   alwaysShow={false}
@@ -430,7 +408,7 @@ Highlighted rectangular region.
   strokeWidth={1}
   fill="#8884d8"
   fillOpacity={0.3}
-  label={{ value: "Area" }}
+  label={{ value: 'Area' }}
 />
 ```
 
@@ -446,11 +424,11 @@ Highlighted point marker.
   yAxisId={0}
   isFront={false}
   alwaysShow={false}
-  r={10}                // Radius
+  r={10} // Radius
   stroke="#8884d8"
   strokeWidth={2}
   fill="#fff"
-  label={{ value: "Point" }}
+  label={{ value: 'Point' }}
 />
 ```
 
@@ -460,18 +438,18 @@ Zoom/scroll control for charts.
 
 ```jsx
 <Brush
-  dataKey="name"        // X-axis data key
-  width={number}        // Brush width
-  height={30}           // Brush height
-  x={number}            // X position
-  y={number}            // Y position
-  startIndex={0}        // Initial start
+  dataKey="name" // X-axis data key
+  width={number} // Brush width
+  height={30} // Brush height
+  x={number} // X position
+  y={number} // Y position
+  startIndex={0} // Initial start
   endIndex={data.length - 1}
-  travellerWidth={5}    // Handle width
+  travellerWidth={5} // Handle width
   stroke="#8884d8"
   fill="#fff"
-  gap={1}               // Gap between items
-  onChange={func}       // Selection change callback
+  gap={1} // Gap between items
+  onChange={func} // Selection change callback
   onDragEnd={func}
 />
 ```
@@ -483,8 +461,8 @@ Error indicators for scatter and bar charts.
 ```jsx
 <ErrorBar
   dataKey="error"
-  direction="x"         // "x" | "y"
-  width={5}             // Error bar width
+  direction="x" // "x" | "y"
+  width={5} // Error bar width
   strokeWidth={2}
 />
 ```
@@ -497,7 +475,7 @@ Third dimension for bubble charts.
 <ZAxis
   type="number"
   dataKey="z"
-  range={[60, 400]}     // Bubble size range
+  range={[60, 400]} // Bubble size range
   unit="units"
 />
 ```
@@ -602,7 +580,7 @@ Grid for radar charts.
   cx={number}
   cy={number}
   outerRadius={number}
-  gridType="polygon"    // "polygon" | "circle"
+  gridType="polygon" // "polygon" | "circle"
 />
 ```
 
@@ -611,12 +589,7 @@ Grid for radar charts.
 Angular axis for radar charts.
 
 ```jsx
-<PolarAngleAxis
-  dataKey="subject"
-  type="category"
-  tick={object|element}
-  tickFormatter={func}
-/>
+<PolarAngleAxis dataKey="subject" type="category" tick={object | element} tickFormatter={func} />
 ```
 
 ### PolarRadiusAxis
@@ -641,13 +614,13 @@ Makes charts responsive to container size. **For Recharts < 3.3.** In Recharts 3
 
 ```jsx
 <ResponsiveContainer
-  width="100%"           // "100%" | number
-  height={300}          // Required: number (NOT percentage)
-  aspect={number}        // Aspect ratio (alternative to height)
+  width="100%" // "100%" | number
+  height={300} // Required: number (NOT percentage)
+  aspect={number} // Aspect ratio (alternative to height)
   minWidth={number}
   minHeight={number}
   maxHeight={number}
-  debounce={number}      // Resize debounce (ms)
+  debounce={number} // Resize debounce (ms)
   className={string}
   style={object}
 >
@@ -663,27 +636,28 @@ Hover/click information display. Also controls active element highlighting (repl
 
 ```jsx
 <Tooltip
-  trigger="hover"         // "hover" (default) | "click"
-  defaultIndex={number}   // Initial highlighted item index on render
-  active={boolean}        // Force tooltip to stay active
-  cursor={{ stroke: '#ccc', strokeWidth: 1 }}  // Cursor style, false to hide
-  content={element|func}  // Custom content, () => null to hide text
-  contentStyle={object}   // Container styles
+  trigger="hover" // "hover" (default) | "click"
+  defaultIndex={number} // Initial highlighted item index on render
+  active={boolean} // Force tooltip to stay active
+  cursor={{ stroke: '#ccc', strokeWidth: 1 }} // Cursor style, false to hide
+  content={element | func} // Custom content, () => null to hide text
+  contentStyle={object} // Container styles
   wrapperStyle={object}
   labelStyle={object}
   itemStyle={object}
-  separator={" : "}
+  separator={' : '}
   formatter={(value, name, props) => [formattedValue, formattedName]}
   labelFormatter={(label) => formattedLabel}
   isAnimationActive={true}
   animationDuration={500}
   animationEasing="ease"
-  itemSorter={func}       // Sort tooltip items
-  filterNull={true}       // Hide null values
+  itemSorter={func} // Sort tooltip items
+  filterNull={true} // Hide null values
 />
 ```
 
 **Custom Tooltip**:
+
 ```jsx
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -708,13 +682,13 @@ Series identification.
 
 ```jsx
 <Legend
-  layout="horizontal"     // "horizontal" | "vertical"
-  align="center"         // "left" | "center" | "right"
-  verticalAlign="bottom"  // "top" | "middle" | "bottom"
-  iconType="line"         // "line" | "square" | "rect" | "circle" | "cross" | "diamond" | "star" | "triangle" | "wye"
+  layout="horizontal" // "horizontal" | "vertical"
+  align="center" // "left" | "center" | "right"
+  verticalAlign="bottom" // "top" | "middle" | "bottom"
+  iconType="line" // "line" | "square" | "rect" | "circle" | "cross" | "diamond" | "star" | "triangle" | "wye"
   iconSize={14}
-  content={element|func}  // Custom content
-  payload={array}         // Custom data
+  content={element | func} // Custom content
+  payload={array} // Custom data
   wrapperStyle={object}
   chartWidth={number}
   chartHeight={number}
@@ -725,6 +699,7 @@ Series identification.
 ```
 
 **Custom Legend**:
+
 ```jsx
 const CustomLegend = ({ payload }) => (
   <ul>
@@ -743,9 +718,9 @@ Individual data point label.
 
 ```jsx
 <Label
-  value="Text"           // Label text
-  position="top"         // "top" | "left" | "right" | "bottom" | "inside" | "outside" | "center"
-  offset={5}             // Distance from element
+  value="Text" // Label text
+  position="top" // "top" | "left" | "right" | "bottom" | "inside" | "outside" | "center"
+  offset={5} // Distance from element
   fill="#666"
   fontSize={12}
   formatter={func}
@@ -796,12 +771,12 @@ SVG text element.
 <Text
   x={number}
   y={number}
-  textAnchor="start"      // "start" | "middle" | "end"
-  width={number}          // Max width for wrapping
-  scaleToFit={false}      // Scale text to fit width
-  angle={0}               // Rotation
-  lineHeight={string}     // Line height for multi-line
-  capHeight={string}      // Capital letter height
+  textAnchor="start" // "start" | "middle" | "end"
+  width={number} // Max width for wrapping
+  scaleToFit={false} // Scale text to fit width
+  angle={0} // Rotation
+  lineHeight={string} // Line height for multi-line
+  capHeight={string} // Capital letter height
   fill="#666"
   fontSize={14}
 >
@@ -980,14 +955,7 @@ Returns chart dimensions.
 ### Circle / Dot
 
 ```jsx
-<Dot
-  cx={number}
-  cy={number}
-  r={number}
-  fill="#8884d8"
-  stroke="#8884d8"
-  strokeWidth={1}
-/>
+<Dot cx={number} cy={number} r={number} fill="#8884d8" stroke="#8884d8" strokeWidth={1} />
 ```
 
 ### Sector
@@ -1011,7 +979,7 @@ Returns chart dimensions.
   cx={number}
   cy={number}
   size={number}
-  type="circle"         // "circle" | "cross" | "diamond" | "square" | "star" | "triangle" | "wye"
+  type="circle" // "circle" | "cross" | "diamond" | "square" | "star" | "triangle" | "wye"
   fill="#8884d8"
 />
 ```
@@ -1040,13 +1008,7 @@ Returns chart dimensions.
 ### Cross
 
 ```jsx
-<Cross
-  x={number}
-  y={number}
-  width={number}
-  height={number}
-  stroke="#000"
-/>
+<Cross x={number} y={number} width={number} height={number} stroke="#000" />
 ```
 
 ### Trapezoid
@@ -1095,9 +1057,9 @@ Configure global defaults.
 ```jsx
 import { Global } from 'recharts';
 
-<Global 
-  isSsrMode={false}      // Server-side rendering mode
-/>
+<Global
+  isSsrMode={false} // Server-side rendering mode
+/>;
 ```
 
 ## Z-Index and Layering
@@ -1105,14 +1067,13 @@ import { Global } from 'recharts';
 ### ZIndexLayer
 
 ```jsx
-<ZIndexLayer zIndex={number}>
-  {/* Components at this z-index */}
-</ZIndexLayer>
+<ZIndexLayer zIndex={number}>{/* Components at this z-index */}</ZIndexLayer>
 ```
 
 ### Default Z-Index Values
 
 Default layer ordering:
+
 - Grid: 0
 - Axes: 1
 - Chart elements: 2

@@ -11,7 +11,6 @@ import { CountryFlag } from '../country-flag';
 import type { CreateShipmentValues } from '@/lib/validations/shipment';
 import { SearchableCountrySelect } from '@/components/ui/searchable-country-select';
 
-
 export function ReceiverDetailsStep() {
   const { control, watch, setValue } = useFormContext<CreateShipmentValues>();
   const toCountryCode = watch('toCountry');
@@ -33,7 +32,6 @@ export function ReceiverDetailsStep() {
     const callingCode = country?.callingCode ?? '';
     setValue('receiverPhone', `${callingCode}${receiverPhoneNum || ''}`);
   }, [receiverPhoneExt, receiverPhoneNum, setValue]);
-
 
   return (
     <div className="space-y-6">
@@ -77,7 +75,6 @@ export function ReceiverDetailsStep() {
               </FormItem>
             )}
           />
-
 
           <span className="h-5 w-px bg-slate-200 mx-3 self-center shrink-0" />
 

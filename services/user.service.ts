@@ -15,7 +15,6 @@ export interface AdminUserListItem {
   image: string | null;
   createdAt: string;
   status: 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED' | 'PENDING_KYC';
-  trustScore: number;
   commissionRate: number;
   kycStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | 'NOT_SUBMITTED';
   activity: UserActivity;
@@ -63,7 +62,7 @@ export interface UserDetailData {
     image: string | null;
     createdAt: string;
     status: 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED' | 'PENDING_KYC';
-    trustScore: number;
+    averageRating: number;
     commissionRate: number;
     isDeactivated: boolean;
     banned: boolean;
@@ -85,6 +84,9 @@ export interface UserDetailData {
     createdAt: string;
   } | null;
   reviews: {
+    averageRating: number;
+    receivedCount: number;
+    givenCount: number;
     received: any[];
     given: any[];
   };

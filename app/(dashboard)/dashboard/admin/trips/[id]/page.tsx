@@ -134,7 +134,6 @@ export default function AdminTripDetailsPage() {
     }
   };
 
-
   if (isLoading) {
     return (
       <RoleGuard
@@ -264,7 +263,6 @@ export default function AdminTripDetailsPage() {
                 Approve
               </Button>
             </div>
-
           </div>
         )}
 

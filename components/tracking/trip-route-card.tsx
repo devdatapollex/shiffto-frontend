@@ -60,20 +60,30 @@ function formatTime(timeStr: string | null | undefined): string {
   }
 }
 
-export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, className }: TripRouteCardProps) {
+export function TripRouteCard({
+  trip,
+  showTicketButton = false,
+  onViewTicket,
+  className,
+}: TripRouteCardProps) {
   const fromCountry = getCountryByCode(trip.fromCountry);
   const toCountry = getCountryByCode(trip.toCountry);
 
   const totalCap =
-    trip.totalCapacity ?? ((trip.cabinBagCapacity ?? 0) + (trip.checkInBagCapacity ?? 0));
+    trip.totalCapacity ?? (trip.cabinBagCapacity ?? 0) + (trip.checkInBagCapacity ?? 0);
   const remainingCap =
     trip.remainingCapacity ??
-    ((trip.remainingCabinCapacity ?? 0) + (trip.remainingCheckInCapacity ?? 0));
+    (trip.remainingCabinCapacity ?? 0) + (trip.remainingCheckInCapacity ?? 0);
 
   const shortTripId = `#TR-${trip.id.slice(-4).toUpperCase()}`;
 
   return (
-    <div className={cn('bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-6', className)}>
+    <div
+      className={cn(
+        'bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm space-y-6',
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
@@ -138,8 +148,10 @@ export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, cl
             <CountryFlag code={trip.toCountry} className="w-6 h-4" />
           </div>
           <span className="text-xs text-slate-500 font-medium">
-            {trip.airportArrivalTime ? formatTime(trip.airportArrivalTime) : formatTime(trip.flightTime)},{' '}
-            {formatDate(trip.flightDate)}
+            {trip.airportArrivalTime
+              ? formatTime(trip.airportArrivalTime)
+              : formatTime(trip.flightTime)}
+            , {formatDate(trip.flightDate)}
           </span>
         </div>
       </div>
@@ -150,13 +162,15 @@ export function TripRouteCard({ trip, showTicketButton = false, onViewTicket, cl
           <div className="flex flex-col">
             <span className="text-slate-400 font-medium">Cabin Luggage</span>
             <span className="text-slate-800 font-bold mt-0.5">
-              Avail: <span className="text-[#0D307A]">{trip.remainingCabinCapacity ?? 0}</span> / {trip.cabinBagCapacity ?? 0} KG
+              Avail: <span className="text-[#0D307A]">{trip.remainingCabinCapacity ?? 0}</span> /{' '}
+              {trip.cabinBagCapacity ?? 0} KG
             </span>
           </div>
           <div className="flex flex-col text-right">
             <span className="text-slate-400 font-medium">Check-in Luggage</span>
             <span className="text-slate-800 font-bold mt-0.5">
-              Avail: <span className="text-[#0D307A]">{trip.remainingCheckInCapacity ?? 0}</span> / {trip.checkInBagCapacity ?? 0} KG
+              Avail: <span className="text-[#0D307A]">{trip.remainingCheckInCapacity ?? 0}</span> /{' '}
+              {trip.checkInBagCapacity ?? 0} KG
             </span>
           </div>
         </div>

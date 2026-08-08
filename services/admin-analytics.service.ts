@@ -15,6 +15,7 @@ export interface AdminStats {
   pendingTripsCount: number;
   openTicketsCount: number;
   pendingWithdrawalsCount: number;
+  pendingRefundsCount: number;
   totalVolume: number;
   totalCommission: number;
 }
@@ -99,6 +100,7 @@ export interface AdminSidebarCounts {
   openTicketsCount: number;
   pendingWithdrawalsCount: number;
   pendingShipmentsCount: number;
+  pendingRefundsCount: number;
 }
 
 export async function getAdminSidebarCounts(): Promise<AdminSidebarCounts> {

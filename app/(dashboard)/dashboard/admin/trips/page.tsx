@@ -108,6 +108,20 @@ export default function AdminTripsPage() {
             Active
           </span>
         );
+      case 'IN_TRANSIT':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-600 border border-sky-200">
+            <Plane className="h-3 w-3" />
+            In Transit
+          </span>
+        );
+      case 'ARRIVED':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-600 border border-purple-200">
+            <CheckCircle2 className="h-3 w-3" />
+            Arrived
+          </span>
+        );
       case 'COMPLETED':
         return (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600 border border-blue-200">
@@ -179,6 +193,14 @@ export default function AdminTripsPage() {
               <TabsTrigger value="ACTIVE" className="flex items-center gap-1.5 py-1.5 px-3">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 Active
+              </TabsTrigger>
+              <TabsTrigger value="IN_TRANSIT" className="flex items-center gap-1.5 py-1.5 px-3">
+                <Plane className="h-4 w-4 text-sky-600" />
+                In Transit
+              </TabsTrigger>
+              <TabsTrigger value="ARRIVED" className="flex items-center gap-1.5 py-1.5 px-3">
+                <CheckCircle2 className="h-4 w-4 text-purple-600" />
+                Arrived
               </TabsTrigger>
               <TabsTrigger value="COMPLETED" className="flex items-center gap-1.5 py-1.5 px-3">
                 <Check className="h-4 w-4 text-blue-600" />

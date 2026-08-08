@@ -1,16 +1,40 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useShipmentDetails } from '@/hooks/use-shipment-details';
 import { useRole } from '@/hooks/use-role';
+import { cancelShipment } from '@/services/shipment.service';
+import { toast } from 'sonner';
 import { ShipmentTimeline } from '@/components/tracking/shipment-timeline';
 import { StepAdvancementCard } from '@/components/tracking/step-advancement-card';
+import { ShipmentReviewCard } from '@/components/shipments/shipment-review-card';
+import { ShipmentChatDrawer } from '@/components/shipments/shipment-chat-drawer';
 import { CountryFlag } from '@/components/shipments/create/country-flag';
 import { getCountryByCode } from '@/lib/constants/countries';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import Image from 'next/image';
-import { ChevronLeft, Package, User, Plane, Eye } from 'lucide-react';
+import {
+  ChevronLeft,
+  Package,
+  User,
+  Plane,
+  Eye,
+  MessageSquare,
+  RotateCcw,
+  CheckCircle2,
+  Ban,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import Link from 'next/link';
 
 function formatDate(dateStr: string): string {
@@ -46,10 +70,37 @@ function formatTime(timeStr: string | null | undefined): string {
 export default function ShipmentDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const shipmentId = params?.id as string;
+  const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const { user, isAdmin } = useRole();
-  const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
+  const {
+    data: shipment,
+    isLoading,
+    error,
+    refetch,
+  } = useShipmentDetails(shipmentId, !!shipmentId);
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => cancelShipment(id),
+    onSuccess: () => {
+      toast.success('Shipment canceled successfully');
+      queryClient.invalidateQueries({ queryKey: ['shipment-details', shipmentId] });
+      queryClient.invalidateQueries({ queryKey: ['shipments'] });
+      setIsCancelModalOpen(false);
+      refetch();
+    },
+    onError: (err: any) => {
+      const message =
+        err?.message ||
+        err?.data?.message ||
+        err?.response?.data?.message ||
+        'Failed to cancel shipment';
+      toast.error(message);
+    },
+  });
 
   if (isLoading) {
     return (
@@ -81,8 +132,8 @@ export default function ShipmentDetailsPage() {
         <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
         <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-md">
-          We couldn't retrieve details for this shipment. It may have been deleted, or you might not
-          have authorization to view it.
+          We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you
+          might not have authorization to view it.
         </p>
         <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
           <Link href="/dashboard/tracking">Back to Tracking</Link>
@@ -95,12 +146,17 @@ export default function ShipmentDetailsPage() {
 
   // Check if current user is the traveller for this trip or admin
   const isTraveller = Boolean(user && shipment.trip?.user?.id === user.id);
+  const isSender = Boolean(user && shipment.userId === user.id);
   const canAdvanceStep = (isTraveller || isAdmin) && shipment.status === 'ACTIVE';
+  const canChat =
+    (isTraveller || isSender || isAdmin) && shipment.status === 'ACTIVE' && Boolean(shipment.trip);
+  const canCancel =
+    (isSender || isAdmin) && (shipment.status === 'AWAITING_MATCH' || shipment.status === 'ACTIVE');
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       {/* Navigation & Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -118,7 +174,111 @@ export default function ShipmentDetailsPage() {
             <span className="text-slate-800 font-bold">Shipment: #{shortShipmentId}</span>
           </div>
         </div>
+
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          {canCancel && (
+            <Button
+              variant="outline"
+              onClick={() => setIsCancelModalOpen(true)}
+              className="border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800 rounded-lg gap-2 text-xs font-semibold h-9 px-4 shadow-xs cursor-pointer"
+            >
+              <Ban className="h-4 w-4 text-rose-600" />
+              Cancel Shipment
+            </Button>
+          )}
+
+          {canChat && (
+            <Button
+              onClick={() => setIsChatDrawerOpen(true)}
+              className="bg-[#0D307A] hover:bg-[#092E72] text-white rounded-lg gap-2 text-xs font-semibold h-9 px-4 shadow-sm cursor-pointer"
+            >
+              <MessageSquare className="h-4 w-4" />
+              {isTraveller ? 'Message Sender' : isSender ? 'Message Traveler' : 'Shipment Chat'}
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* Shipment Review Card for DELIVERED status */}
+      <ShipmentReviewCard shipment={shipment} currentUser={user} isAdmin={isAdmin} />
+
+      {/* Canceled Shipment Refund Status Card */}
+      {shipment.status === 'CANCELED' && (
+        <div className="bg-rose-50/80 border border-rose-200/80 rounded-xl p-5 shadow-xs space-y-3">
+          <div className="flex items-center gap-2 font-bold text-rose-900 text-sm">
+            <RotateCcw className="h-5 w-5 text-rose-600" />
+            <span>Shipment Canceled</span>
+          </div>
+
+          {isTraveller ? (
+            <p className="text-xs text-slate-600 font-medium">
+              This shipment was canceled by the sender. No further action is required for this item.
+            </p>
+          ) : (
+            <>
+              {shipment.paymentTransaction?.status === 'PENDING_REFUND' &&
+                (() => {
+                  const refundable =
+                    shipment.paymentTransaction.refundableAmount ??
+                    shipment.paymentTransaction.grossAmount ??
+                    0;
+                  const cancellationFee = shipment.paymentTransaction.cancellationFeeAmount ?? 0;
+                  const hasFee = cancellationFee > 0;
+                  return (
+                    <div className="bg-white/90 border border-rose-200 p-3.5 rounded-lg text-xs space-y-1">
+                      <div className="flex items-center justify-between font-bold text-rose-900">
+                        <span>Refund Status:</span>
+                        <span className="text-rose-700 font-extrabold uppercase tracking-wide">
+                          Refund Pending
+                        </span>
+                      </div>
+                      <p className="text-slate-600 mt-1">
+                        A net refund of{' '}
+                        <span className="font-bold text-slate-900">${refundable.toFixed(2)}</span>{' '}
+                        {hasFee ? '(after cancellation fee applied) ' : ''}has been queued for a
+                        manual refund payout. An admin will process your payout off-platform (bKash,
+                        Bank, Nagad, etc.) shortly.
+                      </p>
+                    </div>
+                  );
+                })()}
+              {shipment.paymentTransaction?.status === 'REFUNDED' &&
+                (() => {
+                  const refundable =
+                    shipment.paymentTransaction.refundableAmount ??
+                    shipment.paymentTransaction.grossAmount ??
+                    0;
+                  const cancellationFee = shipment.paymentTransaction.cancellationFeeAmount ?? 0;
+                  const hasFee = cancellationFee > 0;
+                  return (
+                    <div className="bg-white/90 border border-purple-200 p-3.5 rounded-lg text-xs space-y-1">
+                      <div className="flex items-center justify-between font-bold text-purple-900">
+                        <span>Refund Status:</span>
+                        <span className="text-purple-700 font-extrabold uppercase tracking-wide">
+                          Refund Processed
+                        </span>
+                      </div>
+                      <p className="text-slate-600 mt-1">
+                        Your net refund of{' '}
+                        <span className="font-bold text-slate-900">${refundable.toFixed(2)}</span>{' '}
+                        {hasFee ? '(after cancellation fee applied) ' : ''}has been successfully
+                        processed by the admin.
+                      </p>
+                      {shipment.paymentTransaction.refundTxnId && (
+                        <div className="flex items-center gap-1.5 text-[11px] font-mono text-purple-800 pt-1 border-t border-purple-100 mt-2">
+                          <span>Reference Transaction ID:</span>
+                          <span className="font-bold bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                            {shipment.paymentTransaction.refundTxnId}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Progress Timeline Tracker Card */}
       <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 overflow-hidden">
@@ -313,13 +473,15 @@ export default function ShipmentDetailsPage() {
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-slate-500 font-medium">Cabin Avail</span>
                       <span className="font-semibold text-[#0D307A]">
-                        {shipment.trip.remainingCabinCapacity ?? 0} / {shipment.trip.cabinBagCapacity ?? 0} KG
+                        {shipment.trip.remainingCabinCapacity ?? 0} /{' '}
+                        {shipment.trip.cabinBagCapacity ?? 0} KG
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs md:text-sm">
                       <span className="text-slate-500 font-medium">Check-in Avail</span>
                       <span className="font-semibold text-[#0D307A]">
-                        {shipment.trip.remainingCheckInCapacity ?? 0} / {shipment.trip.checkInBagCapacity ?? 0} KG
+                        {shipment.trip.remainingCheckInCapacity ?? 0} /{' '}
+                        {shipment.trip.checkInBagCapacity ?? 0} KG
                       </span>
                     </div>
                   </>
@@ -395,13 +557,85 @@ export default function ShipmentDetailsPage() {
               </div>
               <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
               <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                This shipment is currently awaiting a traveler. Once matched, the traveler's flight
-                details, bag capacity, and contact info will appear here.
+                This shipment is currently awaiting a traveler. Once matched, the traveler&apos;s
+                flight details, bag capacity, and contact info will appear here.
               </p>
             </div>
           )}
         </div>
       </div>
+
+      <ShipmentChatDrawer
+        isOpen={isChatDrawerOpen}
+        onClose={() => setIsChatDrawerOpen(false)}
+        shipmentId={shipment.id}
+      />
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-destructive font-semibold text-lg">
+              Cancel Shipment
+            </DialogTitle>
+            <DialogDescription className="text-sm text-slate-600 mt-1">
+              Are you sure you want to cancel &quot;
+              <span className="font-semibold text-slate-900">{shipment.itemName}</span>&quot;?
+            </DialogDescription>
+          </DialogHeader>
+
+          {shipment.status === 'ACTIVE' &&
+            (() => {
+              const gross =
+                shipment.paymentTransaction?.grossAmount ?? shipment.pricePerKg * shipment.weight;
+              const fee = gross * 0.3;
+              const netRefund = gross - fee;
+              return (
+                <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-2 text-xs my-2">
+                  <div className="flex items-center justify-between text-slate-600 font-medium">
+                    <span>Original Amount Paid</span>
+                    <span className="font-semibold text-slate-900">${gross.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-rose-600 font-medium">
+                    <span>Cancellation Fee (30%)</span>
+                    <span className="font-semibold">-${fee.toFixed(2)}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-900 text-sm">
+                    <span>Net Refund Amount</span>
+                    <span className="text-emerald-700 font-extrabold">${netRefund.toFixed(2)}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 pt-1 leading-normal">
+                    As per policy, sender-initiated cancellations incur a 30% cancellation fee. The
+                    net refund will be queued for admin processing.
+                  </p>
+                </div>
+              );
+            })()}
+
+          {shipment.status === 'AWAITING_MATCH' && (
+            <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-md border border-slate-200 my-2">
+              No payment has been processed for this shipment because no offer was accepted yet.
+            </p>
+          )}
+
+          <DialogFooter className="gap-3 sm:gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsCancelModalOpen(false)}
+              disabled={cancelMutation.isPending}
+            >
+              Keep Shipment
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => cancelMutation.mutate(shipment.id)}
+              disabled={cancelMutation.isPending}
+            >
+              {cancelMutation.isPending ? 'Canceling...' : 'Confirm Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

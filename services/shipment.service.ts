@@ -64,11 +64,17 @@ export interface PaymentTransactionDetails {
   id: string;
   transactionId: string;
   grossAmount: number;
+  refundableAmount?: number;
+  cancellationFeeAmount?: number;
+  refundInitiator?: string | null;
   currency: string;
   status: string;
   gatewayTxnId?: string | null;
   proofPhotoUrl?: string | null;
   releasedAt?: string | null;
+  refundTxnId?: string | null;
+  refundReason?: string | null;
+  refundMethodDetails?: Record<string, unknown> | null;
   createdAt: string;
 }
 
@@ -233,4 +239,8 @@ export async function confirmDelivery(
     payload
   );
   return data.data;
+}
+
+export async function cancelShipment(shipmentId: string): Promise<void> {
+  await apiClient.post(`/shipments/${shipmentId}/cancel`);
 }

@@ -150,6 +150,16 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       </motion.span>
                     )}
 
+                    {item.label === 'Notifications' && unreadCount > 0 && !isCollapsed && (
+                      <span className="ml-auto flex h-5 px-2 items-center justify-center rounded-md bg-[#ffece0] text-[11px] font-bold text-primary">
+                        {unreadCount}
+                      </span>
+                    )}
+
+                    {item.label === 'Notifications' && unreadCount > 0 && isCollapsed && (
+                      <span className="absolute right-3 top-3 flex h-2 w-2 rounded-full bg-primary" />
+                    )}
+
                     {item.label === 'My Shipments' && pendingOffersCount > 0 && !isCollapsed && (
                       <span className="ml-auto flex h-5 px-2 items-center justify-center rounded-md bg-[#ffece0] text-[11px] font-bold text-primary">
                         {pendingOffersCount}

@@ -21,7 +21,8 @@ export function SuccessStep() {
             Trip submitted for review!
           </h2>
           <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-            Your flight trip has been successfully submitted to the Admin team. Once verified and approved, it will become active and visible to Senders.
+            Your flight trip has been successfully submitted to the Admin team. Once verified and
+            approved, it will become active and visible to Senders.
           </p>
         </div>
 

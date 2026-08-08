@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @plugin "tailwindcss-animate";
 
 @theme inline {
@@ -54,24 +56,30 @@
     from {
       height: 0;
     }
+
     to {
       height: var(--radix-accordion-content-height);
     }
   }
+
   @keyframes accordion-up {
     from {
       height: var(--radix-accordion-content-height);
     }
+
     to {
       height: 0;
     }
   }
+
   @keyframes caret-blink {
+
     0%,
     70%,
     100% {
       opacity: 1;
     }
+
     20%,
     50% {
       opacity: 0;
@@ -81,6 +89,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --background: hsla(0, 0%, 100%, 1);
     --foreground: hsla(219, 81%, 31%, 1);
     --card: hsla(0, 0%, 100%, 1);
@@ -94,7 +103,7 @@
     --muted: hsla(0, 0%, 100%, 0.8);
     --muted-foreground: hsla(0, 0%, 32%, 1);
     --accent: hsla(215, 94%, 12%, 1);
-    --accent-foreground: hsla(351, 89%, 68%, 1);
+    --accent-foreground: hsla(351, 88%, 68%, 1);
     --destructive: hsla(0, 84%, 60%, 1);
     --destructive-foreground: hsla(0, 0%, 100%, 1);
     --border: hsla(220, 13%, 91%, 1);
@@ -114,6 +123,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

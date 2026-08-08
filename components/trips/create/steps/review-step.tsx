@@ -183,10 +183,11 @@ export function ReviewStep({ onJumpToStep }: ReviewStepProps) {
               <span className="bg-slate-100 border border-slate-200 text-slate-500 text-xs font-semibold px-2.5 py-0.5 rounded-md">
                 No file uploaded
               </span>
-              <h4 className="text-slate-500 text-lg font-bold mt-2 truncate">
-                No ticket attached
-              </h4>
-              <p className="text-slate-400 text-sm mt-1">You did not upload a flight ticket. Admin verification will proceed using flight details.</p>
+              <h4 className="text-slate-500 text-lg font-bold mt-2 truncate">No ticket attached</h4>
+              <p className="text-slate-400 text-sm mt-1">
+                You did not upload a flight ticket. Admin verification will proceed using flight
+                details.
+              </p>
             </div>
           </div>
         )}

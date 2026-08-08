@@ -21,7 +21,7 @@ import {
   FolderOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { io, Socket } from 'socket.io-client';
+import { useSocketStore } from '@/store/useSocketStore';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -89,17 +89,6 @@ export default function UserSupportPage() {
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const getSocketUrl = () => {
-    if (typeof window !== 'undefined') {
-      const isLocalhost =
-        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      if (isLocalhost) {
-        return 'http://localhost:5000';
-      }
-    }
-    return '';
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -194,15 +183,16 @@ export default function UserSupportPage() {
     },
   });
 
+  // Socket store hook
+  const { socket, joinRoom, leaveRoom } = useSocketStore();
+
   // Socket.io real-time listener
   useEffect(() => {
-    if (!expandedTicketId) return;
+    if (!expandedTicketId || !socket) return;
 
-    const socket: Socket = io(getSocketUrl());
+    joinRoom(expandedTicketId);
 
-    socket.emit('join-ticket', expandedTicketId);
-
-    socket.on('new-comment', (newComment: any) => {
+    const handleNewComment = (newComment: any) => {
       queryClient.setQueryData(['ticket-details', expandedTicketId], (oldData: any) => {
         if (!oldData) return oldData;
         const exists = oldData.comments.some((c: any) => c.id === newComment.id);
@@ -229,9 +219,9 @@ export default function UserSupportPage() {
           comments: [...oldData.comments, newComment],
         };
       });
-    });
+    };
 
-    socket.on('ticket-status-updated', ({ status }: { status: string }) => {
+    const handleStatusUpdated = ({ status }: { status: string }) => {
       queryClient.setQueryData(['ticket-details', expandedTicketId], (oldData: any) => {
         if (!oldData) return oldData;
         return {
@@ -240,13 +230,17 @@ export default function UserSupportPage() {
         };
       });
       queryClient.invalidateQueries({ queryKey: ['my-tickets'] });
-    });
+    };
+
+    socket.on('new-comment', handleNewComment);
+    socket.on('ticket-status-updated', handleStatusUpdated);
 
     return () => {
-      socket.emit('leave-ticket', expandedTicketId);
-      socket.disconnect();
+      leaveRoom(expandedTicketId);
+      socket.off('new-comment', handleNewComment);
+      socket.off('ticket-status-updated', handleStatusUpdated);
     };
-  }, [expandedTicketId, queryClient]);
+  }, [expandedTicketId, socket, joinRoom, leaveRoom, currentUserId, queryClient]);
 
   const resetCreateForm = () => {
     setNewTitle('');
@@ -925,10 +919,13 @@ export default function UserSupportPage() {
                 disabled={
                   createTicketMutation.isPending ||
                   isUploading ||
-                  newRelationId === 'NONE' ||
                   !newTitle.trim() ||
                   !newCategory ||
-                  !newDescription.trim()
+                  !newDescription.trim() ||
+                  (newCategory === 'Order' &&
+                    (newRelationId === 'NONE' || !newRelationId.startsWith('shipment:'))) ||
+                  (newCategory === 'Trip' &&
+                    (newRelationId === 'NONE' || !newRelationId.startsWith('trip:')))
                 }
                 className="bg-primary hover:bg-primary/95 text-white"
               >
