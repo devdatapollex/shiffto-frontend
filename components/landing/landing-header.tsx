@@ -26,21 +26,15 @@ export function LandingHeader() {
             <Link href={ROUTES.HOME} className="transition-colors hover:text-foreground">
               Home
             </Link>
-            <a href="#how-it-works" className="transition-colors hover:text-foreground">
+            <Link href={ROUTES.HOW_IT_WORKS} className="transition-colors hover:text-foreground">
               How It Works
-            </a>
-            <a href="#about" className="transition-colors hover:text-foreground">
+            </Link>
+            <Link href={ROUTES.ABOUT} className="transition-colors hover:text-foreground">
               About
-            </a>
-            <a href="#pricing" className="transition-colors hover:text-foreground">
-              Pricing
-            </a>
-            <a href="#tracking" className="transition-colors hover:text-foreground">
-              Tracking
-            </a>
-            <a href="#contact" className="transition-colors hover:text-foreground">
+            </Link>
+            <Link href={ROUTES.CONTACT} className="transition-colors hover:text-foreground">
               Contact
-            </a>
+            </Link>
           </nav>
 
           {isAuthenticated ? (

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Twitter, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { ROUTES } from '@/config/routes';
 import logoWithName from '@/public/logo-with-name.png';
 import playStoreIcon from '@/public/play-store icon.png';
 import appStoreIcon from '@/public/app-store icon.png';
@@ -64,34 +65,22 @@ export function LandingFooter() {
           {/* Left side section (page link texts) */}
           <nav className="flex flex-wrap items-center gap-[32px]">
             <Link
-              href="#about"
+              href={ROUTES.ABOUT}
               className="font-normal text-[16px] leading-[16px] tracking-normal text-[#F9FAFB] hover:opacity-80 transition-opacity"
             >
               About
             </Link>
             <Link
-              href="#pricing"
+              href={ROUTES.HOW_IT_WORKS}
               className="font-normal text-[16px] leading-[16px] tracking-normal text-[#F9FAFB] hover:opacity-80 transition-opacity"
             >
-              Pricing
+              How It Works
             </Link>
             <Link
-              href="#tracking"
-              className="font-normal text-[16px] leading-[16px] tracking-normal text-[#F9FAFB] hover:opacity-80 transition-opacity"
-            >
-              Tracking
-            </Link>
-            <Link
-              href="#contact"
+              href={ROUTES.CONTACT}
               className="font-normal text-[16px] leading-[16px] tracking-normal text-[#F9FAFB] hover:opacity-80 transition-opacity"
             >
               Contact
-            </Link>
-            <Link
-              href="#faqs"
-              className="font-normal text-[16px] leading-[16px] tracking-normal text-[#F9FAFB] hover:opacity-80 transition-opacity"
-            >
-              FAQs
             </Link>
           </nav>
 
