@@ -7,6 +7,7 @@ import {
   getAllTrips,
   verifyTrip,
   getTripById,
+  updateTrip,
 } from '@/services/trip.service';
 
 export function useMyTrips(
@@ -90,7 +91,6 @@ export function useVerifyTrip() {
       queryClient.invalidateQueries({ queryKey: ['my-trips'] });
       queryClient.invalidateQueries({ queryKey: ['trip-details'] });
     },
-
   });
 }
 
@@ -99,5 +99,18 @@ export function useTripDetails(tripId: string | null, enabled: boolean = true) {
     queryKey: ['trip-details', tripId],
     queryFn: () => getTripById(tripId!),
     enabled: enabled && !!tripId,
+  });
+}
+
+export function useUpdateTrip() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Parameters<typeof updateTrip>[1] }) =>
+      updateTrip(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trip-details'] });
+      queryClient.invalidateQueries({ queryKey: ['available-shipments'] });
+    },
   });
 }

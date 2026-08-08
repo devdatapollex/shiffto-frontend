@@ -3,6 +3,7 @@
 Common chart patterns and implementation examples.
 
 > **Note**: Examples below use `ResponsiveContainer` for broad compatibility. In Recharts 3.3+, you can use the `responsive` prop instead:
+>
 > ```jsx
 > <LineChart data={data} responsive style={{ width: '100%', height: 300 }}>
 > ```
@@ -22,7 +23,16 @@ Common chart patterns and implementation examples.
 ### Basic Line Chart
 
 ```jsx
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 const data = [
   { month: 'Jan', sales: 4000, profit: 2400 },
@@ -58,11 +68,11 @@ function SimpleLineChart() {
   <YAxis />
   <CartesianGrid strokeDasharray="3 3" />
   <Tooltip />
-  <Line 
-    type="monotone" 
-    dataKey="sales" 
-    stroke="#8884d8" 
-    strokeDasharray="5 5"  // Dashed pattern
+  <Line
+    type="monotone"
+    dataKey="sales"
+    stroke="#8884d8"
+    strokeDasharray="5 5" // Dashed pattern
   />
 </LineChart>
 ```
@@ -85,7 +95,7 @@ function SimpleLineChart() {
 ```jsx
 const CustomDot = (props) => {
   const { cx, cy, stroke, payload, value } = props;
-  
+
   return (
     <svg x={cx - 10} y={cy - 10} width={20} height={20} fill={stroke} viewBox="0 0 1024 1024">
       <path d="M512 0C229.25 0 0 229.25 0 512s229.25 512 512 512 512-229.25 512-512S794.75 0 512 0z" />
@@ -98,14 +108,8 @@ const CustomDot = (props) => {
   <YAxis />
   <CartesianGrid strokeDasharray="3 3" />
   <Tooltip />
-  <Line 
-    type="monotone" 
-    dataKey="sales" 
-    stroke="#8884d8"
-    dot={<CustomDot />}
-    activeDot={{ r: 8 }}
-  />
-</LineChart>
+  <Line type="monotone" dataKey="sales" stroke="#8884d8" dot={<CustomDot />} activeDot={{ r: 8 }} />
+</LineChart>;
 ```
 
 ### Synchronized Multi-Chart
@@ -121,7 +125,7 @@ const CustomDot = (props) => {
       <Line type="monotone" dataKey="sales" stroke="#8884d8" />
     </LineChart>
   </ResponsiveContainer>
-  
+
   <ResponsiveContainer width="100%" height={200}>
     <LineChart data={data} syncId="salesSync">
       <XAxis dataKey="month" />
@@ -131,7 +135,7 @@ const CustomDot = (props) => {
       <Line type="monotone" dataKey="profit" stroke="#82ca9d" />
     </LineChart>
   </ResponsiveContainer>
-  
+
   <p>Charts share synchronized tooltips</p>
 </>
 ```
@@ -157,11 +161,9 @@ function HighlightZoomChart({ data }) {
     // Filter data between selected range
     const left = Math.min(refAreaLeft, refAreaRight);
     const right = Math.max(refAreaLeft, refAreaRight);
-    
-    const newData = data.filter(
-      (d) => d.index >= left && d.index <= right
-    );
-    
+
+    const newData = data.filter((d) => d.index >= left && d.index <= right);
+
     setZoomData(newData);
     setRefAreaLeft('');
     setRefAreaRight('');
@@ -179,13 +181,9 @@ function HighlightZoomChart({ data }) {
       <YAxis allowDataOverflow />
       <Tooltip />
       <Line type="monotone" dataKey="value" stroke="#8884d8" />
-      
+
       {refAreaLeft && refAreaRight && (
-        <ReferenceArea
-          x1={refAreaLeft}
-          x2={refAreaRight}
-          strokeOpacity={0.3}
-        />
+        <ReferenceArea x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} />
       )}
     </LineChart>
   );
@@ -197,7 +195,16 @@ function HighlightZoomChart({ data }) {
 ### Basic Bar Chart
 
 ```jsx
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 function SimpleBarChart() {
   return (
@@ -264,7 +271,7 @@ function SimpleBarChart() {
 ```jsx
 const CustomBarShape = (props) => {
   const { fill, x, y, width, height } = props;
-  
+
   return (
     <g>
       <rect x={x} y={y} width={width} height={height} rx={5} ry={5} fill={fill} />
@@ -281,7 +288,7 @@ const CustomBarShape = (props) => {
   <CartesianGrid strokeDasharray="3 3" />
   <Tooltip />
   <Bar dataKey="sales" fill="#8884d8" shape={<CustomBarShape />} />
-</BarChart>
+</BarChart>;
 ```
 
 ### Rounded Corners
@@ -292,10 +299,10 @@ const CustomBarShape = (props) => {
   <YAxis />
   <CartesianGrid strokeDasharray="3 3" />
   <Tooltip />
-  <Bar 
-    dataKey="sales" 
+  <Bar
+    dataKey="sales"
     fill="#8884d8"
-    radius={[4, 4, 0, 0]}  // [topLeft, topRight, bottomRight, bottomLeft]
+    radius={[4, 4, 0, 0]} // [topLeft, topRight, bottomRight, bottomLeft]
   />
 </BarChart>
 ```
@@ -320,7 +327,15 @@ const CustomBarShape = (props) => {
 ### Basic Area Chart
 
 ```jsx
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 function SimpleAreaChart() {
   return (
@@ -343,21 +358,15 @@ function SimpleAreaChart() {
 <AreaChart data={data}>
   <defs>
     <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-      <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+      <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
     </linearGradient>
   </defs>
   <XAxis dataKey="month" />
   <YAxis />
   <CartesianGrid strokeDasharray="3 3" />
   <Tooltip />
-  <Area 
-    type="monotone" 
-    dataKey="sales" 
-    stroke="#8884d8" 
-    fillOpacity={1} 
-    fill="url(#colorSales)" 
-  />
+  <Area type="monotone" dataKey="sales" stroke="#8884d8" fillOpacity={1} fill="url(#colorSales)" />
 </AreaChart>
 ```
 
@@ -370,20 +379,8 @@ function SimpleAreaChart() {
   <YAxis />
   <Tooltip />
   <Legend />
-  <Area 
-    type="monotone" 
-    dataKey="sales" 
-    stackId="1" 
-    stroke="#8884d8" 
-    fill="#8884d8" 
-  />
-  <Area 
-    type="monotone" 
-    dataKey="profit" 
-    stackId="1" 
-    stroke="#82ca9d" 
-    fill="#82ca9d" 
-  />
+  <Area type="monotone" dataKey="sales" stackId="1" stroke="#8884d8" fill="#8884d8" />
+  <Area type="monotone" dataKey="profit" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
 </AreaChart>
 ```
 
@@ -493,12 +490,25 @@ import { PieChart, Pie, Sector, Tooltip } from 'recharts';
 // `activeShape` and `activeIndex` props are deprecated — use `shape` instead.
 
 const renderShape = (props) => {
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value, isActive } = props;
-  
+  const {
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+    fill,
+    payload,
+    percent,
+    value,
+    isActive,
+  } = props;
+
   if (!isActive) {
     return <Sector {...props} />;
   }
-  
+
   // Expanded active slice with label
   return (
     <g>
@@ -550,7 +560,15 @@ function ActivePieChart() {
 ### Basic Scatter Chart
 
 ```jsx
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 const data = [
   { x: 100, y: 200, z: 200 },
@@ -602,13 +620,13 @@ function ScatterWithTrend() {
   const sumY = data.reduce((sum, d) => sum + d.y, 0);
   const sumXY = data.reduce((sum, d) => sum + d.x * d.y, 0);
   const sumX2 = data.reduce((sum, d) => sum + d.x * d.x, 0);
-  
+
   const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;
-  
-  const minX = Math.min(...data.map(d => d.x));
-  const maxX = Math.max(...data.map(d => d.x));
-  
+
+  const minX = Math.min(...data.map((d) => d.x));
+  const maxX = Math.max(...data.map((d) => d.x));
+
   return (
     <ScatterChart>
       <CartesianGrid />
@@ -616,13 +634,13 @@ function ScatterWithTrend() {
       <YAxis type="number" dataKey="y" />
       <Tooltip cursor={{ strokeDasharray: '3 3' }} />
       <Scatter data={data} fill="#8884d8" />
-      <ReferenceLine 
+      <ReferenceLine
         segment={[
           { x: minX, y: slope * minX + intercept },
-          { x: maxX, y: slope * maxX + intercept }
-        ]} 
-        stroke="red" 
-        strokeDasharray="3 3" 
+          { x: maxX, y: slope * maxX + intercept },
+        ]}
+        stroke="red"
+        strokeDasharray="3 3"
       />
     </ScatterChart>
   );
@@ -634,7 +652,17 @@ function ScatterWithTrend() {
 ### Line + Bar + Area
 
 ```jsx
-import { ComposedChart, Line, Bar, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {
+  ComposedChart,
+  Line,
+  Bar,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 
 function MixedChart() {
   return (
@@ -679,34 +707,37 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 
 function RealtimeChart() {
   const [data, setData] = useState([]);
-  
+
   useEffect(() => {
     let counter = 0;
     const interval = setInterval(() => {
-      setData(prev => {
-        const newData = [...prev, {
-          time: new Date().toLocaleTimeString(),
-          value: Math.floor(Math.random() * 100),
-          index: counter++
-        }].slice(-20); // Keep last 20 points
+      setData((prev) => {
+        const newData = [
+          ...prev,
+          {
+            time: new Date().toLocaleTimeString(),
+            value: Math.floor(Math.random() * 100),
+            index: counter++,
+          },
+        ].slice(-20); // Keep last 20 points
         return newData;
       });
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   return (
     <LineChart data={data}>
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="time" interval="preserveStartEnd" />
       <YAxis domain={[0, 100]} />
       <Tooltip />
-      <Line 
-        type="monotone" 
-        dataKey="value" 
-        stroke="#8884d8" 
-        isAnimationActive={false}  // Disable for performance
+      <Line
+        type="monotone"
+        dataKey="value"
+        stroke="#8884d8"
+        isAnimationActive={false} // Disable for performance
         dot={false}
       />
     </LineChart>
@@ -720,20 +751,25 @@ function RealtimeChart() {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{ 
-        backgroundColor: '#fff', 
-        padding: '10px', 
-        border: '1px solid #ccc',
-        borderRadius: '4px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
+      <div
+        style={{
+          backgroundColor: '#fff',
+          padding: '10px',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        }}
+      >
         <p style={{ margin: 0, fontWeight: 'bold' }}>{label}</p>
         {payload.map((entry, index) => (
-          <p key={index} style={{ 
-            margin: '5px 0 0 0', 
-            color: entry.color,
-            fontSize: '14px'
-          }}>
+          <p
+            key={index}
+            style={{
+              margin: '5px 0 0 0',
+              color: entry.color,
+              fontSize: '14px',
+            }}
+          >
             {entry.name}: {entry.value.toLocaleString()}
           </p>
         ))}
@@ -748,7 +784,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   <YAxis />
   <Tooltip content={<CustomTooltip />} />
   <Line type="monotone" dataKey="sales" stroke="#8884d8" />
-</LineChart>
+</LineChart>;
 ```
 
 ### Chart with Reference Elements
@@ -760,34 +796,16 @@ const CustomTooltip = ({ active, payload, label }) => {
   <YAxis />
   <Tooltip />
   <Legend />
-  
+
   {/* Target line */}
-  <ReferenceLine 
-    y={5000} 
-    label="Target" 
-    stroke="red" 
-    strokeDasharray="3 3" 
-  />
-  
+  <ReferenceLine y={5000} label="Target" stroke="red" strokeDasharray="3 3" />
+
   {/* Highlighted period */}
-  <ReferenceArea 
-    x1="Feb" 
-    x2="Apr" 
-    label="Campaign" 
-    fill="#8884d8" 
-    fillOpacity={0.1} 
-  />
-  
+  <ReferenceArea x1="Feb" x2="Apr" label="Campaign" fill="#8884d8" fillOpacity={0.1} />
+
   {/* Important point */}
-  <ReferenceDot 
-    x="Jun" 
-    y={9800} 
-    r={8} 
-    fill="gold" 
-    stroke="orange" 
-    label="Peak" 
-  />
-  
+  <ReferenceDot x="Jun" y={9800} r={8} fill="gold" stroke="orange" label="Peak" />
+
   <Line type="monotone" dataKey="sales" stroke="#8884d8" />
 </LineChart>
 ```
@@ -798,15 +816,23 @@ const CustomTooltip = ({ active, payload, label }) => {
 import { Treemap, Tooltip } from 'recharts';
 
 const treemapData = [
-  { name: 'A', size: 100, children: [
-    { name: 'A1', size: 30 },
-    { name: 'A2', size: 40 },
-    { name: 'A3', size: 30 },
-  ]},
-  { name: 'B', size: 80, children: [
-    { name: 'B1', size: 25 },
-    { name: 'B2', size: 55 },
-  ]},
+  {
+    name: 'A',
+    size: 100,
+    children: [
+      { name: 'A1', size: 30 },
+      { name: 'A2', size: 40 },
+      { name: 'A3', size: 30 },
+    ],
+  },
+  {
+    name: 'B',
+    size: 80,
+    children: [
+      { name: 'B1', size: 25 },
+      { name: 'B2', size: 55 },
+    ],
+  },
 ];
 
 <Treemap
@@ -818,7 +844,14 @@ const treemapData = [
   fill="#8884d8"
   content={({ x, y, width, height, index, name, value }) => (
     <g>
-      <rect x={x} y={y} width={width} height={height} fill={COLORS[index % COLORS.length]} stroke="#fff" />
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={COLORS[index % COLORS.length]}
+        stroke="#fff"
+      />
       {width > 50 && height > 30 && (
         <text x={x + 10} y={y + 20} fill="#fff" fontSize={12}>
           {name} ({value})
@@ -826,7 +859,7 @@ const treemapData = [
       )}
     </g>
   )}
-/>
+/>;
 ```
 
 ### Sankey Diagram
@@ -835,12 +868,7 @@ const treemapData = [
 import { Sankey } from 'recharts';
 
 const sankeyData = {
-  nodes: [
-    { name: 'Source A' },
-    { name: 'Source B' },
-    { name: 'Target X' },
-    { name: 'Target Y' },
-  ],
+  nodes: [{ name: 'Source A' }, { name: 'Source B' }, { name: 'Target X' }, { name: 'Target Y' }],
   links: [
     { source: 0, target: 2, value: 10 },
     { source: 0, target: 3, value: 5 },
@@ -858,7 +886,7 @@ const sankeyData = {
   linkCurvature={0.5}
 >
   <Tooltip />
-</Sankey>
+</Sankey>;
 ```
 
 ### Radar Chart
@@ -883,7 +911,7 @@ const radarData = [
   <Radar name="Student B" dataKey="B" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
   <Legend />
   <Tooltip />
-</RadarChart>
+</RadarChart>;
 ```
 
 ### Custom Axis Tick
@@ -897,7 +925,7 @@ const CustomTick = ({ x, y, stroke, payload }) => (
   </g>
 );
 
-<XAxis dataKey="month" tick={<CustomTick />} height={60} />
+<XAxis dataKey="month" tick={<CustomTick />} height={60} />;
 ```
 
 ### Performance-Optimized Large Dataset
@@ -915,24 +943,24 @@ function OptimizedChart({ rawData }) {
     }
     return rawData;
   }, [rawData]);
-  
+
   // Stable callback for dataKey if using function
   const dataKey = useCallback((entry) => entry.value, []);
-  
+
   // Memoized tooltip
   const tooltipContent = useMemo(() => <CustomTooltip />, []);
-  
+
   return (
     <LineChart data={data}>
       <XAxis dataKey="time" interval="preserveStartEnd" />
       <YAxis domain={['auto', 'auto']} />
       <Tooltip content={tooltipContent} />
-      <Line 
-        type="monotone" 
+      <Line
+        type="monotone"
         dataKey={dataKey}
         stroke="#8884d8"
-        dot={false}  // Disable dots for performance
-        isAnimationActive={false}  // Disable animation
+        dot={false} // Disable dots for performance
+        isAnimationActive={false} // Disable animation
       />
     </LineChart>
   );

@@ -34,8 +34,13 @@ export function useCreateRestrictedItem() {
 export function useUpdateRestrictedItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { name?: string; description?: string | null; isActive?: boolean } }) =>
-      updateRestrictedItem(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name?: string; description?: string | null; isActive?: boolean };
+    }) => updateRestrictedItem(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: RESTRICTED_ITEMS_QUERY_KEY });
       toast.success('Restricted item updated successfully');

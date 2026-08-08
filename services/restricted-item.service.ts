@@ -33,7 +33,9 @@ export interface SingleRestrictedItemApiResponse {
   data: RestrictedItem;
 }
 
-export async function getRestrictedItems(params?: GetRestrictedItemsParams): Promise<RestrictedItemsApiResponse> {
+export async function getRestrictedItems(
+  params?: GetRestrictedItemsParams
+): Promise<RestrictedItemsApiResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
@@ -46,13 +48,26 @@ export async function getRestrictedItems(params?: GetRestrictedItemsParams): Pro
   return response.data;
 }
 
-export async function createRestrictedItem(payload: { name: string; description?: string | null; isActive?: boolean }): Promise<RestrictedItem> {
-  const response = await apiClient.post<SingleRestrictedItemApiResponse>('/restricted-items', payload);
+export async function createRestrictedItem(payload: {
+  name: string;
+  description?: string | null;
+  isActive?: boolean;
+}): Promise<RestrictedItem> {
+  const response = await apiClient.post<SingleRestrictedItemApiResponse>(
+    '/restricted-items',
+    payload
+  );
   return response.data.data;
 }
 
-export async function updateRestrictedItem(id: string, payload: { name?: string; description?: string | null; isActive?: boolean }): Promise<RestrictedItem> {
-  const response = await apiClient.patch<SingleRestrictedItemApiResponse>(`/restricted-items/${id}`, payload);
+export async function updateRestrictedItem(
+  id: string,
+  payload: { name?: string; description?: string | null; isActive?: boolean }
+): Promise<RestrictedItem> {
+  const response = await apiClient.patch<SingleRestrictedItemApiResponse>(
+    `/restricted-items/${id}`,
+    payload
+  );
   return response.data.data;
 }
 

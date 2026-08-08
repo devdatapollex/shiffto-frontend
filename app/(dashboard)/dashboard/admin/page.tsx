@@ -17,6 +17,7 @@ import {
   Percent,
   ShieldAlert,
   ChevronRight,
+  RotateCcw,
 } from 'lucide-react';
 import Link from 'next/link';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -100,7 +101,7 @@ export default function AdminDashboardPage() {
   return (
     <RoleGuard roles={['admin']}>
       <div className="space-y-6 sm:space-y-8 max-w-[1144px] mx-auto pb-12">
-        {/* Action Required Section - 5 Card Shapes */}
+        {/* Action Required Section - 6 Cards in 2 Rows of 3 */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-[#0B3A8E] tracking-tight">
@@ -109,24 +110,24 @@ export default function AdminDashboardPage() {
             <span className="text-xs font-medium text-slate-400">High priority tasks</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {/* Pending KYC Card */}
             <Link
               href={ROUTES.ADMIN_KYC}
-              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#FF6F3F]/40 hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 sm:space-y-3 shadow-xs hover:border-[#FF6F3F]/40 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <div className="h-10 w-10 rounded-lg bg-[#fff5f0] text-[#FF6F3F] flex items-center justify-center shrink-0 border border-[#ffedd5]">
-                  <ShieldAlert className="h-5 w-5 stroke-[1.75]" />
+                <div className="h-9 w-9 rounded-lg bg-[#fff5f0] text-[#FF6F3F] flex items-center justify-center shrink-0 border border-[#ffedd5]">
+                  <ShieldAlert className="h-4.5 w-4.5 stroke-[1.75]" />
                 </div>
-                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff5f0] group-hover:text-[#FF6F3F] flex items-center justify-center transition-colors">
-                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                <div className="h-6.5 w-6.5 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff5f0] group-hover:text-[#FF6F3F] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {isLoading ? (
-                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                  <div className="h-7 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
                 ) : (
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
                     {formatValue(stats?.pendingKycCount)}
@@ -135,7 +136,7 @@ export default function AdminDashboardPage() {
                 <div className="text-xs sm:text-sm font-semibold text-slate-700">Pending KYC</div>
               </div>
 
-              <div className="text-xs font-semibold text-[#FF6F3F] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+              <div className="text-xs font-semibold text-[#FF6F3F] group-hover:underline flex items-center gap-1 pt-1.5 border-t border-slate-100">
                 <span>Review Submissions</span>
                 <ArrowUpRight className="h-3 w-3" />
               </div>
@@ -144,20 +145,20 @@ export default function AdminDashboardPage() {
             {/* Pending Release Card */}
             <Link
               href={ROUTES.SETTLEMENTS}
-              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#7c3aed]/40 hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 sm:space-y-3 shadow-xs hover:border-[#7c3aed]/40 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <div className="h-10 w-10 rounded-lg bg-[#f5f3ff] text-[#7c3aed] flex items-center justify-center shrink-0 border border-[#ede9fe]">
-                  <Scale className="h-5 w-5 stroke-[1.75]" />
+                <div className="h-9 w-9 rounded-lg bg-[#f5f3ff] text-[#7c3aed] flex items-center justify-center shrink-0 border border-[#ede9fe]">
+                  <Scale className="h-4.5 w-4.5 stroke-[1.75]" />
                 </div>
-                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#f5f3ff] group-hover:text-[#7c3aed] flex items-center justify-center transition-colors">
-                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                <div className="h-6.5 w-6.5 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#f5f3ff] group-hover:text-[#7c3aed] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {isLoading ? (
-                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                  <div className="h-7 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
                 ) : (
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
                     {formatValue(stats?.pendingReleasesCount)}
@@ -168,7 +169,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="text-xs font-semibold text-[#7c3aed] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+              <div className="text-xs font-semibold text-[#7c3aed] group-hover:underline flex items-center gap-1 pt-1.5 border-t border-slate-100">
                 <span>Manage Escrow</span>
                 <ArrowUpRight className="h-3 w-3" />
               </div>
@@ -177,20 +178,20 @@ export default function AdminDashboardPage() {
             {/* Pending Trip Card */}
             <Link
               href={ROUTES.ADMIN_TRIPS}
-              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#FF8552]/40 hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 sm:space-y-3 shadow-xs hover:border-[#FF8552]/40 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <div className="h-10 w-10 rounded-lg bg-[#fff8f0] text-[#FF8552] flex items-center justify-center shrink-0 border border-[#ffe8dc]">
-                  <PlaneTakeoff className="h-5 w-5 stroke-[1.75]" />
+                <div className="h-9 w-9 rounded-lg bg-[#fff8f0] text-[#FF8552] flex items-center justify-center shrink-0 border border-[#ffe8dc]">
+                  <PlaneTakeoff className="h-4.5 w-4.5 stroke-[1.75]" />
                 </div>
-                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff8f0] group-hover:text-[#FF8552] flex items-center justify-center transition-colors">
-                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                <div className="h-6.5 w-6.5 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff8f0] group-hover:text-[#FF8552] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {isLoading ? (
-                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                  <div className="h-7 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
                 ) : (
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
                     {formatValue(stats?.pendingTripsCount)}
@@ -199,7 +200,7 @@ export default function AdminDashboardPage() {
                 <div className="text-xs sm:text-sm font-semibold text-slate-700">Pending Trips</div>
               </div>
 
-              <div className="text-xs font-semibold text-[#FF8552] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+              <div className="text-xs font-semibold text-[#FF8552] group-hover:underline flex items-center gap-1 pt-1.5 border-t border-slate-100">
                 <span>Review Trips</span>
                 <ArrowUpRight className="h-3 w-3" />
               </div>
@@ -208,20 +209,20 @@ export default function AdminDashboardPage() {
             {/* Open Tickets Card */}
             <Link
               href={ROUTES.ADMIN_TICKETS}
-              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#0B3A8E]/40 hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 sm:space-y-3 shadow-xs hover:border-[#0B3A8E]/40 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <div className="h-10 w-10 rounded-lg bg-[#f0f5ff] text-[#0B3A8E] flex items-center justify-center shrink-0 border border-[#dbeafe]">
-                  <LifeBuoy className="h-5 w-5 stroke-[1.75]" />
+                <div className="h-9 w-9 rounded-lg bg-[#f0f5ff] text-[#0B3A8E] flex items-center justify-center shrink-0 border border-[#dbeafe]">
+                  <LifeBuoy className="h-4.5 w-4.5 stroke-[1.75]" />
                 </div>
-                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#f0f5ff] group-hover:text-[#0B3A8E] flex items-center justify-center transition-colors">
-                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                <div className="h-6.5 w-6.5 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#f0f5ff] group-hover:text-[#0B3A8E] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {isLoading ? (
-                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                  <div className="h-7 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
                 ) : (
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
                     {formatValue(stats?.openTicketsCount)}
@@ -230,7 +231,7 @@ export default function AdminDashboardPage() {
                 <div className="text-xs sm:text-sm font-semibold text-slate-700">Open Tickets</div>
               </div>
 
-              <div className="text-xs font-semibold text-[#0B3A8E] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+              <div className="text-xs font-semibold text-[#0B3A8E] group-hover:underline flex items-center gap-1 pt-1.5 border-t border-slate-100">
                 <span>Manage Support</span>
                 <ArrowUpRight className="h-3 w-3" />
               </div>
@@ -239,20 +240,20 @@ export default function AdminDashboardPage() {
             {/* Pending Withdrawal Card */}
             <Link
               href={ROUTES.WITHDRAWALS}
-              className="bg-white border border-slate-200/80 rounded-lg p-5 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#10b981]/40 hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 sm:space-y-3 shadow-xs hover:border-[#10b981]/40 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <div className="h-10 w-10 rounded-lg bg-[#eefcf4] text-[#10b981] flex items-center justify-center shrink-0 border border-[#c6f6d5]">
-                  <Banknote className="h-5 w-5 stroke-[1.75]" />
+                <div className="h-9 w-9 rounded-lg bg-[#eefcf4] text-[#10b981] flex items-center justify-center shrink-0 border border-[#c6f6d5]">
+                  <Banknote className="h-4.5 w-4.5 stroke-[1.75]" />
                 </div>
-                <div className="h-7 w-7 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#eefcf4] group-hover:text-[#10b981] flex items-center justify-center transition-colors">
-                  <ChevronRight className="h-4 w-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                <div className="h-6.5 w-6.5 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#eefcf4] group-hover:text-[#10b981] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {isLoading ? (
-                  <div className="h-8 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                  <div className="h-7 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
                 ) : (
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
                     {formatValue(stats?.pendingWithdrawalsCount)}
@@ -263,8 +264,41 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="text-xs font-semibold text-[#10b981] group-hover:underline flex items-center gap-1 pt-1 border-t border-slate-100">
+              <div className="text-xs font-semibold text-[#10b981] group-hover:underline flex items-center gap-1 pt-1.5 border-t border-slate-100">
                 <span>Process Payouts</span>
+                <ArrowUpRight className="h-3 w-3" />
+              </div>
+            </Link>
+
+            {/* Pending Refunds Card */}
+            <Link
+              href={`${ROUTES.ADMIN_PAYMENTS}?status=PENDING_REFUND`}
+              className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 sm:space-y-3 shadow-xs hover:border-[#e11d48]/40 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-9 w-9 rounded-lg bg-[#fff1f2] text-[#e11d48] flex items-center justify-center shrink-0 border border-[#ffe4e6]">
+                  <RotateCcw className="h-4.5 w-4.5 stroke-[1.75]" />
+                </div>
+                <div className="h-6.5 w-6.5 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#fff1f2] group-hover:text-[#e11d48] flex items-center justify-center transition-colors">
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+
+              <div className="space-y-0.5">
+                {isLoading ? (
+                  <div className="h-7 w-12 bg-slate-200/80 rounded-lg animate-pulse my-0.5" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B3A8E] tracking-tight">
+                    {formatValue(stats?.pendingRefundsCount)}
+                  </div>
+                )}
+                <div className="text-xs sm:text-sm font-semibold text-slate-700">
+                  Pending Refunds
+                </div>
+              </div>
+
+              <div className="text-xs font-semibold text-[#e11d48] group-hover:underline flex items-center gap-1 pt-1.5 border-t border-slate-100">
+                <span>Process Refunds</span>
                 <ArrowUpRight className="h-3 w-3" />
               </div>
             </Link>

@@ -79,7 +79,6 @@ export default function LoginPage() {
     router.refresh();
   };
 
-
   const handleGoogleSignIn = () => {
     authClient.signIn.social({ provider: 'google', callbackURL: callbackUrl });
   };

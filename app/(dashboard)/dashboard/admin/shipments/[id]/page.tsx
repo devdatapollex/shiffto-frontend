@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useShipmentDetails } from '@/hooks/use-shipment-details';
 import { useRole } from '@/hooks/use-role';
-import { releasePayment } from '@/services/payment.service';
+import { releasePayment, processAdminRefund } from '@/services/payment.service';
 import { toast } from 'sonner';
 import { ShipmentTimeline } from '@/components/tracking/shipment-timeline';
 import { StepAdvancementCard } from '@/components/tracking/step-advancement-card';
@@ -19,8 +19,13 @@ import {
   FileText,
   Plane,
   Eye,
+  AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -29,13 +34,50 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import Link from 'next/link';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { toRelativeImageUrl } from '@/lib/image-utils';
 import { getCountryByCode } from '@/lib/constants/countries';
 import Image from 'next/image';
 import { useState } from 'react';
+import { AdminCancelShipmentModal } from '@/components/admin/admin-cancel-shipment-modal';
+
+interface PaymentTxInfo {
+  id?: string;
+  status?: string;
+  grossAmount?: number;
+  transactionId?: string;
+  proofPhotoUrl?: string;
+  refundableAmount?: number;
+  cancellationFeeAmount?: number;
+  refundInitiator?: string | null;
+  refundReason?: string | null;
+  refundTxnId?: string | null;
+  refundedAt?: string | null;
+  adminRefundNotes?: string | null;
+  releasedAt?: string | null;
+  refundMethodDetails?: {
+    type?: string;
+    accountName?: string;
+    accountNumber?: string;
+    bankName?: string;
+    branchName?: string;
+    routingNumber?: string;
+    cryptoAddress?: string;
+  } | null;
+}
+
+interface TripInfo {
+  ticketPhoto?: string;
+}
 
 function formatDate(dateStr: string): string {
   try {
@@ -83,12 +125,52 @@ export default function AdminShipmentDetailsPage() {
   const shipmentId = params?.id as string;
 
   const { user } = useRole();
-  const { data: shipment, isLoading, error } = useShipmentDetails(shipmentId, !!shipmentId);
+  const {
+    data: shipment,
+    isLoading,
+    error,
+    refetch,
+  } = useShipmentDetails(shipmentId, !!shipmentId);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; title: string } | null>(null);
   const [isReleasing, setIsReleasing] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isProcessRefundModalOpen, setIsProcessRefundModalOpen] = useState(false);
+  const [refundTxnIdInput, setRefundTxnIdInput] = useState('');
+  const [adminNotesInput, setAdminNotesInput] = useState('');
+  const [isSubmittingRefund, setIsSubmittingRefund] = useState(false);
+
+  const handleProcessRefundSubmit = async () => {
+    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })?.paymentTransaction
+      ?.transactionId;
+    if (!txId || !refundTxnIdInput.trim()) {
+      toast.error('Refund Reference Transaction ID is required');
+      return;
+    }
+    setIsSubmittingRefund(true);
+    try {
+      await processAdminRefund(txId, {
+        refundTxnId: refundTxnIdInput.trim(),
+        adminNotes: adminNotesInput.trim() || undefined,
+      });
+      toast.success('Refund successfully processed and marked as REFUNDED!');
+      setIsProcessRefundModalOpen(false);
+      setRefundTxnIdInput('');
+      setAdminNotesInput('');
+      refetch();
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        'Failed to process refund';
+      toast.error(errorMsg);
+    } finally {
+      setIsSubmittingRefund(false);
+    }
+  };
 
   const handleReleasePayment = async () => {
-    const txId = (shipment as any)?.paymentTransaction?.transactionId;
+    const txId = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })?.paymentTransaction
+      ?.transactionId;
     if (!txId) {
       toast.error('No payment transaction ID found for this shipment');
       return;
@@ -98,8 +180,11 @@ export default function AdminShipmentDetailsPage() {
       await releasePayment(txId);
       toast.success('Payment successfully released to traveler!');
       window.location.reload();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to release payment');
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Failed to release payment';
+      toast.error(errorMsg);
     } finally {
       setIsReleasing(false);
     }
@@ -167,8 +252,8 @@ export default function AdminShipmentDetailsPage() {
           <Package className="h-16 w-16 text-slate-300 mb-4 animate-bounce" />
           <h2 className="text-xl font-bold text-slate-800">Shipment Not Found</h2>
           <p className="text-sm text-slate-500 mt-2 max-w-md">
-            We couldn't retrieve details for this shipment. It may have been deleted, or you might
-            not have authorization to view it.
+            We couldn&apos;t retrieve details for this shipment. It may have been deleted, or you
+            might not have authorization to view it.
           </p>
           <Button asChild className="mt-6 bg-[#0D307A] hover:bg-[#092E72]">
             <Link href="/dashboard/admin/shipments">Back to Shipments</Link>
@@ -212,91 +297,355 @@ export default function AdminShipmentDetailsPage() {
               <span className="text-slate-800 font-bold">Shipment: #{shortShipmentId}</span>
             </div>
           </div>
+          {shipment.status !== 'CANCELED' && shipment.status !== 'DELIVERED' && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setIsCancelModalOpen(true)}
+              className="h-9 px-4 font-semibold text-xs rounded-lg cursor-pointer"
+            >
+              <AlertTriangle className="mr-1.5 h-4 w-4" />
+              Cancel Shipment
+            </Button>
+          )}
         </div>
 
-        {/* Payment Verification & Release Card for Admin */}
-        {(shipment as any)?.paymentTransaction && (
-          <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Escrow Payment Verification & Release
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Verify proof of delivery uploaded by traveler and release escrowed funds.
-                </p>
-              </div>
+        {/* Payment Verification & Release / Refund Card for Admin */}
+        {(() => {
+          const paymentTx = (shipment as unknown as { paymentTransaction?: PaymentTxInfo })
+            ?.paymentTransaction;
+          if (!paymentTx) return null;
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-500 font-medium">Status:</span>
-                <span
-                  className={`px-3 py-1 rounded-full font-bold text-xs ${
-                    (shipment as any).paymentTransaction.status === 'RELEASED'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : (shipment as any).paymentTransaction.status === 'PENDING_RELEASE'
-                        ? 'bg-amber-100 text-amber-800 animate-pulse'
-                        : 'bg-blue-100 text-blue-800'
-                  }`}
-                >
-                  {(shipment as any).paymentTransaction.status}
-                </span>
-              </div>
-            </div>
+          const isCanceled = shipment.status === 'CANCELED';
+          const isDelivered = shipment.status === 'DELIVERED';
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
-              <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
-                <p className="text-2xl font-extrabold text-slate-900">
-                  ${(shipment as any).paymentTransaction.grossAmount?.toFixed(2)}
-                </p>
-                <p className="text-[11px] text-slate-400 font-mono">
-                  Txn ID: #{(shipment as any).paymentTransaction.transactionId}
-                </p>
-              </div>
+          // Scenario 1: Shipment is CANCELED
+          if (isCanceled) {
+            // Sub-scenario 1A: Pending Refund
+            if (paymentTx.status === 'PENDING_REFUND') {
+              const initiatorLabel =
+                paymentTx.refundInitiator === 'SENDER'
+                  ? 'Sender Initiated'
+                  : paymentTx.refundInitiator === 'TRAVELLER'
+                    ? 'Traveler Initiated'
+                    : paymentTx.refundInitiator === 'ADMIN'
+                      ? 'Admin Initiated'
+                      : 'Pending Refund';
 
-              {(shipment as any).paymentTransaction.proofPhotoUrl && (
-                <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 relative rounded-lg border border-slate-200 overflow-hidden bg-white">
-                    <Image
-                      src={toRelativeImageUrl((shipment as any).paymentTransaction.proofPhotoUrl)}
-                      alt="Delivery proof"
-                      fill
-                      className="object-cover"
-                    />
+              const method = paymentTx.refundMethodDetails;
+
+              return (
+                <div className="bg-white border border-rose-200 rounded-lg shadow-sm p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-rose-100 pb-4">
+                    <div>
+                      <h2 className="text-sm font-bold text-rose-900 uppercase tracking-wider flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-rose-600" />
+                        Shipment Canceled — Refund Pending
+                      </h2>
+                      <p className="text-xs text-rose-600 mt-0.5">
+                        This shipment has been canceled. Review calculated refund amounts and
+                        process payout to sender.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-slate-500 font-medium">Payment Status:</span>
+                      <span className="px-3 py-1 rounded-full font-bold text-xs bg-rose-100 text-rose-800 border border-rose-200 animate-pulse">
+                        PENDING_REFUND
+                      </span>
+                    </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      setSelectedPhoto({
-                        url: (shipment as any).paymentTransaction.proofPhotoUrl,
-                        title: 'Delivery Proof',
-                      })
-                    }
-                    className="text-xs text-slate-700 font-semibold"
-                  >
-                    View Proof
-                  </Button>
-                </div>
-              )}
 
-              {(shipment as any).paymentTransaction.status !== 'RELEASED' ? (
-                <Button
-                  onClick={handleReleasePayment}
-                  disabled={isReleasing}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-5 text-sm shadow-md"
-                >
-                  {isReleasing ? 'Releasing...' : 'Release Payment to Traveler'}
-                </Button>
-              ) : (
-                <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4" /> Released to Traveler
-                </span>
-              )}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-rose-50/50 p-4 rounded-lg border border-rose-100">
+                    <div className="space-y-1">
+                      <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
+                      <p className="text-xl font-extrabold text-slate-900">
+                        ${(paymentTx.grossAmount || 0).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-slate-500 font-medium">
+                        Retained Cancellation Fee:
+                      </p>
+                      <p className="text-xl font-extrabold text-amber-700">
+                        -${(paymentTx.cancellationFeeAmount || 0).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-slate-500 font-medium">
+                        Net Refundable to Sender:
+                      </p>
+                      <p className="text-xl font-extrabold text-emerald-700">
+                        ${(paymentTx.refundableAmount ?? paymentTx.grossAmount ?? 0).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-slate-100 text-xs">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-700">Initiator:</span>
+                        <span className="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded">
+                          {initiatorLabel}
+                        </span>
+                      </div>
+                      {paymentTx.refundReason && (
+                        <p className="text-slate-600">
+                          <span className="font-semibold">Reason:</span> {paymentTx.refundReason}
+                        </p>
+                      )}
+                      {method && (
+                        <p className="text-slate-500 font-mono">
+                          <span className="font-semibold font-sans">Payout Method:</span>{' '}
+                          {method.type || 'ACCOUNT'}{' '}
+                          {method.accountNumber ? `(${method.accountNumber})` : ''}{' '}
+                          {method.bankName ? `- ${method.bankName}` : ''}
+                        </p>
+                      )}
+                    </div>
+
+                    <Button
+                      onClick={() => setIsProcessRefundModalOpen(true)}
+                      className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-5 h-10 rounded-lg gap-2 cursor-pointer transition-colors shadow-sm shrink-0"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Process Refund to Sender
+                    </Button>
+                  </div>
+                </div>
+              );
+            }
+
+            // Sub-scenario 1B: Refunded
+            if (paymentTx.status === 'REFUNDED') {
+              return (
+                <div className="bg-white border border-purple-200 rounded-lg shadow-sm p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-100 pb-4">
+                    <div>
+                      <h2 className="text-sm font-bold text-purple-900 uppercase tracking-wider flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                        Shipment Canceled — Refund Processed
+                      </h2>
+                      <p className="text-xs text-purple-600 mt-0.5">
+                        Refund has been successfully issued to sender.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-slate-500 font-medium">Payment Status:</span>
+                      <span className="px-3 py-1 rounded-full font-bold text-xs bg-purple-100 text-purple-800 border border-purple-200">
+                        REFUNDED
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-purple-50/50 p-4 rounded-lg border border-purple-100 text-xs">
+                    <div>
+                      <p className="text-slate-500 font-medium">Refund Reference Txn ID:</p>
+                      <p className="font-mono font-bold text-slate-800 text-sm mt-0.5">
+                        {paymentTx.refundTxnId || 'N/A'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-slate-500 font-medium">Refunded Amount:</p>
+                      <p className="font-extrabold text-emerald-700 text-base mt-0.5">
+                        ${(paymentTx.refundableAmount ?? paymentTx.grossAmount ?? 0).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-slate-500 font-medium">Retained Cancellation Fee:</p>
+                      <p className="font-extrabold text-amber-700 text-base mt-0.5">
+                        ${(paymentTx.cancellationFeeAmount || 0).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {paymentTx.adminRefundNotes && (
+                    <p className="text-xs text-slate-600 italic border-t border-purple-100 pt-2">
+                      <span className="font-semibold not-italic text-slate-700">Admin Notes:</span>{' '}
+                      {paymentTx.adminRefundNotes}
+                    </p>
+                  )}
+                </div>
+              );
+            }
+
+            // Sub-scenario 1C: Released prior to cancellation (Edge case)
+            if (paymentTx.status === 'RELEASED') {
+              return (
+                <div className="bg-white border border-amber-200 rounded-lg shadow-sm p-6 space-y-3">
+                  <div className="flex items-center justify-between border-b border-amber-100 pb-3">
+                    <h2 className="text-sm font-bold text-amber-900 uppercase tracking-wider flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
+                      Shipment Canceled (Payment Was Previously Released)
+                    </h2>
+                    <span className="px-3 py-1 rounded-full font-bold text-xs bg-emerald-100 text-emerald-800">
+                      RELEASED
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600">
+                    Escrowed funds of <strong>${(paymentTx.grossAmount || 0).toFixed(2)}</strong>{' '}
+                    were released to traveler prior to shipment cancellation.
+                  </p>
+                </div>
+              );
+            }
+
+            // Sub-scenario 1D: Pending Payment or Failed
+            return (
+              <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <Package className="w-4 h-4 text-slate-500" />
+                    Shipment Canceled — Payment Unfulfilled
+                  </h2>
+                  <span className="px-3 py-1 rounded-full font-bold text-xs bg-slate-100 text-slate-700">
+                    {paymentTx.status || 'CANCELED'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  This shipment was canceled without captured escrow funds. No refund action is
+                  required.
+                </p>
+              </div>
+            );
+          }
+
+          // Scenario 2: Active / Delivered Shipment
+          const deliveredStep = shipment.shipmentSteps?.find((s) => s.stage === 'DELIVERED');
+          const deliveryTimestamp = deliveredStep?.completedAt
+            ? new Date(deliveredStep.completedAt).getTime()
+            : isDelivered && shipment.updatedAt
+              ? new Date(shipment.updatedAt).getTime()
+              : null;
+          const HOLD_MS = 3 * 24 * 60 * 60 * 1000;
+          const releaseEligibleAt = deliveryTimestamp ? deliveryTimestamp + HOLD_MS : null;
+          const isHoldActive = releaseEligibleAt ? Date.now() < releaseEligibleAt : false;
+          const formattedEligibleDate = releaseEligibleAt
+            ? new Date(releaseEligibleAt).toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              })
+            : '';
+
+          const canReleaseToTraveler =
+            isDelivered &&
+            (paymentTx.status === 'PENDING_RELEASE' || paymentTx.status === 'ESCROWED') &&
+            !isHoldActive;
+          const isReleased = paymentTx.status === 'RELEASED';
+
+          return (
+            <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    Escrow Payment Verification & Release
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Verify proof of delivery uploaded by traveler and release escrowed funds.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-500 font-medium">Status:</span>
+                  <span
+                    className={`px-3 py-1 rounded-full font-bold text-xs ${
+                      paymentTx.status === 'RELEASED'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : paymentTx.status === 'PENDING_RELEASE'
+                          ? 'bg-amber-100 text-amber-800 animate-pulse'
+                          : 'bg-blue-100 text-blue-800'
+                    }`}
+                  >
+                    {paymentTx.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 font-medium">Escrowed Gross Amount:</p>
+                  <p className="text-2xl font-extrabold text-slate-900">
+                    ${(paymentTx.grossAmount || 0).toFixed(2)}
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    Txn ID: #{paymentTx.transactionId}
+                  </p>
+                </div>
+
+                {paymentTx.proofPhotoUrl && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 relative rounded-lg border border-slate-200 overflow-hidden bg-white">
+                      <Image
+                        src={toRelativeImageUrl(paymentTx.proofPhotoUrl)}
+                        alt="Delivery proof"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setSelectedPhoto({
+                          url: paymentTx.proofPhotoUrl!,
+                          title: 'Delivery Proof',
+                        })
+                      }
+                      className="text-xs text-slate-700 font-semibold"
+                    >
+                      View Proof
+                    </Button>
+                  </div>
+                )}
+
+                {canReleaseToTraveler ? (
+                  <Button
+                    onClick={handleReleasePayment}
+                    disabled={isReleasing}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-5 h-10 rounded-lg gap-2 cursor-pointer transition-colors shadow-sm"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {isReleasing ? 'Releasing...' : 'Release Payment to Traveler'}
+                  </Button>
+                ) : isDelivered &&
+                  isHoldActive &&
+                  (paymentTx.status === 'PENDING_RELEASE' || paymentTx.status === 'ESCROWED') ? (
+                  <div className="flex flex-col items-start md:items-end gap-1">
+                    <Button
+                      disabled
+                      className="bg-amber-50 text-amber-800 text-xs font-semibold px-4 h-10 rounded-lg gap-2 cursor-not-allowed border border-amber-200/80"
+                    >
+                      <Clock className="h-4 w-4 text-amber-600 animate-pulse" />
+                      3-Day Hold Active
+                    </Button>
+                    <span className="text-[11px] text-amber-700 font-medium">
+                      Release eligible on {formattedEligibleDate}
+                    </span>
+                  </div>
+                ) : isReleased ? (
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    Payment Released
+                  </div>
+                ) : (
+                  <div className="text-xs text-slate-500 font-medium bg-slate-100 px-4 py-2 rounded-lg border border-slate-200">
+                    Awaiting Delivery for Release
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Progress Timeline Tracker Card */}
         <div className="bg-white border border-slate-200/60 rounded-lg shadow-sm p-6 overflow-hidden">
@@ -419,13 +768,10 @@ export default function AdminShipmentDetailsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        if (
-                          shipment.trip &&
-                          (shipment.trip as any).ticketPhoto &&
-                          (shipment.trip as any).ticketPhoto !== 'pending'
-                        ) {
+                        const ticketPhoto = (shipment.trip as unknown as TripInfo)?.ticketPhoto;
+                        if (shipment.trip && ticketPhoto && ticketPhoto !== 'pending') {
                           setSelectedPhoto({
-                            url: (shipment.trip as any).ticketPhoto,
+                            url: ticketPhoto,
                             title: 'Flight Ticket Scan',
                           });
                         } else if (shipment.trip) {
@@ -506,13 +852,15 @@ export default function AdminShipmentDetailsPage() {
                       <div className="flex justify-between items-center text-xs md:text-sm">
                         <span className="text-slate-500 font-medium">Cabin Avail</span>
                         <span className="font-semibold text-[#0D307A]">
-                          {shipment.trip.remainingCabinCapacity ?? 0} / {shipment.trip.cabinBagCapacity ?? 0} KG
+                          {shipment.trip.remainingCabinCapacity ?? 0} /{' '}
+                          {shipment.trip.cabinBagCapacity ?? 0} KG
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-xs md:text-sm">
                         <span className="text-slate-500 font-medium">Check-in Avail</span>
                         <span className="font-semibold text-[#0D307A]">
-                          {shipment.trip.remainingCheckInCapacity ?? 0} / {shipment.trip.checkInBagCapacity ?? 0} KG
+                          {shipment.trip.remainingCheckInCapacity ?? 0} /{' '}
+                          {shipment.trip.checkInBagCapacity ?? 0} KG
                         </span>
                       </div>
                     </>
@@ -588,7 +936,7 @@ export default function AdminShipmentDetailsPage() {
                 </div>
                 <h3 className="text-base font-bold text-slate-800">Awaiting Traveler Match</h3>
                 <p className="text-xs text-slate-400 mt-2 max-w-sm leading-relaxed">
-                  This shipment is currently awaiting a traveler. Once matched, the traveler's
+                  This shipment is currently awaiting a traveler. Once matched, the traveler&apos;s
                   flight details, bag capacity, and contact info will appear here.
                 </p>
               </div>
@@ -714,6 +1062,78 @@ export default function AdminShipmentDetailsPage() {
                 />
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+        <AdminCancelShipmentModal
+          isOpen={isCancelModalOpen}
+          onClose={() => setIsCancelModalOpen(false)}
+          shipment={shipment}
+          onSuccess={() => refetch()}
+        />
+
+        {/* Process Refund Modal */}
+        <Dialog
+          open={isProcessRefundModalOpen}
+          onOpenChange={(o) => !o && setIsProcessRefundModalOpen(false)}
+        >
+          <DialogContent className="max-w-md rounded-lg p-6 bg-white">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <RotateCcw className="h-5 w-5 text-rose-600" />
+                Process Refund to Sender
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500 mt-1">
+                Enter the reference payment transaction ID for the processed refund payout.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="refund-txn-id" className="text-xs font-semibold text-slate-700">
+                  Refund Reference Txn ID <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  id="refund-txn-id"
+                  placeholder="e.g. REF-12345678 or Bank/Stripe Ref ID"
+                  value={refundTxnIdInput}
+                  onChange={(e) => setRefundTxnIdInput(e.target.value)}
+                  className="text-xs h-9"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="admin-notes" className="text-xs font-semibold text-slate-700">
+                  Admin Notes (Optional)
+                </Label>
+                <Textarea
+                  id="admin-notes"
+                  placeholder="Add any internal processing notes..."
+                  value={adminNotesInput}
+                  onChange={(e) => setAdminNotesInput(e.target.value)}
+                  className="text-xs min-h-[70px]"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsProcessRefundModalOpen(false)}
+                disabled={isSubmittingRefund}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleProcessRefundSubmit}
+                disabled={isSubmittingRefund || !refundTxnIdInput.trim()}
+                className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold cursor-pointer"
+              >
+                {isSubmittingRefund ? 'Processing...' : 'Confirm & Process Refund'}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

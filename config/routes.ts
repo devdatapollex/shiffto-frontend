@@ -4,6 +4,9 @@
 export const ROUTES = {
   // Public Routes
   HOME: '/',
+  HOW_IT_WORKS: '/how-it-works',
+  ABOUT: '/about',
+  CONTACT: '/contact',
   LOGIN: '/login',
   ADMIN_LOGIN: '/admin/login',
   REGISTER: '/register',
@@ -44,6 +47,9 @@ export const ROUTES = {
 
 export const PUBLIC_ROUTES = [
   ROUTES.HOME,
+  ROUTES.HOW_IT_WORKS,
+  ROUTES.ABOUT,
+  ROUTES.CONTACT,
   ROUTES.LOGIN,
   ROUTES.ADMIN_LOGIN,
   ROUTES.REGISTER,

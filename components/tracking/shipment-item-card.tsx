@@ -16,7 +16,12 @@ export function ShipmentItemCard({ shipment, className }: ShipmentItemCardProps)
   const shortId = `SH-${shipment.id.slice(-6).toUpperCase()}`;
 
   return (
-    <div className={cn('bg-white border border-slate-200/60 rounded-lg p-4 shadow-sm space-y-4', className)}>
+    <div
+      className={cn(
+        'bg-white border border-slate-200/60 rounded-lg p-4 shadow-sm space-y-4',
+        className
+      )}
+    >
       <div>
         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
           Shipment
@@ -40,18 +45,14 @@ export function ShipmentItemCard({ shipment, className }: ShipmentItemCardProps)
             )}
           </div>
           <div>
-            <h4 className="font-bold text-sm text-slate-800 leading-tight">
-              {shipment.itemName}
-            </h4>
+            <h4 className="font-bold text-sm text-slate-800 leading-tight">{shipment.itemName}</h4>
             <p className="text-xs text-slate-500 mt-1">
               {shipment.weight} kg &bull; {shipment.quantity}pcs
             </p>
           </div>
         </div>
 
-        <span className="font-extrabold text-base text-[#0D307A]">
-          ${amount}
-        </span>
+        <span className="font-extrabold text-base text-[#0D307A]">${amount}</span>
       </div>
     </div>
   );

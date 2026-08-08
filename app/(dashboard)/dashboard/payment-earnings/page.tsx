@@ -479,14 +479,15 @@ export default function PaymentEarningsPage() {
               <CardContent className="p-6 flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Dispute Money
+                    Pending Refund
                   </p>
                   <p className="text-2xl font-extrabold text-rose-600">
-                    ${senderData?.stats.disputeMoney.toFixed(2) || '0.00'}
+                    ${(senderData?.stats.pendingRefundAmount ?? 0).toFixed(2)}
                   </p>
+                  <p className="text-[11px] text-slate-400">Awaiting admin payout</p>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5" />
+                  <RotateCcw className="w-5 h-5 animate-pulse" />
                 </div>
               </CardContent>
             </Card>
@@ -505,7 +506,7 @@ export default function PaymentEarningsPage() {
                   <Card key={tx.id} className="border-slate-200 shadow-sm bg-white">
                     <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           <span className="font-bold text-blue-600 text-sm">
                             #{tx.transactionId}
                           </span>
@@ -516,18 +517,26 @@ export default function PaymentEarningsPage() {
                                 ? 'bg-emerald-100 text-emerald-700 font-semibold'
                                 : tx.status === 'PENDING_RELEASE'
                                   ? 'bg-amber-100 text-amber-700 font-semibold'
-                                  : tx.status === 'FAILED'
+                                  : tx.status === 'PENDING_REFUND'
                                     ? 'bg-rose-100 text-rose-700 font-semibold'
-                                    : 'bg-slate-100 text-slate-700'
+                                    : tx.status === 'REFUNDED'
+                                      ? 'bg-purple-100 text-purple-700 font-semibold'
+                                      : tx.status === 'FAILED'
+                                        ? 'bg-rose-100 text-rose-700 font-semibold'
+                                        : 'bg-slate-100 text-slate-700'
                             }
                           >
                             {tx.status === 'ESCROWED' || tx.status === 'RELEASED'
                               ? 'Completed'
                               : tx.status === 'PENDING_RELEASE'
                                 ? 'Pending Release'
-                                : tx.status === 'FAILED'
-                                  ? 'Failed'
-                                  : tx.status}
+                                : tx.status === 'PENDING_REFUND'
+                                  ? 'Refund Pending'
+                                  : tx.status === 'REFUNDED'
+                                    ? 'Refunded'
+                                    : tx.status === 'FAILED'
+                                      ? 'Failed'
+                                      : tx.status}
                           </Badge>
                         </div>
                         <h3 className="font-semibold text-slate-900 text-base">

@@ -94,7 +94,8 @@ export function WizardCard({
               disabled={isPending}
               className="bg-orange-500 hover:bg-orange-600 text-white font-semibold flex items-center gap-1 rounded-md px-6 py-5 h-9"
             >
-              {isPending ? 'Confirming...' : 'Confirm and submit'} <ChevronRight className="h-4 w-4" />
+              {isPending ? 'Confirming...' : 'Confirm and submit'}{' '}
+              <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
             <Button

@@ -86,6 +86,7 @@ components/
     ├── button.tsx              Radix Slot + CVA. Extended sizes: xs, icon-xs, icon-sm, icon-lg.
     ├── card.tsx                Pure card components (Card, CardHeader, etc.).
     ├── checkbox.tsx            Radix checkbox.
+    ├── command.tsx             shadcn command palette built on cmdk.
     ├── dialog.tsx              Radix dialog.
     ├── dropdown-menu.tsx       Radix dropdown menu.
     ├── form.tsx                react-hook-form + Radix label integration. Exports
@@ -94,6 +95,7 @@ components/
     ├── input.tsx               Styled input.
     ├── label.tsx               Radix label.
     ├── pagination.tsx          Pure pagination components.
+    ├── searchable-country-select.tsx Searchable country select using Popover + Command.
     ├── select.tsx              Radix select.
     ├── table.tsx               Styled table components (Table, TableHeader, TableRow, etc.).
     └── tabs.tsx                Radix tabs.
@@ -123,9 +125,10 @@ components/
 
 ## `hooks/` — Custom React Hooks
 
-| File          | Purpose                                                                                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `use-role.ts` | Central access-control hook. Wraps `useSession()` from better-auth. Returns `role`, `isAdmin`, `isUser`, `user`, `isAuthenticated`, `isPending`, `hasPermission(resource:action)`, `checkAccess(allowedRoles[])`. |
+| File                      | Purpose                                                                                                                                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `use-role.ts`             | Central access-control hook. Wraps `useSession()` from better-auth. Returns `role`, `isAdmin`, `isUser`, `user`, `isAuthenticated`, `isPending`, `hasPermission(resource:action)`, `checkAccess(allowedRoles[])`. |
+| `use-shipment-reviews.ts` | React Query hooks (`useShipmentReviews`, `useCreateReview`) for fetching and submitting shipment reviews.                                                                                                         |
 
 ---
 

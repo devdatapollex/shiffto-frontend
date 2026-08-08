@@ -29,7 +29,7 @@ export default function QueryProvider({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       {children}
       {/* DevTools enabled only in development */}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

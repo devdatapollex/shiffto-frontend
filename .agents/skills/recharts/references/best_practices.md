@@ -21,9 +21,9 @@ Always use `useMemo` for data transformations and `useCallback` for event handle
 ```jsx
 // GOOD: Stable data reference
 const processedData = useMemo(() => {
-  return rawData.map(item => ({
+  return rawData.map((item) => ({
     ...item,
-    total: item.revenue + item.expenses
+    total: item.revenue + item.expenses,
   }));
 }, [rawData]);
 
@@ -37,7 +37,7 @@ const dataKeyFn = useCallback((entry) => entry.value * 100, []);
 
 <LineChart data={processedData}>
   <Line dataKey={dataKeyFn} onClick={handleClick} />
-</LineChart>
+</LineChart>;
 ```
 
 **Why this matters**: Recharts compares props by reference. New function references on each render trigger unnecessary recalculations.
@@ -58,7 +58,7 @@ const MemoizedChart = React.memo(({ data }) => (
 // Parent component
 function Dashboard() {
   const [data] = useState(initialData);
-  
+
   return <MemoizedChart data={data} />; // Won't re-render if data is stable
 }
 ```
@@ -70,14 +70,14 @@ Separate static and dynamic chart parts:
 ```jsx
 function OptimizedChart() {
   const [hoveredPoint, setHoveredPoint] = useState(null);
-  
+
   // Debounced hover handler
   const handleMouseMove = useDebouncedCallback((e) => {
     if (e && e.activePayload) {
       setHoveredPoint(e.activePayload[0]);
     }
   }, 50);
-  
+
   return (
     <LineChart data={data} onMouseMove={handleMouseMove}>
       {/* Static - rarely changes */}
@@ -86,14 +86,10 @@ function OptimizedChart() {
       <YAxis />
       <Tooltip />
       <Line type="monotone" dataKey="sales" stroke="#8884d8" />
-      
+
       {/* Dynamic - changes often */}
       {hoveredPoint && (
-        <ReferenceLine 
-          x={hoveredPoint.payload.name} 
-          stroke="#ff7300" 
-          strokeDasharray="3 3"
-        />
+        <ReferenceLine x={hoveredPoint.payload.name} stroke="#ff7300" strokeDasharray="3 3" />
       )}
     </LineChart>
   );
@@ -111,28 +107,29 @@ function OptimizedLargeChart({ rawData }) {
   // Sample data if too large
   const data = useMemo(() => {
     if (rawData.length <= 500) return rawData;
-    
+
     // Use d3.bin for histogram or simple sampling
     const step = Math.ceil(rawData.length / 500);
     return rawData.filter((_, i) => i % step === 0);
   }, [rawData]);
-  
+
   // Or use binning for distributions
   const binnedData = useMemo(() => {
     if (rawData.length <= 500) return rawData;
-    
-    const bin = d3.bin()
-      .value(d => d.x)
+
+    const bin = d3
+      .bin()
+      .value((d) => d.x)
       .thresholds(50);
-    
-    return bin(rawData).map(b => ({
+
+    return bin(rawData).map((b) => ({
       x0: b.x0,
       x1: b.x1,
       count: b.length,
-      y: d3.mean(b, d => d.y)
+      y: d3.mean(b, (d) => d.y),
     }));
   }, [rawData]);
-  
+
   return (
     <ScatterChart>
       <Scatter data={binnedData} />
@@ -146,22 +143,22 @@ function OptimizedLargeChart({ rawData }) {
 ```jsx
 function RealtimeChart() {
   const [data, setData] = useState([]);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setData(prev => [...prev.slice(-50), newPoint]);
+      setData((prev) => [...prev.slice(-50), newPoint]);
     }, 100);
     return () => clearInterval(interval);
   }, []);
-  
+
   return (
     <LineChart data={data}>
-      <Line 
-        type="monotone" 
-        dataKey="value" 
+      <Line
+        type="monotone"
+        dataKey="value"
         stroke="#8884d8"
-        isAnimationActive={false}  // Critical for performance
-        dot={false}                // Disable dots
+        isAnimationActive={false} // Critical for performance
+        dot={false} // Disable dots
       />
     </LineChart>
   );
@@ -172,7 +169,7 @@ function RealtimeChart() {
 
 ```jsx
 // BAD: New component reference every render
-<Tooltip content={<CustomTooltip />} />
+<Tooltip content={<CustomTooltip />} />;
 
 // GOOD: Stable component reference
 const CustomTooltip = useMemo(() => {
@@ -184,7 +181,7 @@ const CustomTooltip = useMemo(() => {
   };
 }, []);
 
-<Tooltip content={CustomTooltip} />
+<Tooltip content={CustomTooltip} />;
 
 // OR use a separate component outside the render function
 const StableTooltip = React.memo(({ active, payload }) => {
@@ -192,7 +189,7 @@ const StableTooltip = React.memo(({ active, payload }) => {
   return <div>{payload[0].value}</div>;
 });
 
-<Tooltip content={<StableTooltip />} />
+<Tooltip content={<StableTooltip />} />;
 ```
 
 ### 7. Virtualize Lists with Charts
@@ -204,17 +201,17 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 function ChartList({ datasets }) {
   const parentRef = useRef();
-  
+
   const virtualizer = useVirtualizer({
     count: datasets.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 300,
   });
-  
+
   return (
     <div ref={parentRef} style={{ height: '600px', overflow: 'auto' }}>
       <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
-        {virtualizer.getVirtualItems().map(virtualItem => (
+        {virtualizer.getVirtualItems().map((virtualItem) => (
           <div
             key={virtualItem.key}
             style={{
@@ -264,9 +261,7 @@ For Recharts < 3.3, wrap the chart in `ResponsiveContainer`:
 
 ```jsx
 <ResponsiveContainer width="100%" height={300}>
-  <LineChart data={data}>
-    {/* ... */}
-  </LineChart>
+  <LineChart data={data}>{/* ... */}</LineChart>
 </ResponsiveContainer>
 ```
 
@@ -301,11 +296,11 @@ import { useMediaQuery } from 'react-responsive';
 
 function AdaptiveChart({ data }) {
   const isMobile = useMediaQuery({ maxWidth: 768 });
-  
+
   return (
     <LineChart data={data} responsive style={{ width: '100%', height: isMobile ? 200 : 400 }}>
-      <XAxis 
-        dataKey="name" 
+      <XAxis
+        dataKey="name"
         interval={isMobile ? 'preserveEnd' : 0}
         angle={isMobile ? -45 : 0}
         height={isMobile ? 50 : 30}
@@ -325,12 +320,14 @@ function AdaptiveChart({ data }) {
 ```jsx
 <LineChart data={data} responsive style={{ width: '100%', aspectRatio: '16/9' }}>
   {/* ... */}
-</LineChart>
+</LineChart>;
 
-{/* Or with ResponsiveContainer (older versions): */}
+{
+  /* Or with ResponsiveContainer (older versions): */
+}
 <ResponsiveContainer width="100%" aspect={16 / 9}>
   <LineChart>{/* ... */}</LineChart>
-</ResponsiveContainer>
+</ResponsiveContainer>;
 ```
 
 ## Accessibility
@@ -340,18 +337,13 @@ function AdaptiveChart({ data }) {
 Enabled by default, but can be explicitly set:
 
 ```jsx
-<LineChart accessibilityLayer={true}>
-  {/* Components */}
-</LineChart>
+<LineChart accessibilityLayer={true}>{/* Components */}</LineChart>
 ```
 
 ### 2. Add ARIA Labels
 
 ```jsx
-<LineChart 
-  role="img" 
-  aria-label="Line chart showing monthly sales from January to June 2024"
->
+<LineChart role="img" aria-label="Line chart showing monthly sales from January to June 2024">
   {/* Components */}
 </LineChart>
 ```
@@ -366,8 +358,7 @@ Always include descriptive text near charts:
     {/* ... */}
   </LineChart>
   <figcaption>
-    Sales increased 25% from January to June 2024, 
-    with the highest sales in June at $9,800.
+    Sales increased 25% from January to June 2024, with the highest sales in June at $9,800.
   </figcaption>
 </figure>
 ```
@@ -388,8 +379,8 @@ Ensure sufficient contrast for all chart elements:
 
 ```jsx
 <LineChart>
-  <Line stroke="#1f77b4" />  // Good contrast on white
-  <Line stroke="#ff7f0e" />  // Good contrast on white
+  <Line stroke="#1f77b4" /> // Good contrast on white
+  <Line stroke="#ff7f0e" /> // Good contrast on white
   {/* Avoid: stroke="#ddd" on white background */}
 </LineChart>
 ```
@@ -400,17 +391,17 @@ Use patterns, labels, or different line styles:
 
 ```jsx
 <LineChart>
-  <Line 
-    type="monotone" 
-    dataKey="sales" 
-    stroke="#8884d8" 
+  <Line
+    type="monotone"
+    dataKey="sales"
+    stroke="#8884d8"
     strokeWidth={2}
     name="Sales (solid line)"
   />
-  <Line 
-    type="monotone" 
-    dataKey="profit" 
-    stroke="#82ca9d" 
+  <Line
+    type="monotone"
+    dataKey="profit"
+    stroke="#82ca9d"
     strokeWidth={2}
     strokeDasharray="5 5"
     name="Profit (dashed line)"
@@ -476,26 +467,20 @@ Transform data before passing to Recharts:
 const Chart = ({ rawData }) => {
   // Calculate derived values
   const processedData = useMemo(() => {
-    return rawData.map(item => ({
+    return rawData.map((item) => ({
       ...item,
       total: item.q1 + item.q2 + item.q3 + item.q4,
       average: (item.q1 + item.q2 + item.q3 + item.q4) / 4,
-      growth: ((item.q4 - item.q1) / item.q1) * 100
+      growth: ((item.q4 - item.q1) / item.q1) * 100,
     }));
   }, [rawData]);
-  
+
   // Filter or sort if needed
   const filteredData = useMemo(() => {
-    return processedData
-      .filter(item => item.total > 0)
-      .sort((a, b) => b.total - a.total);
+    return processedData.filter((item) => item.total > 0).sort((a, b) => b.total - a.total);
   }, [processedData]);
-  
-  return (
-    <LineChart data={filteredData}>
-      {/* ... */}
-    </LineChart>
-  );
+
+  return <LineChart data={filteredData}>{/* ... */}</LineChart>;
 };
 ```
 
@@ -518,15 +503,15 @@ const formattedData = data.map(d => ({
 <XAxis dataKey="formattedDate" />
 
 // Option 2: Format with tickFormatter
-<XAxis 
-  dataKey="date" 
+<XAxis
+  dataKey="date"
   tickFormatter={(date) => format(parseISO(date), 'MMM')}
 />
 
 // Option 3: Use time scale with custom domain
-<XAxis 
-  dataKey="date" 
-  type="number" 
+<XAxis
+  dataKey="date"
+  type="number"
   scale="time"
   domain={['auto', 'auto']}
   tickFormatter={(timestamp) => format(new Date(timestamp), 'MMM d')}
@@ -551,12 +536,12 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 ### 2. Typography
 
 ```jsx
-<XAxis 
+<XAxis
   tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif', fill: '#666' }}
   label={{ value: 'Month', fontSize: 14, fontWeight: 'bold', fill: '#333' }}
 />
 
-<YAxis 
+<YAxis
   tick={{ fontSize: 12, fill: '#666' }}
   tickFormatter={(value) => `$${value.toLocaleString()}`}
 />
@@ -575,39 +560,29 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 ### 4. Grid Styling
 
 ```jsx
-<CartesianGrid 
-  strokeDasharray="3 3" 
-  stroke="#e0e0e0"
-  vertical={true}
-  horizontal={true}
-/>
+<CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={true} horizontal={true} />
 ```
 
 ### 5. Legends
 
 ```jsx
-<Legend 
-  verticalAlign="top" 
-  height={36}
-  iconType="circle"
-  wrapperStyle={{ paddingTop: 20 }}
-/>
+<Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ paddingTop: 20 }} />
 ```
 
 ### 6. Tooltips
 
 ```jsx
-<Tooltip 
-  contentStyle={{ 
-    backgroundColor: '#fff', 
+<Tooltip
+  contentStyle={{
+    backgroundColor: '#fff',
     border: '1px solid #ccc',
     borderRadius: '4px',
     padding: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   }}
   labelStyle={{ fontWeight: 'bold', marginBottom: '8px' }}
   itemStyle={{ fontSize: '14px' }}
-  separator={": "}
+  separator={': '}
 />
 ```
 
@@ -626,8 +601,8 @@ import { RechartsDevtools } from '@recharts/devtools';
 
 <LineChart data={data}>
   {/* ... */}
-  <RechartsDevtools />  // Shows hook inspector
-</LineChart>
+  <RechartsDevtools /> // Shows hook inspector
+</LineChart>;
 ```
 
 ### 2. Testing Chart Components
@@ -641,7 +616,7 @@ describe('ChartComponent', () => {
     { name: 'A', value: 10 },
     { name: 'B', value: 20 },
   ];
-  
+
   it('renders without crashing', () => {
     render(
       <div style={{ width: '400px', height: '300px' }}>
@@ -655,7 +630,7 @@ describe('ChartComponent', () => {
       </div>
     );
   });
-  
+
   it('displays correct data', () => {
     render(<ChartComponent data={mockData} />);
     // Check for aria-label or figcaption content
@@ -740,11 +715,11 @@ const data = useMemo(() => getData(), []);
 
 ```jsx
 // Solution: Rotate labels
-<XAxis 
-  dataKey="name" 
-  angle={-45} 
-  textAnchor="end" 
-  height={80} 
+<XAxis
+  dataKey="name"
+  angle={-45}
+  textAnchor="end"
+  height={80}
 />
 
 // OR reduce tick count
@@ -754,6 +729,7 @@ const data = useMemo(() => getData(), []);
 ### 6. Ignoring Performance Warnings
 
 Always check for:
+
 - Creating new functions in render
 - Not memoizing data transformations
 - Animating large datasets

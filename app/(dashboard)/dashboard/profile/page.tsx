@@ -672,28 +672,30 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold">Document Type</Label>
                     <div className="flex flex-wrap gap-4">
-                      {[DocumentType.PASSPORT, DocumentType.DRIVING_LICENSE, DocumentType.NID].map((type) => (
-                        <label
-                          key={type}
-                          className={`flex items-center gap-2 border rounded-lg px-4 py-3 cursor-pointer text-sm transition-all ${
-                            docType === type
-                              ? 'border-primary bg-primary/5 text-primary font-semibold'
-                              : 'border-slate-200 hover:bg-slate-50'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="documentType"
-                            value={type}
-                            checked={docType === type}
-                            onChange={() => setDocType(type)}
-                            className="text-primary focus:ring-primary h-4 w-4"
-                          />
-                          {type === DocumentType.PASSPORT && 'Passport'}
-                          {type === DocumentType.DRIVING_LICENSE && 'Driving License'}
-                          {type === DocumentType.NID && 'National ID (NID)'}
-                        </label>
-                      ))}
+                      {[DocumentType.PASSPORT, DocumentType.DRIVING_LICENSE, DocumentType.NID].map(
+                        (type) => (
+                          <label
+                            key={type}
+                            className={`flex items-center gap-2 border rounded-lg px-4 py-3 cursor-pointer text-sm transition-all ${
+                              docType === type
+                                ? 'border-primary bg-primary/5 text-primary font-semibold'
+                                : 'border-slate-200 hover:bg-slate-50'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="documentType"
+                              value={type}
+                              checked={docType === type}
+                              onChange={() => setDocType(type)}
+                              className="text-primary focus:ring-primary h-4 w-4"
+                            />
+                            {type === DocumentType.PASSPORT && 'Passport'}
+                            {type === DocumentType.DRIVING_LICENSE && 'Driving License'}
+                            {type === DocumentType.NID && 'National ID (NID)'}
+                          </label>
+                        )
+                      )}
                     </div>
                   </div>
 

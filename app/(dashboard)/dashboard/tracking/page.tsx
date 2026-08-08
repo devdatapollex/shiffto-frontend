@@ -730,15 +730,19 @@ export default function TrackingPage() {
                       </td>
                       <td className="px-5 py-4">
                         <span className="text-slate-600 font-medium text-xs block">
-                          Cabin: {item.remainingCabinCapacity || 0} / {item.cabinBagCapacity || 0} KG
+                          Cabin: {item.remainingCabinCapacity || 0} / {item.cabinBagCapacity || 0}{' '}
+                          KG
                         </span>
                         <span className="text-slate-600 font-medium text-xs block mt-0.5">
-                          Check-in: {item.remainingCheckInCapacity || 0} / {item.checkInBagCapacity || 0} KG
+                          Check-in: {item.remainingCheckInCapacity || 0} /{' '}
+                          {item.checkInBagCapacity || 0} KG
                         </span>
                       </td>
                       <td className="px-5 py-4">
                         <span className="font-semibold text-[#0D307A] text-xs">
-                          {((item.remainingCabinCapacity || 0) + (item.remainingCheckInCapacity || 0))} KG Total Avail
+                          {(item.remainingCabinCapacity || 0) +
+                            (item.remainingCheckInCapacity || 0)}{' '}
+                          KG Total Avail
                         </span>
                       </td>
                     </tr>
