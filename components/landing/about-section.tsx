@@ -1,7 +1,15 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
+import { ROUTES } from '@/config/routes';
 import aboutSectionImage from '@/public/about-section-image.png';
 
-export function AboutSection() {
+interface AboutSectionProps {
+  showContactButton?: boolean;
+  showSubtitle?: boolean;
+}
+
+export function AboutSection({ showContactButton = false, showSubtitle = false }: AboutSectionProps) {
   return (
     <section
       id="about"
@@ -20,6 +28,11 @@ export function AboutSection() {
 
         {/* Right Side: Text Section */}
         <div className="w-full lg:w-1/2 flex flex-col gap-3.5 sm:gap-4 md:gap-5">
+          {showSubtitle && (
+            <span className="text-[12px] font-bold tracking-[2.5px] uppercase text-[#F05336]">
+              Who We Are
+            </span>
+          )}
           <h2 className="font-medium text-2xl sm:text-3xl lg:text-[40px] leading-tight sm:leading-snug lg:leading-[48px] tracking-tight lg:tracking-[-2px] text-foreground">
             About Us
           </h2>
@@ -41,6 +54,17 @@ export function AboutSection() {
             Join us in revolutionizing the way we perceive shipping and travel, and experience the
             joy of connecting with others through your journeys!
           </p>
+
+          {showContactButton && (
+            <div className="pt-2">
+              <Link
+                href={ROUTES.CONTACT}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#F05336] text-white text-sm font-semibold hover:bg-[#d84429] transition-colors"
+              >
+                Get in Touch <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </section>
